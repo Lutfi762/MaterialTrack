@@ -2,63 +2,56 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $current_stock
+ * @property int $min_stock
+ * @property string $name
+ * @property string $code
+ * @property string $unit
+ */
 class Item extends Model
 {
     use HasFactory;
 
- protected $fillable = [
-    'category_id',
-    'location_id',
-    'code',
-    'name',
-    'description',
-    'unit',
-    'min_stock',
-    'current_stock',
-    'image',
-];
-    /**
-     * Accessor: image → full URL ke storage
-     */
-    protected function image(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? asset('/storage/items/' . $value) : null,
-        );
-    }
+    protected $fillable = [
+        'category_id', 'location_id', 'code', 'name', 'description',
+        'unit', 'min_stock', 'current_stock', 'image',
+    ];
 
-    /**
-     * Accessor: format tanggal created_at
-     */
-    protected function createdAt(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => Carbon::parse($value)->format('d-M-Y H:i:s'),
-        );
-    }
-
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function stockIns()
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function stockIns(): HasMany
     {
         return $this->hasMany(StockIn::class);
     }
 
-    public function stockOuts()
+    public function stockOuts(): HasMany
     {
         return $this->hasMany(StockOut::class);
     }
 
-    public function movements()
+    public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
+    }
+
+    public function getStockStatusAttribute(): string
+    {
+        if ($this->current_stock <= 0) return 'habis';
+        if ($this->current_stock <= $this->min_stock) return 'menipis';
+        return 'aman';
     }
 }

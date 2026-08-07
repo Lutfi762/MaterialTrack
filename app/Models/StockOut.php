@@ -12,12 +12,17 @@ class StockOut extends Model
     use HasFactory;
 
     protected $fillable = [
-        'item_id', 'user_id', 'department_id', 'quantity', 'note', 'date'
+        'item_id',
+        'department_id',
+        'pic_id',
+        'user_id',
+        'reference_no',
+        'qty',
+        'purpose',
+        'notes',
+        'date',
     ];
 
-    /**
-     * Accessor: format tanggal created_at
-     */
     protected function createdAt(): Attribute
     {
         return Attribute::make(
@@ -38,5 +43,10 @@ class StockOut extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function pic()
+    {
+        return $this->belongsTo(Pic::class);
     }
 }

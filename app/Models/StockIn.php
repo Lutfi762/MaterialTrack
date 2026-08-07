@@ -12,7 +12,14 @@ class StockIn extends Model
     use HasFactory;
 
     protected $fillable = [
-        'item_id', 'user_id', 'quantity', 'note', 'date'
+        'item_id',
+        'department_id',
+        'user_id',
+        'reference_no',
+        'qty',
+        'source',
+        'notes',
+        'date',
     ];
 
     /**
@@ -33,5 +40,10 @@ class StockIn extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

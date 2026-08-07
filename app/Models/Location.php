@@ -9,12 +9,5 @@ class Location extends Model
 {
     use HasFactory;
 
-    /**
-     * fillable
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'warehouse_zone'
-    ];
+    protected $fillable = ['name', 'code', 'address'];
 }

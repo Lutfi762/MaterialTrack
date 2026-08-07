@@ -1,30 +1,19 @@
 <template>
-  <div class="c-app">
-    <!-- Sidebar -->
-    <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show" id="sidebar">
-      <div class="c-sidebar-brand d-lg-down-none" style="background: #894b9d;">
-        <span class="ml-2 font-weight-bold text-white fs-5">APLIKASI KASIR</span>
-      </div>
+    <div class="app-wrapper">
+        <Sidebar @toggle="onToggle" />
 
-      <!-- Component Sidebar -->
-      <Sidebar />
+        <div class="main-area" :class="{ 'main-collapsed': collapsed }">
+            <Header />
+
+            <div class="main-content">
+                <slot />
+            </div>
+
+            <footer class="main-footer">
+                MaterialTrack &copy; 2026 — Sistem Manajemen Stok & Pengeluaran Material Gudang
+            </footer>
+        </div>
     </div>
-
-    <div class="c-wrapper c-fixed-components">
-      <!-- Component Header -->
-      <Header />
-
-      <!-- Main Body Content -->
-      <div class="c-body">
-        <slot />
-
-        <!-- Footer -->
-        <footer class="c-footer">
-          <div><strong>APLIKASI KASIR</strong> &copy; 2022 - SantriKoding.com.</div>
-        </footer>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -32,9 +21,60 @@ import Header from '../Components/Header.vue';
 import Sidebar from '../Components/Sidebar.vue';
 
 export default {
-  components: {
-    Header,
-    Sidebar
-  }
+    components: { Header, Sidebar },
+    data() {
+        return { collapsed: false };
+    },
+    methods: {
+        onToggle(state) {
+            this.collapsed = state;
+        }
+    }
 }
 </script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    background: #f0f2f5;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+}
+
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-area {
+    margin-left: 260px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+.main-area.main-collapsed {
+    margin-left: 70px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 24px;
+}
+
+.main-footer {
+    padding: 14px 24px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* Reset sisa CoreUI */
+.c-main { padding: 0 !important; }
+.fade-in { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>

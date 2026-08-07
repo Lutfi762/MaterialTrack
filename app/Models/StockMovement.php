@@ -11,14 +11,14 @@ class StockMovement extends Model
 {
     use HasFactory;
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
-        'item_id', 'user_id', 'type', 'quantity',
-        'stock_before', 'stock_after', 'note', 'date'
+        'item_id', 'user_id', 'pic_id', 'type', 'qty',
+        'stock_before', 'balance_after',
+        'ref_type', 'ref_id', 'notes',
     ];
 
-    /**
-     * Accessor: format tanggal created_at
-     */
     protected function createdAt(): Attribute
     {
         return Attribute::make(
@@ -34,5 +34,10 @@ class StockMovement extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function pic()
+    {
+        return $this->belongsTo(Pic::class);
     }
 }

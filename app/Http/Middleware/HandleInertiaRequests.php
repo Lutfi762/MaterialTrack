@@ -40,6 +40,7 @@ class HandleInertiaRequests extends Middleware
                 'status'  => fn () => $request->session()->get('status'),
                 'success' => fn () => $request->session()->get('success'),
                 'error'   => fn () => $request->session()->get('error'),
+                 'newStockOutId' => fn () => $request->session()->get('newStockOutId'),
             ],
 
             // 2. Authenticated User + Role & Department Context
