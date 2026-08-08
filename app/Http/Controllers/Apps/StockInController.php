@@ -51,43 +51,55 @@ class StockInController extends Controller
             'department_id' => 'nullable|exists:departments,id',
             'qty'           => 'required|integer|min:1',
             'source'        => 'nullable|string|max:255',
-            'notes'         => 'nullable|string',
+            'notes'         => 'nullable|string|max:500',
             'date'          => 'required|date',
         ]);
 
+        // Sanitize text fields
+        if (isset($validated['source'])) {
+            $validated['source'] = strip_tags($validated['source']);
+        }
+        if (isset($validated['notes'])) {
+            $validated['notes'] = strip_tags($validated['notes']);
+        }
+
         $user = auth()->user();
 
-        $stockIn = DB::transaction(function () use ($validated, $user) {
-            // Lock item row untuk prevent race condition
-            $item = Item::lockForUpdate()->findOrFail($validated['item_id']);
+        try {
+            $stockIn = DB::transaction(function () use ($validated, $user) {
+                // Lock item row untuk prevent race condition
+                $item = Item::lockForUpdate()->findOrFail($validated['item_id']);
 
-            $stockIn = StockIn::create([
-                'item_id'       => $validated['item_id'],
-                'department_id' => $validated['department_id'] ?? null,
-                'user_id'       => $user->id,
-                'reference_no'  => 'IN-' . now()->format('Ymd') . '-' . str_pad(StockIn::whereDate('created_at', now())->count() + 1, 4, '0', STR_PAD_LEFT),
-                'qty'           => $validated['qty'],
-                'source'        => $validated['source'] ?? null,
-                'notes'         => $validated['notes'] ?? null,
-                'date'          => $validated['date'],
+                $stockIn = StockIn::create([
+                    'item_id'       => $validated['item_id'],
+                    'department_id' => $validated['department_id'] ?? null,
+                    'user_id'       => $user->id,
+                    'reference_no'  => 'IN-' . now()->format('Ymd') . '-' . str_pad(StockIn::whereDate('created_at', now())->count() + 1, 4, '0', STR_PAD_LEFT),
+                    'qty'           => $validated['qty'],
+                    'source'        => $validated['source'] ?? null,
+                    'notes'         => $validated['notes'] ?? null,
+                    'date'          => $validated['date'],
+                ]);
+
+                $stockBefore = $item->current_stock;
+                $stockAfter = $stockBefore + $validated['qty'];
+
+                // Update stock atomically
+                $item->current_stock = $stockAfter;
+                $item->save();
+
+                // Observer akan handle StockMovement creation otomatis
+
+                return $stockIn;
+            });
+
+            return to_route('apps.stock-ins.index')->with([
+                'success'      => 'Material masuk berhasil dicatat.',
+                'newStockInId' => $stockIn->id,
             ]);
-
-            $stockBefore = $item->current_stock;
-            $stockAfter = $stockBefore + $validated['qty'];
-
-            // Update stock atomically
-            $item->current_stock = $stockAfter;
-            $item->save();
-
-            // Observer akan handle StockMovement creation otomatis
-
-            return $stockIn;
-        });
-
-        return to_route('apps.stock-ins.index')->with([
-            'success'      => 'Material masuk berhasil dicatat.',
-            'newStockInId' => $stockIn->id,
-        ]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menyimpan transaksi material masuk: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function edit(StockIn $stockIn)
@@ -105,8 +117,16 @@ class StockInController extends Controller
 
         $validated = $request->validate([
             'source' => 'nullable|string|max:255',
-            'notes'  => 'nullable|string',
+            'notes'  => 'nullable|string|max:500',
         ]);
+
+        // Sanitize text fields
+        if (isset($validated['source'])) {
+            $validated['source'] = strip_tags($validated['source']);
+        }
+        if (isset($validated['notes'])) {
+            $validated['notes'] = strip_tags($validated['notes']);
+        }
 
         $stockIn->update($validated);
 
@@ -117,33 +137,37 @@ class StockInController extends Controller
     {
         $this->authorize('delete', $stockIn);
 
-        DB::transaction(function () use ($stockIn) {
-            $item = $stockIn->item;
+        try {
+            DB::transaction(function () use ($stockIn) {
+                $item = $stockIn->item;
 
-            if ($item->current_stock < $stockIn->qty) {
-                abort(422, 'Tidak bisa membatalkan: stok saat ini sudah lebih kecil dari qty transaksi ini (sudah terpakai).');
-            }
+                if ($item->current_stock < $stockIn->qty) {
+                    throw new \Exception('Tidak bisa membatalkan: stok saat ini sudah lebih kecil dari qty transaksi ini (sudah terpakai).');
+                }
 
-            $stockBefore = $item->current_stock;
+                $stockBefore = $item->current_stock;
 
-            $item->decrement('current_stock', $stockIn->qty);
+                $item->decrement('current_stock', $stockIn->qty);
 
-            StockMovement::create([
-                'item_id'       => $item->id,
-                'user_id'       => auth()->id(),
-                'type'          => 'out',
-                'qty'           => $stockIn->qty,
-                'stock_before'  => $stockBefore,
-                'balance_after' => $item->fresh()->current_stock,
-                'ref_type'      => StockIn::class,
-                'ref_id'        => $stockIn->id,
-                'notes'         => 'Pembatalan transaksi ' . $stockIn->reference_no,
-            ]);
+                StockMovement::create([
+                    'item_id'       => $item->id,
+                    'user_id'       => auth()->id(),
+                    'type'          => 'out',
+                    'qty'           => $stockIn->qty,
+                    'stock_before'  => $stockBefore,
+                    'balance_after' => $item->fresh()->current_stock,
+                    'ref_type'      => StockIn::class,
+                    'ref_id'        => $stockIn->id,
+                    'notes'         => 'Pembatalan transaksi ' . $stockIn->reference_no,
+                ]);
 
-            $stockIn->delete();
-        });
+                $stockIn->delete();
+            });
 
-        return to_route('apps.stock-ins.index')->with('success', 'Transaksi berhasil dibatalkan, stok dikembalikan.');
+            return to_route('apps.stock-ins.index')->with('success', 'Transaksi berhasil dibatalkan, stok dikembalikan.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal membatalkan transaksi: ' . $e->getMessage()]);
+        }
     }
 
     public function downloadPdf(StockIn $stockIn)
@@ -159,6 +183,12 @@ class StockInController extends Controller
 
     public function exportExcel(Request $request)
     {
+        $user = auth()->user();
+
+        if (!$user->hasAnyPermission(['stock-ins.export', 'stock-ins.index'])) {
+            abort(403, 'Anda tidak memiliki izin untuk mengekspor data.');
+        }
+
         $query = StockIn::query()->latest();
 
         if ($request->filled('date_from')) {
@@ -172,6 +202,12 @@ class StockInController extends Controller
     }
     public function downloadAllPdf(Request $request)
     {
+        $user = auth()->user();
+
+        if (!$user->hasAnyPermission(['stock-ins.export', 'stock-ins.index'])) {
+            abort(403, 'Anda tidak memiliki izin untuk mengekspor data.');
+        }
+
         $query = StockIn::with(['item', 'department', 'user'])->latest();
 
         if ($request->filled('item_id')) {

@@ -30,14 +30,14 @@ class DepartmentController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'code'        => 'nullable|string|max:50|unique:departments,code',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:500',
             'status'      => 'nullable|in:active,inactive',
         ]);
 
         Department::create([
             'name'        => $request->name,
             'code'        => $request->code,
-            'description' => $request->description,
+            'description' => strip_tags($request->description),
             'status'      => $request->status ?? 'active',
         ]);
 
@@ -56,14 +56,14 @@ class DepartmentController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'code'        => 'nullable|string|max:50|unique:departments,code,' . $department->id,
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:500',
             'status'      => 'nullable|in:active,inactive',
         ]);
 
         $department->update([
             'name'        => $request->name,
             'code'        => $request->code,
-            'description' => $request->description,
+            'description' => strip_tags($request->description),
             'status'      => $request->status ?? $department->status,
         ]);
 
@@ -72,8 +72,16 @@ class DepartmentController extends Controller
 
     public function destroy(Department $department)
     {
-        $department->delete();
+        try {
+            if ($department->pics()->exists() || $department->users()->exists() || $department->stockOuts()->exists()) {
+                return back()->withErrors(['error' => 'Department tidak bisa dihapus karena masih memiliki data terkait (PIC, User, atau Transaksi).']);
+            }
 
-        return to_route('apps.departments.index')->with('success', 'Department berhasil dihapus.');
+            $department->delete();
+
+            return to_route('apps.departments.index')->with('success', 'Department berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus department.']);
+        }
     }
 }

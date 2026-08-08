@@ -35,7 +35,7 @@ class CategoryController extends Controller
         $request->validate([
             'name'              => 'required|string|max:255',
             'code_prefix'       => 'required|string|max:10|unique:categories,code_prefix|alpha',
-            'description'       => 'nullable|string',
+            'description'       => 'nullable|string|max:500',
             'department_ids'    => 'nullable|array',
             'department_ids.*'  => 'exists:departments,id',
         ]);
@@ -43,7 +43,7 @@ class CategoryController extends Controller
         $category = Category::create([
             'name'        => $request->name,
             'code_prefix' => strtoupper($request->code_prefix),
-            'description' => $request->description,
+            'description' => strip_tags($request->description),
         ]);
 
         $category->departments()->sync($request->department_ids ?? []);
@@ -64,7 +64,7 @@ class CategoryController extends Controller
         $request->validate([
             'name'              => 'required|string|max:255',
             'code_prefix'       => 'required|string|max:10|unique:categories,code_prefix,' . $category->id . '|alpha',
-            'description'       => 'nullable|string',
+            'description'       => 'nullable|string|max:500',
             'department_ids'    => 'nullable|array',
             'department_ids.*'  => 'exists:departments,id',
         ]);
@@ -72,7 +72,7 @@ class CategoryController extends Controller
         $category->update([
             'name'        => $request->name,
             'code_prefix' => strtoupper($request->code_prefix),
-            'description' => $request->description,
+            'description' => strip_tags($request->description),
         ]);
 
         $category->departments()->sync($request->department_ids ?? []);
@@ -82,8 +82,17 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        $category->delete();
+        try {
+            if ($category->items()->exists()) {
+                return back()->withErrors(['error' => 'Kategori tidak bisa dihapus karena masih memiliki material.']);
+            }
 
-        return to_route('apps.categories.index')->with('success', 'Kategori berhasil dihapus.');
+            $category->departments()->detach();
+            $category->delete();
+
+            return to_route('apps.categories.index')->with('success', 'Kategori berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus kategori.']);
+        }
     }
 }

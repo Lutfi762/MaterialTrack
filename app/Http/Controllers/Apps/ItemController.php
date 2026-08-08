@@ -100,12 +100,17 @@ class ItemController extends Controller
             'category_id'   => 'required|exists:categories,id',
             'location_id'   => 'nullable|exists:locations,id',
             'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
+            'description'   => 'nullable|string|max:500',
             'unit'          => 'required|in:' . implode(',', self::UNIT_OPTIONS),
             'min_stock'     => 'required|integer|min:0',
             'current_stock' => 'required|integer|min:0',
-            'image'         => 'nullable|image|max:2048',
+            'image'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:min_width=100,min_height=100',
         ]);
+
+        // Sanitize description
+        if (isset($validated['description'])) {
+            $validated['description'] = strip_tags($validated['description']);
+        }
 
         $category = Category::findOrFail($validated['category_id']);
 
@@ -116,10 +121,22 @@ class ItemController extends Controller
         $validated['code'] = $prefix . '-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('items', 'public');
+            try {
+                $validated['image'] = $request->file('image')->store('items', 'public');
+            } catch (\Exception $e) {
+                return back()->withErrors(['image' => 'Gagal mengunggah gambar. Silakan coba lagi.'])->withInput();
+            }
         }
 
-        Item::create($validated);
+        try {
+            Item::create($validated);
+        } catch (\Exception $e) {
+            // Cleanup uploaded image if database insert fails
+            if (isset($validated['image'])) {
+                Storage::disk('public')->delete($validated['image']);
+            }
+            return back()->withErrors(['error' => 'Gagal menyimpan data material.'])->withInput();
+        }
 
         return to_route('apps.items.index')->with('success', "Material berhasil ditambahkan dengan kode {$validated['code']}.");
     }
@@ -147,11 +164,16 @@ class ItemController extends Controller
             'category_id' => 'required|exists:categories,id',
             'location_id' => 'nullable|exists:locations,id',
             'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:500',
             'unit'        => 'required|in:' . implode(',', self::UNIT_OPTIONS),
             'min_stock'   => 'required|integer|min:0',
-            'image'       => 'nullable|image|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:min_width=100,min_height=100',
         ]);
+
+        // Sanitize description
+        if (isset($validated['description'])) {
+            $validated['description'] = strip_tags($validated['description']);
+        }
 
         if ($validated['category_id'] != $item->category_id) {
             return back()->withErrors([
@@ -160,25 +182,45 @@ class ItemController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            if ($item->getRawOriginal('image')) {
-                Storage::disk('public')->delete($item->getRawOriginal('image'));
+            try {
+                if ($item->getRawOriginal('image')) {
+                    Storage::disk('public')->delete($item->getRawOriginal('image'));
+                }
+                $validated['image'] = $request->file('image')->store('items', 'public');
+            } catch (\Exception $e) {
+                return back()->withErrors(['image' => 'Gagal mengunggah gambar. Silakan coba lagi.'])->withInput();
             }
-            $validated['image'] = $request->file('image')->store('items', 'public');
         }
 
-        $item->update($validated);
+        try {
+            $item->update($validated);
+        } catch (\Exception $e) {
+            // Cleanup new uploaded image if update fails
+            if (isset($validated['image']) && $validated['image'] !== $item->getRawOriginal('image')) {
+                Storage::disk('public')->delete($validated['image']);
+            }
+            return back()->withErrors(['error' => 'Gagal memperbarui data material.'])->withInput();
+        }
 
         return to_route('apps.items.index')->with('success', 'Material berhasil diperbarui.');
     }
 
     public function destroy(Item $item)
     {
-        if ($item->getRawOriginal('image')) {
-            Storage::disk('public')->delete($item->getRawOriginal('image'));
+        try {
+            if ($item->stockIns()->exists() || $item->stockOuts()->exists() || $item->stockMovements()->exists()) {
+                return back()->withErrors(['error' => 'Material tidak bisa dihapus karena sudah memiliki riwayat transaksi.']);
+            }
+
+            if ($item->getRawOriginal('image')) {
+                Storage::disk('public')->delete($item->getRawOriginal('image'));
+            }
+
+            $item->delete();
+
+            return to_route('apps.items.index')->with('success', 'Material berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus material.']);
         }
-
-        $item->delete();
-
-        return to_route('apps.items.index')->with('success', 'Material berhasil dihapus.');
     }
 }

@@ -94,9 +94,15 @@ public function create()
             'pic_id'        => 'required|exists:pics,id',
             'qty'           => 'required|integer|min:1',
             'purpose'       => 'required|string|max:255',
-            'notes'         => 'nullable|string',
+            'notes'         => 'nullable|string|max:500',
             'date'          => 'required|date',
         ]);
+
+        // Sanitize text fields
+        $validated['purpose'] = strip_tags($validated['purpose']);
+        if (isset($validated['notes'])) {
+            $validated['notes'] = strip_tags($validated['notes']);
+        }
 
         if ($user->hasRole('department_user') && $validated['department_id'] != $user->department_id) {
             abort(403, 'Anda hanya bisa membuat transaksi untuk departemen Anda sendiri.');
@@ -168,8 +174,14 @@ public function create()
 
         $validated = $request->validate([
             'purpose' => 'required|string|max:255',
-            'notes'   => 'nullable|string',
+            'notes'   => 'nullable|string|max:500',
         ]);
+
+        // Sanitize text fields
+        $validated['purpose'] = strip_tags($validated['purpose']);
+        if (isset($validated['notes'])) {
+            $validated['notes'] = strip_tags($validated['notes']);
+        }
 
         $stockOut->update($validated);
 
@@ -180,28 +192,32 @@ public function create()
     {
         $this->authorizeStockOutAccess($stockOut);
 
-        DB::transaction(function () use ($stockOut) {
-            $item = $stockOut->item;
-            $stockBefore = $item->current_stock;
+        try {
+            DB::transaction(function () use ($stockOut) {
+                $item = $stockOut->item;
+                $stockBefore = $item->current_stock;
 
-            $item->increment('current_stock', $stockOut->qty);
+                $item->increment('current_stock', $stockOut->qty);
 
-            StockMovement::create([
-                'item_id'       => $item->id,
-                'user_id'       => auth()->id(),
-                'type'          => 'in',
-                'qty'           => $stockOut->qty,
-                'stock_before'  => $stockBefore,
-                'balance_after' => $item->fresh()->current_stock,
-                'ref_type'      => StockOut::class,
-                'ref_id'        => $stockOut->id,
-                'notes'         => 'Pembatalan transaksi ' . $stockOut->reference_no,
-            ]);
+                StockMovement::create([
+                    'item_id'       => $item->id,
+                    'user_id'       => auth()->id(),
+                    'type'          => 'in',
+                    'qty'           => $stockOut->qty,
+                    'stock_before'  => $stockBefore,
+                    'balance_after' => $item->fresh()->current_stock,
+                    'ref_type'      => StockOut::class,
+                    'ref_id'        => $stockOut->id,
+                    'notes'         => 'Pembatalan transaksi ' . $stockOut->reference_no,
+                ]);
 
-            $stockOut->delete();
-        });
+                $stockOut->delete();
+            });
 
-        return to_route('apps.stock-outs.index')->with('success', 'Transaksi berhasil dibatalkan, stok dikembalikan.');
+            return to_route('apps.stock-outs.index')->with('success', 'Transaksi berhasil dibatalkan, stok dikembalikan.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal membatalkan transaksi: ' . $e->getMessage()]);
+        }
     }
 
     public function downloadPdf(StockOut $stockOut)
@@ -218,6 +234,10 @@ public function create()
     public function exportExcel(Request $request)
     {
         $user = auth()->user();
+
+        if (!$user->hasAnyPermission(['stock-outs.export', 'stock-outs.index'])) {
+            abort(403, 'Anda tidak memiliki izin untuk mengekspor data.');
+        }
 
         $query = StockOut::query()->latest();
 
@@ -237,6 +257,10 @@ public function create()
     public function downloadAllPdf(Request $request)
     {
         $user = auth()->user();
+
+        if (!$user->hasAnyPermission(['stock-outs.export', 'stock-outs.index'])) {
+            abort(403, 'Anda tidak memiliki izin untuk mengekspor data.');
+        }
 
         $query = StockOut::with(['item', 'department', 'pic', 'user'])->latest();
 

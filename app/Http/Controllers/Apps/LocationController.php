@@ -56,8 +56,16 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
-        $location->delete();
+        try {
+            if ($location->items()->exists()) {
+                return back()->withErrors(['error' => 'Lokasi tidak bisa dihapus karena masih memiliki material.']);
+            }
 
-        return to_route('apps.locations.index')->with('success', 'Lokasi gudang berhasil dihapus.');
+            $location->delete();
+
+            return to_route('apps.locations.index')->with('success', 'Lokasi gudang berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus lokasi gudang.']);
+        }
     }
 }

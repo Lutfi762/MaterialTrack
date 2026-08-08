@@ -103,9 +103,17 @@ class PicController extends Controller
 
     public function destroy(Pic $pic)
     {
-        $pic->delete();
+        try {
+            if ($pic->stockOuts()->exists()) {
+                return back()->withErrors(['error' => 'PIC tidak bisa dihapus karena masih memiliki riwayat transaksi stock out.']);
+            }
 
-        return to_route('apps.pics.index')->with('success', 'PIC berhasil dihapus.');
+            $pic->delete();
+
+            return to_route('apps.pics.index')->with('success', 'PIC berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus PIC.']);
+        }
     }
 
     private function authorizePicAccess(Pic $pic): void
