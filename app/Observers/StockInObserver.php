@@ -11,18 +11,18 @@ class StockInObserver
     {
         /** @var \App\Models\Item $item */
         $item = $stockIn->item;
-        $stockBefore = $item->stock - $stockIn->qty;
+        $stockBefore = $item->current_stock - $stockIn->qty;
 
         StockMovement::create([
             'item_id'        => $stockIn->item_id,
+            'user_id'        => $stockIn->user_id,
             'type'           => 'in',
             'qty'            => $stockIn->qty,
             'stock_before'   => $stockBefore,
-            'stock_after'    => $item->stock,
-            'reference_type' => 'StockIn',
-            'reference_id'   => $stockIn->id,
+            'balance_after'  => $item->current_stock,
+            'ref_type'       => StockIn::class,
+            'ref_id'         => $stockIn->id,
             'notes'          => $stockIn->notes ?? null,
-            'created_by'     => auth()->id(),
         ]);
     }
 }

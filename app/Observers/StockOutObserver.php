@@ -11,18 +11,18 @@ class StockOutObserver
     {
         /** @var \App\Models\Item $item */
         $item = $stockOut->item;
-        $stockBefore = $item->stock + $stockOut->qty;
+        $stockBefore = $item->current_stock + $stockOut->qty;
 
         StockMovement::create([
             'item_id'        => $stockOut->item_id,
+            'user_id'        => $stockOut->user_id,
             'type'           => 'out',
             'qty'            => $stockOut->qty,
             'stock_before'   => $stockBefore,
-            'stock_after'    => $item->stock,
-            'reference_type' => 'StockOut',
-            'reference_id'   => $stockOut->id,
+            'balance_after'  => $item->current_stock,
+            'ref_type'       => StockOut::class,
+            'ref_id'         => $stockOut->id,
             'notes'          => $stockOut->notes ?? null,
-            'created_by'     => auth()->id(),
         ]);
     }
 }

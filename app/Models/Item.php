@@ -23,6 +23,33 @@ class Item extends Model
         'unit', 'min_stock', 'current_stock', 'image',
     ];
 
+    protected $casts = [
+        'current_stock' => 'integer',
+        'min_stock' => 'integer',
+    ];
+
+    /**
+     * Set the current_stock attribute with validation
+     */
+    public function setCurrentStockAttribute($value): void
+    {
+        if ($value < 0) {
+            throw new \InvalidArgumentException('Stock tidak boleh negatif.');
+        }
+        $this->attributes['current_stock'] = $value;
+    }
+
+    /**
+     * Set the min_stock attribute with validation
+     */
+    public function setMinStockAttribute($value): void
+    {
+        if ($value < 0) {
+            throw new \InvalidArgumentException('Minimum stock tidak boleh negatif.');
+        }
+        $this->attributes['min_stock'] = $value;
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

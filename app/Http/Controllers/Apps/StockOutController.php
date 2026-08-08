@@ -102,15 +102,15 @@ public function create()
             abort(403, 'Anda hanya bisa membuat transaksi untuk departemen Anda sendiri.');
         }
 
-        $item = Item::findOrFail($validated['item_id']);
+        $stockOut = DB::transaction(function () use ($validated, $user) {
+            // Lock item row untuk prevent race condition
+            $item = Item::lockForUpdate()->findOrFail($validated['item_id']);
 
-        if ($validated['qty'] > $item->current_stock) {
-            return back()->withErrors([
-                'qty' => "Stok tidak cukup. Stok tersedia: {$item->current_stock} {$item->unit}.",
-            ])->withInput();
-        }
+            // Check stock availability INSIDE transaction with locked row
+            if ($validated['qty'] > $item->current_stock) {
+                throw new \Exception("Stok tidak cukup. Stok tersedia: {$item->current_stock} {$item->unit}.");
+            }
 
-        $stockOut = DB::transaction(function () use ($validated, $item, $user) {
             $stockOut = StockOut::create([
                 'item_id'       => $validated['item_id'],
                 'department_id' => $validated['department_id'],
@@ -124,21 +124,13 @@ public function create()
             ]);
 
             $stockBefore = $item->current_stock;
+            $stockAfter = $stockBefore - $validated['qty'];
 
-            $item->decrement('current_stock', $validated['qty']);
+            // Update stock atomically
+            $item->current_stock = $stockAfter;
+            $item->save();
 
-            StockMovement::create([
-                'item_id'       => $item->id,
-                'user_id'       => $user->id,
-                'pic_id'        => $validated['pic_id'],
-                'type'          => 'out',
-                'qty'           => $validated['qty'],
-                'stock_before'  => $stockBefore,
-                'balance_after' => $item->fresh()->current_stock,
-                'ref_type'      => StockOut::class,
-                'ref_id'        => $stockOut->id,
-                'notes'         => $validated['purpose'],
-            ]);
+            // Observer akan handle StockMovement creation otomatis
 
             return $stockOut;
         });
@@ -273,10 +265,6 @@ public function create()
 
     private function authorizeStockOutAccess(StockOut $stockOut): void
     {
-        $user = auth()->user();
-
-        if ($user->hasRole('department_user') && $stockOut->department_id != $user->department_id) {
-            abort(403, 'Anda tidak memiliki akses ke transaksi departemen lain.');
-        }
+        $this->authorize('view', $stockOut);
     }
 }

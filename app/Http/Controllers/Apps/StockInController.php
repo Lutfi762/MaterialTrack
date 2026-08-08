@@ -55,10 +55,12 @@ class StockInController extends Controller
             'date'          => 'required|date',
         ]);
 
-        $item = Item::findOrFail($validated['item_id']);
         $user = auth()->user();
 
-        $stockIn = DB::transaction(function () use ($validated, $item, $user) {
+        $stockIn = DB::transaction(function () use ($validated, $user) {
+            // Lock item row untuk prevent race condition
+            $item = Item::lockForUpdate()->findOrFail($validated['item_id']);
+
             $stockIn = StockIn::create([
                 'item_id'       => $validated['item_id'],
                 'department_id' => $validated['department_id'] ?? null,
@@ -71,20 +73,13 @@ class StockInController extends Controller
             ]);
 
             $stockBefore = $item->current_stock;
+            $stockAfter = $stockBefore + $validated['qty'];
 
-            $item->increment('current_stock', $validated['qty']);
+            // Update stock atomically
+            $item->current_stock = $stockAfter;
+            $item->save();
 
-            StockMovement::create([
-                'item_id'       => $item->id,
-                'user_id'       => $user->id,
-                'type'          => 'in',
-                'qty'           => $validated['qty'],
-                'stock_before'  => $stockBefore,
-                'balance_after' => $item->fresh()->current_stock,
-                'ref_type'      => StockIn::class,
-                'ref_id'        => $stockIn->id,
-                'notes'         => $validated['source'] ?? 'Restock',
-            ]);
+            // Observer akan handle StockMovement creation otomatis
 
             return $stockIn;
         });
@@ -97,6 +92,8 @@ class StockInController extends Controller
 
     public function edit(StockIn $stockIn)
     {
+        $this->authorize('update', $stockIn);
+
         return inertia('Apps/StockIns/Edit', [
             'stockIn' => $stockIn->load(['item', 'department']),
         ]);
@@ -104,6 +101,8 @@ class StockInController extends Controller
 
     public function update(Request $request, StockIn $stockIn)
     {
+        $this->authorize('update', $stockIn);
+
         $validated = $request->validate([
             'source' => 'nullable|string|max:255',
             'notes'  => 'nullable|string',
@@ -116,6 +115,8 @@ class StockInController extends Controller
 
     public function destroy(StockIn $stockIn)
     {
+        $this->authorize('delete', $stockIn);
+
         DB::transaction(function () use ($stockIn) {
             $item = $stockIn->item;
 
@@ -147,6 +148,8 @@ class StockInController extends Controller
 
     public function downloadPdf(StockIn $stockIn)
     {
+        $this->authorize('view', $stockIn);
+
         $pdf = Pdf::loadView('pdf.stock-in', [
             'stockIn' => $stockIn->load(['item', 'department', 'user']),
         ]);
