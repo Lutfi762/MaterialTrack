@@ -8,13 +8,13 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span class="font-weight-bold"><i class="fa fa-clipboard-check me-1"></i> STOCK OPNAME</span>
                             <div class="d-flex gap-2">
-                                <a :href="`/apps/stock-opnames/export/excel?period=${currentPeriod}`" class="btn btn-success btn-sm">
+                                <a v-if="hasAnyPermission(['stock_opnames.export', 'stock_opnames.index'])" :href="`/apps/stock-opnames/export/excel?period=${currentPeriod}`" class="btn btn-success btn-sm">
                                     <i class="fa fa-file-excel me-1"></i> Export Excel
                                 </a>
-                                <a :href="`/apps/stock-opnames/download-all/pdf?period=${currentPeriod}`" class="btn btn-outline-danger btn-sm">
+                                <a v-if="hasAnyPermission(['stock_opnames.export', 'stock_opnames.index'])" :href="`/apps/stock-opnames/download-all/pdf?period=${currentPeriod}`" class="btn btn-outline-danger btn-sm">
                                     <i class="fa fa-file-pdf me-1"></i> Download Semua PDF
                                 </a>
-                                <Link :href="`/apps/stock-opnames/create?period=${currentPeriod}`" class="btn btn-primary btn-sm">
+                                <Link v-if="hasAnyPermission(['stock_opnames.create'])" :href="`/apps/stock-opnames/create?period=${currentPeriod}`" class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus-circle me-2"></i> INPUT OPNAME
                                 </Link>
                             </div>

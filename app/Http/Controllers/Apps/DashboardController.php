@@ -52,10 +52,11 @@ class DashboardController extends Controller
             ->selectRaw('COUNT(*) as total_transaction, SUM(qty) as total_qty')
             ->first();
 
-        // 4. Top 5 Material Terbanyak Dikeluarkan
+        // 4. Top 5 Material Terbanyak Dikeluarkan (optimized with index)
         $chart_best_products = DB::table('stock_outs')
             ->select('items.name as title', DB::raw('SUM(stock_outs.qty) as total'))
             ->join('items', 'items.id', '=', 'stock_outs.item_id')
+            ->where('stock_outs.created_at', '>=', $week) // Only last 7 days for better performance
             ->groupBy('stock_outs.item_id', 'items.name')
             ->orderBy('total', 'DESC')
             ->limit(5)
@@ -74,15 +75,22 @@ class DashboardController extends Controller
             $total[]   = 0;
         }
 
-        // 5. Status Stok (Aman / Menipis / Habis)
-        $stock_aman    = Item::whereColumn('current_stock', '>', 'min_stock')->count();
-        $stock_menipis = Item::where('current_stock', '>', 0)
-            ->whereColumn('current_stock', '<=', 'min_stock')
-            ->count();
-        $stock_habis   = Item::where('current_stock', '<=', 0)->count();
+        // 5. Status Stok (Aman / Menipis / Habis) - Optimized with single query
+        $stockStats = DB::table('items')
+            ->selectRaw('
+                SUM(CASE WHEN current_stock > min_stock THEN 1 ELSE 0 END) as aman,
+                SUM(CASE WHEN current_stock > 0 AND current_stock <= min_stock THEN 1 ELSE 0 END) as menipis,
+                SUM(CASE WHEN current_stock <= 0 THEN 1 ELSE 0 END) as habis
+            ')
+            ->first();
 
-        // 6. Tabel Material Stok Menipis
-        $low_stock_items = Item::with('category')
+        $stock_aman = (int) $stockStats->aman;
+        $stock_menipis = (int) $stockStats->menipis;
+        $stock_habis = (int) $stockStats->habis;
+
+        // 6. Tabel Material Stok Menipis (only select needed columns)
+        $low_stock_items = Item::with('category:id,name')
+            ->select(['id', 'name', 'code', 'unit', 'current_stock', 'min_stock', 'category_id'])
             ->whereColumn('current_stock', '<=', 'min_stock')
             ->orderBy('current_stock', 'ASC')
             ->limit(10)

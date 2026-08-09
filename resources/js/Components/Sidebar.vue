@@ -192,7 +192,7 @@ export default {
 .sidebar {
     width: 260px;
     min-height: 100vh;
-    background: linear-gradient(180deg, #1a2942 0%, #0f1f35 100%);
+    background: linear-gradient(180deg, #0f172a 0%, #0b1120 100%);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -301,9 +301,9 @@ export default {
 }
 
 .nav-item.active {
-    background: #3b82f6;
+    background: linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(59,130,246,0.35);
+    box-shadow: 0 4px 14px rgba(124,58,237,0.4);
 }
 
 .nav-icon {

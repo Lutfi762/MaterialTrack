@@ -40,7 +40,7 @@ class StockOpnameController extends Controller
     {
         $period = $request->get('period', now()->format('Y-m'));
 
-        $items = Item::with('category')->orderBy('name')->get(['id', 'name', 'code', 'unit', 'current_stock', 'category_id']);
+        $items = Item::with('category:id,name')->orderBy('name')->get(['id', 'name', 'code', 'unit', 'current_stock', 'category_id']);
 
         $alreadyDone = StockOpname::where('period', $period)->pluck('item_id')->toArray();
 

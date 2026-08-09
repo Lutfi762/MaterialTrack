@@ -46,7 +46,7 @@ public function create()
 {
     $user = auth()->user();
 
-    $itemsQuery = Item::with('category.departments:id');
+    $itemsQuery = Item::with('category:id,name', 'category.departments:id');
 
     // department_user hanya boleh input Stock Out untuk material dari
     // kategori yang di-assign ke departemennya sendiri.
@@ -73,7 +73,7 @@ public function create()
         $pics        = Pic::where('department_id', $user->department_id)->get(['id', 'name', 'department_id']);
     } else {
         $departments = Department::orderBy('name')->get(['id', 'name']);
-        $pics        = Pic::orderBy('name')->get(['id', 'name', 'department_id']);
+        $pics        = Pic::with('department:id,name')->orderBy('name')->get(['id', 'name', 'department_id']);
     }
 
     return inertia('Apps/StockOuts/Create', [

@@ -46,7 +46,7 @@ class StockMovementController extends Controller
         return Inertia::render('Apps/StockMovements/Index', [
             'movements'   => $query->paginate(20)->withQueryString(),
             'departments' => Department::orderBy('name')->get(['id', 'name']),
-            'items'       => Item::with('category.departments:id')->orderBy('name')->get(['id', 'name', 'code', 'category_id'])
+            'items'       => Item::with('category.departments:id,name')->orderBy('name')->get(['id', 'name', 'code', 'category_id'])
                 ->map(fn ($item) => [
                     'id'             => $item->id,
                     'name'           => $item->name,
@@ -54,7 +54,7 @@ class StockMovementController extends Controller
                     'category_id'    => $item->category_id,
                     'department_ids' => $item->category?->departments->pluck('id') ?? [],
                 ]),
-            'categories'  => Category::orderBy('name')->get(['id', 'name']),
+            'categories'  => Category::with('departments:id')->orderBy('name')->get(['id', 'name']),
             'filters'     => $request->only(['item_id', 'type', 'date_from', 'date_to', 'category_id', 'department_id']),
         ]);
     }

@@ -39,7 +39,7 @@ class StockInController extends Controller
     public function create()
     {
         return inertia('Apps/StockIns/Create', [
-            'items'       => Item::orderBy('name')->get(['id', 'name', 'code', 'unit', 'current_stock']),
+            'items'       => Item::with('category:id,name')->orderBy('name')->get(['id', 'name', 'code', 'unit', 'current_stock', 'category_id']),
             'departments' => Department::orderBy('name')->get(['id', 'name']),
         ]);
     }

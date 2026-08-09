@@ -29,13 +29,19 @@ class PermissionsTableSeeder extends Seeder
             'locations.index', 'locations.create', 'locations.edit', 'locations.delete',
             // 6. Master Data - Departments
             'departments.index', 'departments.create', 'departments.edit', 'departments.delete',
-            // 7. Master Data - Items
+            // 7. Master Data - PICs
+            'pics.index', 'pics.create', 'pics.edit', 'pics.delete',
+            // 8. Master Data - Items
             'items.index', 'items.create', 'items.edit', 'items.delete',
-            // 8. Transaksi - Stock In
-            'stock_ins.index', 'stock_ins.create', 'stock_ins.delete',
-            // 9. Transaksi - Stock Out
-            'stock_outs.index', 'stock_outs.create', 'stock_outs.approve', 'stock_outs.delete',
-            // 10. Reports
+            // 9. Transaksi - Stock In
+            'stock_ins.index', 'stock_ins.create', 'stock_ins.edit', 'stock_ins.delete', 'stock_ins.export',
+            // 10. Transaksi - Stock Out
+            'stock_outs.index', 'stock_outs.create', 'stock_outs.edit', 'stock_outs.delete', 'stock_outs.export',
+            // 11. Stock Movements (Read-only audit log)
+            'stock_movements.index', 'stock_movements.export',
+            // 12. Stock Opnames
+            'stock_opnames.index', 'stock_opnames.create', 'stock_opnames.export',
+            // 13. Reports
             'reports.index',
         ];
 

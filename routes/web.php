@@ -50,67 +50,67 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
 
     // Stock In
     Route::resource('/stock-ins', StockInController::class, ['as' => 'apps'])
-        ->middleware('permission:stock-ins.index|stock-ins.create|stock-ins.edit|stock-ins.delete');
+        ->middleware('permission:stock_ins.index|stock_ins.create|stock_ins.edit|stock_ins.delete');
     Route::get('/stock-ins/{stock_in}/pdf', [StockInController::class, 'downloadPdf'])
         ->name('apps.stock-ins.pdf')
-        ->middleware('permission:stock-ins.index');
+        ->middleware('permission:stock_ins.index');
     Route::get('/stock-ins/export/excel', [StockInController::class, 'exportExcel'])
         ->name('apps.stock-ins.export')
-        ->middleware('permission:stock-ins.index')
+        ->middleware('permission:stock_ins.index')
         ->middleware('throttle:10,1');
     Route::get('/stock-ins/download-all/pdf', [StockInController::class, 'downloadAllPdf'])
         ->name('apps.stock-ins.download-all-pdf')
-        ->middleware('permission:stock-ins.index');
+        ->middleware('permission:stock_ins.index');
 
     // Stock Out
     Route::resource('/stock-outs', StockOutController::class, ['as' => 'apps'])
-        ->middleware('permission:stock-outs.index|stock-outs.create|stock-outs.edit|stock-outs.delete');
+        ->middleware('permission:stock_outs.index|stock_outs.create|stock_outs.edit|stock_outs.delete');
     Route::get('/stock-outs/{stock_out}/pdf', [StockOutController::class, 'downloadPdf'])
         ->name('apps.stock-outs.pdf')
-        ->middleware('permission:stock-outs.index');
+        ->middleware('permission:stock_outs.index');
     Route::get('/stock-outs/export/excel', [StockOutController::class, 'exportExcel'])
         ->name('apps.stock-outs.export')
-        ->middleware('permission:stock-outs.index')
+        ->middleware('permission:stock_outs.index')
         ->middleware('throttle:10,1');
     Route::get('/stock-outs/download-all/pdf', [StockOutController::class, 'downloadAllPdf'])
         ->name('apps.stock-outs.download-all-pdf')
-        ->middleware('permission:stock-outs.index');
+        ->middleware('permission:stock_outs.index');
 
     // Stock Movements
     Route::get('/stock-movements', [StockMovementController::class, 'index'])
         ->name('apps.stock-movements.index')
-        ->middleware('permission:stock-movements.index');
+        ->middleware('permission:stock_movements.index');
     Route::get('/stock-movements/download-all/pdf', [StockMovementController::class, 'downloadAllPdf'])
         ->name('apps.stock-movements.download-all-pdf')
-        ->middleware('permission:stock-movements.index');
+        ->middleware('permission:stock_movements.index');
     Route::get('/stock-movements/export/excel', [StockMovementController::class, 'exportExcel'])
         ->name('apps.stock-movements.export')
-        ->middleware('permission:stock-movements.index')
+        ->middleware('permission:stock_movements.index')
         ->middleware('throttle:10,1');
 
     // Stock Opnames
     Route::get('/stock-opnames', [StockOpnameController::class, 'index'])
         ->name('apps.stock-opnames.index')
-        ->middleware('permission:stock-opnames.index');
+        ->middleware('permission:stock_opnames.index');
     Route::get('/stock-opnames/create', [StockOpnameController::class, 'create'])
         ->name('apps.stock-opnames.create')
-        ->middleware('permission:stock-opnames.create');
+        ->middleware('permission:stock_opnames.create');
     Route::post('/stock-opnames', [StockOpnameController::class, 'store'])
         ->name('apps.stock-opnames.store')
-        ->middleware('permission:stock-opnames.create');
+        ->middleware('permission:stock_opnames.create');
     Route::get('/stock-opnames/export/excel', [StockOpnameController::class, 'exportExcel'])
         ->name('apps.stock-opnames.export')
-        ->middleware('permission:stock-opnames.index')
+        ->middleware('permission:stock_opnames.index')
         ->middleware('throttle:10,1');
     Route::get('/stock-opnames/download-all/pdf', [StockOpnameController::class, 'downloadAllPdf'])
         ->name('apps.stock-opnames.download-all-pdf')
-        ->middleware('permission:stock-opnames.index');
+        ->middleware('permission:stock_opnames.index');
     Route::get('/stock-opnames/{stockOpname}', [StockOpnameController::class, 'show'])
         ->name('apps.stock-opnames.show')
-        ->middleware('permission:stock-opnames.index');
+        ->middleware('permission:stock_opnames.index');
     Route::get('/stock-opnames/{stockOpname}/pdf', [StockOpnameController::class, 'downloadPdf'])
         ->name('apps.stock-opnames.pdf')
-        ->middleware('permission:stock-opnames.index');
+        ->middleware('permission:stock_opnames.index');
 
     // Departments
     Route::resource('/departments', DepartmentController::class, ['as' => 'apps'])

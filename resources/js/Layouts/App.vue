@@ -37,9 +37,11 @@ export default {
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-    background: #f0f2f5;
+    background: #f9fafb;
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .app-wrapper {
@@ -66,11 +68,12 @@ body {
 }
 
 .main-footer {
-    padding: 14px 24px;
+    padding: 16px 24px;
     background: white;
     border-top: 1px solid #e5e7eb;
     font-size: 12px;
     color: #9ca3af;
+    text-align: center;
 }
 
 /* Reset sisa CoreUI */

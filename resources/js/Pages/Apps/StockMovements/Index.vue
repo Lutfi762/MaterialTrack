@@ -9,10 +9,10 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <span class="font-weight-bold"><i class="fa fa-clock-rotate-left me-1"></i> RIWAYAT PERGERAKAN STOK MATERIAL</span>
                                 <div class="d-flex gap-2">
-                                    <a :href="exportExcelUrl" class="btn btn-sm btn-outline-success">
+                                    <a v-if="hasAnyPermission(['stock_movements.export', 'stock_movements.index'])" :href="exportExcelUrl" class="btn btn-sm btn-outline-success">
                                         <i class="fa fa-file-excel me-1"></i> Export Excel
                                     </a>
-                                    <a :href="downloadAllUrl" class="btn btn-sm btn-outline-danger">
+                                    <a v-if="hasAnyPermission(['stock_movements.export', 'stock_movements.index'])" :href="downloadAllUrl" class="btn btn-sm btn-outline-danger">
                                         <i class="fa fa-file-pdf me-1"></i> Download Semua PDF
                                     </a>
                                 </div>

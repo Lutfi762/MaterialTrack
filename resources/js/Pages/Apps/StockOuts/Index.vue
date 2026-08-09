@@ -8,10 +8,10 @@
                 <p class="text-muted mb-0 small">Riwayat pengeluaran material dari gudang</p>
             </div>
             <div class="d-flex gap-2">
-                <a v-if="hasAnyPermission(['stock-outs.export', 'stock-outs.index'])" href="/apps/stock-outs/export/excel" class="btn-modern btn-modern-outline">
+                <a v-if="hasAnyPermission(['stock_outs.export', 'stock_outs.index'])" href="/apps/stock-outs/export/excel" class="btn-modern btn-modern-outline">
                     <i class="fa fa-file-excel me-2"></i>Export Excel
                 </a>
-                <a v-if="hasAnyPermission(['stock-outs.export', 'stock-outs.index'])" href="/apps/stock-outs/download-all/pdf" class="btn-modern btn-modern-outline">
+                <a v-if="hasAnyPermission(['stock_outs.export', 'stock_outs.index'])" href="/apps/stock-outs/download-all/pdf" class="btn-modern btn-modern-outline">
                     <i class="fa fa-file-pdf me-2"></i>Download Semua PDF
                 </a>
                 <Link v-if="hasAnyPermission(['stock_outs.create'])" href="/apps/stock-outs/create" class="btn-modern btn-modern-danger">
