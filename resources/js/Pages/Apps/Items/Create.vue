@@ -21,16 +21,16 @@
                                         <small class="text-muted">Pilih department untuk menyaring daftar kategori di bawah.</small>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="fw-bold">Nama Material</label>
-                                        <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.name }" type="text">
+                                        <label class="fw-bold">Nama Material <span class="text-danger">*</span></label>
+                                        <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.name }" type="text" required>
                                         <div v-if="form.errors.name" class="invalid-feedback d-block">{{ form.errors.name }}</div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="fw-bold">Kategori</label>
-                                        <select class="form-select" v-model="form.category_id" :class="{ 'is-invalid': form.errors.category_id }">
+                                        <label class="fw-bold">Kategori <span class="text-danger">*</span></label>
+                                        <select class="form-select" v-model="form.category_id" :class="{ 'is-invalid': form.errors.category_id }" required>
                                             <option :value="null" disabled>- Pilih Kategori -</option>
                                             <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">{{ cat.name }} ({{ cat.code_prefix }})</option>
                                         </select>
@@ -50,24 +50,24 @@
                                         </select>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="fw-bold">Satuan</label>
-                                        <select class="form-select" v-model="form.unit" :class="{ 'is-invalid': form.errors.unit }">
+                                        <label class="fw-bold">Satuan <span class="text-danger">*</span></label>
+                                        <select class="form-select" v-model="form.unit" :class="{ 'is-invalid': form.errors.unit }" required>
                                             <option value="" disabled>- Pilih Satuan -</option>
                                             <option v-for="u in unitOptions" :key="u" :value="u">{{ u }}</option>
                                         </select>
                                         <div v-if="form.errors.unit" class="invalid-feedback d-block">{{ form.errors.unit }}</div>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="fw-bold">Stok Awal</label>
-                                        <input class="form-control" v-model.number="form.current_stock" :class="{ 'is-invalid': form.errors.current_stock }" type="number" min="0">
+                                        <label class="fw-bold">Stok Awal <span class="text-danger">*</span></label>
+                                        <input class="form-control" v-model.number="form.current_stock" :class="{ 'is-invalid': form.errors.current_stock }" type="number" min="0" required>
                                         <div v-if="form.errors.current_stock" class="invalid-feedback d-block">{{ form.errors.current_stock }}</div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="fw-bold">Stok Minimum</label>
-                                        <input class="form-control" v-model.number="form.min_stock" :class="{ 'is-invalid': form.errors.min_stock }" type="number" min="0">
+                                        <label class="fw-bold">Stok Minimum <span class="text-danger">*</span></label>
+                                        <input class="form-control" v-model.number="form.min_stock" :class="{ 'is-invalid': form.errors.min_stock }" type="number" min="0" required>
                                         <div v-if="form.errors.min_stock" class="invalid-feedback d-block">{{ form.errors.min_stock }}</div>
                                     </div>
                                 </div>
@@ -138,6 +138,14 @@ export default {
         const submit = () => {
             form.post('/apps/items', {
                 onSuccess: () => Swal.fire({ title: 'Berhasil!', text: 'Material ditambahkan.', icon: 'success', showConfirmButton: false, timer: 2000 }),
+                onError: () => {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan saat menyimpan. Periksa kembali form Anda.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
         };
 

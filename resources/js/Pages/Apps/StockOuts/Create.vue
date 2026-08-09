@@ -20,13 +20,14 @@
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="fw-bold">Department</label>
+                                            <label class="fw-bold">Department <span class="text-danger">*</span></label>
                                             <select
                                                 class="form-select"
                                                 v-model="form.department_id"
                                                 :class="{ 'is-invalid': form.errors.department_id }"
                                                 :disabled="isDepartmentLocked"
                                                 @change="onDepartmentChange"
+                                                required
                                             >
                                                 <option v-for="dept in departments" :key="dept.id" :value="dept.id">
                                                     {{ dept.name }}
@@ -56,12 +57,13 @@
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="fw-bold">Material</label>
+                                            <label class="fw-bold">Material <span class="text-danger">*</span></label>
                                             <select
                                                 class="form-select"
                                                 v-model="form.item_id"
                                                 :class="{ 'is-invalid': form.errors.item_id }"
                                                 @change="onItemChange"
+                                                required
                                             >
                                                 <option :value="null" disabled>- Pilih Material -</option>
                                                 <option v-for="item in filteredItems" :key="item.id" :value="item.id">
@@ -75,7 +77,7 @@
                                         </div>
 
                                         <div class="col-md-6 mb-3">
-                                            <label class="fw-bold">Quantity</label>
+                                            <label class="fw-bold">Quantity <span class="text-danger">*</span></label>
                                             <div class="input-group">
                                                 <input
                                                     class="form-control"
@@ -84,6 +86,7 @@
                                                     type="number"
                                                     min="1"
                                                     :max="selectedItem?.current_stock ?? null"
+                                                    required
                                                 >
                                                 <span class="input-group-text">{{ selectedItem?.unit ?? 'unit' }}</span>
                                             </div>
@@ -98,11 +101,12 @@
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="fw-bold">PIC Pengambil Barang</label>
+                                            <label class="fw-bold">PIC Pengambil Barang <span class="text-danger">*</span></label>
                                             <select
                                                 class="form-select"
                                                 v-model="form.pic_id"
                                                 :class="{ 'is-invalid': form.errors.pic_id }"
+                                                required
                                             >
                                                 <option :value="null" disabled>- Pilih PIC -</option>
                                                 <option v-for="pic in filteredPics" :key="pic.id" :value="pic.id">
@@ -117,13 +121,14 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="fw-bold">Keperluan Penggunaan</label>
+                                        <label class="fw-bold">Keperluan Penggunaan <span class="text-danger">*</span></label>
                                         <input
                                             class="form-control"
                                             v-model="form.purpose"
                                             :class="{ 'is-invalid': form.errors.purpose }"
                                             type="text"
                                             placeholder="Contoh: Maintenance Mesin A"
+                                            required
                                         >
                                         <div v-if="form.errors.purpose" class="invalid-feedback d-block">{{ form.errors.purpose }}</div>
                                     </div>
@@ -138,12 +143,13 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="fw-bold">Tanggal Pengambilan</label>
+                                        <label class="fw-bold">Tanggal Pengambilan <span class="text-danger">*</span></label>
                                         <input
                                             class="form-control"
                                             v-model="form.date"
                                             :class="{ 'is-invalid': form.errors.date }"
                                             type="date"
+                                            required
                                         >
                                         <div v-if="form.errors.date" class="invalid-feedback d-block">{{ form.errors.date }}</div>
                                     </div>
@@ -276,6 +282,14 @@ export default {
                         window.open(`/apps/stock-outs/${newId}/pdf`, '_blank');
                     }
                 },
+                onError: () => {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan saat menyimpan. Periksa kembali form Anda.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
         };
 

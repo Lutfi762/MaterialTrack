@@ -67,6 +67,7 @@
 import LayoutApp from '../../../Layouts/App.vue';
 import Pagination from '../../../Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { confirmDelete } from '@/Utils/confirmDialog';
 
 export default {
@@ -74,6 +75,8 @@ export default {
     components: { Head, Link, Pagination },
     props: { pics: Object },
     setup() {
+        const isLoading = ref(false);
+
         const initials = (name) => {
             if (!name) return '?';
             const parts = name.trim().split(' ');
@@ -84,11 +87,17 @@ export default {
 
         const handleDelete = async (id) => {
             if (await confirmDelete('PIC ini akan dihapus permanen.')) {
-                router.delete(`/apps/pics/${id}`);
+                isLoading.value = true;
+                router.delete(`/apps/pics/${id}`, {
+                    onFinish: () => { isLoading.value = false; },
+                    onError: () => {
+                        isLoading.value = false;
+                    }
+                });
             }
         };
 
-        return { initials, handleDelete };
+        return { initials, handleDelete, isLoading };
     },
 };
 </script>

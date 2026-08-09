@@ -12,13 +12,13 @@
                         <div class="card-body">
                             <form @submit.prevent="submit">
                                 <div class="mb-3">
-                                    <label class="fw-bold">Nama Kategori</label>
-                                    <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.name }" type="text" placeholder="Contoh: Layer, Carton Box, Pallet">
+                                    <label class="fw-bold">Nama Kategori <span class="text-danger">*</span></label>
+                                    <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.name }" type="text" placeholder="Contoh: Layer, Carton Box, Pallet" required>
                                     <div v-if="form.errors.name" class="invalid-feedback d-block">{{ form.errors.name }}</div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="fw-bold">Kode Prefix</label>
+                                    <label class="fw-bold">Kode Prefix <span class="text-danger">*</span></label>
                                     <input
                                         class="form-control"
                                         v-model="form.code_prefix"
@@ -27,6 +27,7 @@
                                         type="text"
                                         maxlength="10"
                                         placeholder="Contoh: LY, CB, PT"
+                                        required
                                     >
                                     <small class="text-muted">Huruf saja, akan dipakai sebagai awalan kode material otomatis. Contoh: LY-0001</small>
                                     <div v-if="form.errors.code_prefix" class="invalid-feedback d-block">{{ form.errors.code_prefix }}</div>
@@ -90,6 +91,14 @@ export default {
         const submit = () => {
             form.post('/apps/categories', {
                 onSuccess: () => Swal.fire({ title: 'Berhasil!', text: 'Kategori ditambahkan.', icon: 'success', showConfirmButton: false, timer: 2000 }),
+                onError: () => {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan saat menyimpan. Periksa kembali form Anda.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
         };
 

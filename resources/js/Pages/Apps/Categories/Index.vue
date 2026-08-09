@@ -18,8 +18,9 @@
                             </span>
 
 
-                            <Link 
-                                href="/apps/categories/create" 
+                            <Link
+                                v-if="hasAnyPermission(['categories.create'])"
+                                href="/apps/categories/create"
                                 class="btn btn-primary btn-sm"
                             >
                                 <i class="fa fa-plus-circle me-2"></i>
@@ -36,10 +37,10 @@
 
                                 <thead>
                                     <tr>
-                                        <th>Nama</th>
-                                        <th>Deskripsi</th>
-                                        <th>Jumlah Item</th>
-                                        <th width="15%" class="text-center">
+                                        <th scope="col">Nama</th>
+                                        <th scope="col">Deskripsi</th>
+                                        <th scope="col">Jumlah Item</th>
+                                        <th scope="col" width="15%" class="text-center">
                                             Actions
                                         </th>
                                     </tr>
@@ -58,8 +59,8 @@
                                     </tr>
 
 
-                                    <tr 
-                                        v-for="cat in categories.data" 
+                                    <tr
+                                        v-for="cat in categories.data"
                                         :key="cat.id"
                                     >
 
@@ -82,20 +83,24 @@
 
 
                                             <Link
+                                                v-if="hasAnyPermission(['categories.edit'])"
                                                 :href="`/apps/categories/${cat.id}/edit`"
                                                 class="btn btn-success btn-sm me-2"
+                                                aria-label="Edit Kategori"
                                             >
-                                                <i class="fa fa-pencil-alt"></i>
+                                                <i class="fa fa-pencil-alt" aria-hidden="true"></i>
                                             </Link>
 
 
 
                                             <button
+                                                v-if="hasAnyPermission(['categories.delete'])"
                                                 class="btn btn-danger btn-sm"
+                                                aria-label="Hapus Kategori"
                                                 @click="handleDelete(cat.id)"
                                             >
 
-                                                <i class="fa fa-trash"></i>
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
 
                                             </button>
 
@@ -143,6 +148,8 @@ import {
     router
 } from '@inertiajs/vue3';
 
+import { ref } from 'vue';
+import { confirmDelete } from '@/Utils/confirmDialog';
 
 
 export default {
@@ -165,15 +172,22 @@ export default {
 
     setup(){
 
+        const isLoading = ref(false);
 
-        const handleDelete=(id)=>{
-
-
-            if(confirm('Yakin ingin menghapus kategori ini?')){
+        const handleDelete = async (id) => {
 
 
+            if (await confirmDelete('Yakin ingin menghapus kategori ini?')) {
+
+                isLoading.value = true;
                 router.delete(
-                    `/apps/categories/${id}`
+                    `/apps/categories/${id}`,
+                    {
+                        onFinish: () => { isLoading.value = false; },
+                        onError: () => {
+                            isLoading.value = false;
+                        }
+                    }
                 );
 
 
@@ -184,7 +198,8 @@ export default {
 
 
         return {
-            handleDelete
+            handleDelete,
+            isLoading
         };
 
 

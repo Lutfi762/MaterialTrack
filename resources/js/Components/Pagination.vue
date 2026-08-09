@@ -13,8 +13,11 @@
                 <Link
                     class="page-link"
                     :href="link.url === null ? '#' : link.url"
-                    v-html="link.label"
-                />
+                >
+                    <span v-if="link.label === '&laquo; Previous'">&laquo; Previous</span>
+                    <span v-else-if="link.label === 'Next &raquo;'">Next &raquo;</span>
+                    <span v-else>{{ link.label }}</span>
+                </Link>
             </li>
         </ul>
     </nav>

@@ -8,12 +8,12 @@
                 <p class="text-muted mb-0 small">Riwayat penerimaan/restock material ke gudang</p>
             </div>
             <div class="d-flex gap-2">
-                <a href="/apps/stock-ins/export/excel" class="btn-modern btn-modern-outline">
+                <a v-if="hasAnyPermission(['stock-ins.export', 'stock-ins.index'])" href="/apps/stock-ins/export/excel" class="btn-modern btn-modern-outline">
                     <i class="fa fa-file-excel me-2"></i>Export Excel
                 </a>
-                <a href="/apps/stock-ins/download-all/pdf" class="btn-modern btn-modern-outline">
-    <i class="fa fa-file-pdf me-2"></i>Download Semua PDF
-</a>
+                <a v-if="hasAnyPermission(['stock-ins.export', 'stock-ins.index'])" href="/apps/stock-ins/download-all/pdf" class="btn-modern btn-modern-outline">
+                    <i class="fa fa-file-pdf me-2"></i>Download Semua PDF
+                </a>
                 <Link v-if="hasAnyPermission(['stock_ins.create'])" href="/apps/stock-ins/create" class="btn-modern btn-modern-success">
                     <i class="fa fa-plus me-2"></i>Input Baru
                 </Link>
@@ -22,8 +22,8 @@
 
         <div v-if="stockIns.data.length > 0" class="transaction-list">
             <div v-for="row in stockIns.data" :key="row.id" class="transaction-card">
-                <div class="transaction-icon">
-                    <i class="fa fa-arrow-down-left"></i>
+                <div class="transaction-icon" role="img" aria-label="Material Masuk">
+                    <i class="fa fa-arrow-down-left" aria-hidden="true"></i>
                 </div>
                 <div class="transaction-main">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
@@ -31,25 +31,25 @@
                             <div class="transaction-ref">{{ row.reference_no }}</div>
                             <div class="transaction-item-name">{{ row.item?.name }}</div>
                         </div>
-                        <div class="transaction-qty">
+                        <div class="transaction-qty" aria-label="Quantity">
                             <span>{{ row.qty }}</span> {{ row.item?.unit }}
                         </div>
                     </div>
                     <div class="transaction-meta">
-                        <span class="meta-badge" v-if="row.department"><i class="fa fa-building me-1"></i>{{ row.department.name }}</span>
-                        <span class="meta-badge"><i class="fa fa-truck me-1"></i>{{ row.source ?? '-' }}</span>
-                        <span class="meta-badge"><i class="fa fa-calendar me-1"></i>{{ row.date }}</span>
+                        <span class="meta-badge" v-if="row.department"><i class="fa fa-building me-1" aria-hidden="true"></i>{{ row.department.name }}</span>
+                        <span class="meta-badge"><i class="fa fa-truck me-1" aria-hidden="true"></i>{{ row.source ?? '-' }}</span>
+                        <span class="meta-badge"><i class="fa fa-calendar me-1" aria-hidden="true"></i>{{ row.date }}</span>
                     </div>
                 </div>
                 <div class="transaction-actions">
-                    <a :href="`/apps/stock-ins/${row.id}/pdf`" target="_blank" class="act-btn act-btn-neutral" title="Download PDF">
-                        <i class="fa fa-file-pdf"></i>
+                    <a :href="`/apps/stock-ins/${row.id}/pdf`" target="_blank" class="act-btn act-btn-neutral" title="Download PDF" aria-label="Download PDF">
+                        <i class="fa fa-file-pdf" aria-hidden="true"></i>
                     </a>
-                    <Link v-if="hasAnyPermission(['stock_ins.edit'])" :href="`/apps/stock-ins/${row.id}/edit`" class="act-btn act-btn-success" title="Edit">
-                        <i class="fa fa-pencil-alt"></i>
+                    <Link v-if="hasAnyPermission(['stock_ins.edit'])" :href="`/apps/stock-ins/${row.id}/edit`" class="act-btn act-btn-success" title="Edit" aria-label="Edit Transaksi">
+                        <i class="fa fa-pencil-alt" aria-hidden="true"></i>
                     </Link>
-                    <button v-if="hasAnyPermission(['stock_ins.delete'])" class="act-btn act-btn-danger" title="Batalkan" @click="handleDelete(row.id)">
-                        <i class="fa fa-undo"></i>
+                    <button v-if="hasAnyPermission(['stock_ins.delete'])" class="act-btn act-btn-danger" title="Batalkan" aria-label="Batalkan Transaksi" @click="handleDelete(row.id)">
+                        <i class="fa fa-undo" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -76,12 +76,20 @@ export default {
     components: { Head, Link, Pagination },
     props: { stockIns: Object, items: Array, filters: Object },
     setup() {
+        const isLoading = ref(false);
+
         const handleDelete = async (id) => {
             if (await confirmDelete('Transaksi ini akan dibatalkan dan stok dikurangi kembali.')) {
-                router.delete(`/apps/stock-ins/${id}`);
+                isLoading.value = true;
+                router.delete(`/apps/stock-ins/${id}`, {
+                    onFinish: () => { isLoading.value = false; },
+                    onError: () => {
+                        isLoading.value = false;
+                    }
+                });
             }
         };
-        return { handleDelete };
+        return { handleDelete, isLoading };
     },
 };
 </script>

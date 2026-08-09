@@ -14,8 +14,8 @@
                                 <form @submit.prevent="submit">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="fw-bold">Material</label>
-                                            <select class="form-select" v-model="form.item_id" :class="{ 'is-invalid': form.errors.item_id }">
+                                            <label class="fw-bold" for="item-select">Material <span class="text-danger">*</span></label>
+                                            <select id="item-select" class="form-select" v-model="form.item_id" :class="{ 'is-invalid': form.errors.item_id }" required>
                                                 <option :value="null" disabled>- Pilih Material -</option>
                                                 <option v-for="item in items" :key="item.id" :value="item.id">
                                                     {{ item.name }} ({{ item.code }}) — Stok saat ini: {{ item.current_stock }} {{ item.unit }}
@@ -24,8 +24,8 @@
                                             <div v-if="form.errors.item_id" class="invalid-feedback d-block">{{ form.errors.item_id }}</div>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="fw-bold">Quantity Masuk</label>
-                                            <input class="form-control" v-model.number="form.qty" :class="{ 'is-invalid': form.errors.qty }" type="number" min="1">
+                                            <label class="fw-bold" for="qty-input">Quantity Masuk <span class="text-danger">*</span></label>
+                                            <input id="qty-input" class="form-control" v-model.number="form.qty" :class="{ 'is-invalid': form.errors.qty }" type="number" min="1" required>
                                             <div v-if="form.errors.qty" class="invalid-feedback d-block">{{ form.errors.qty }}</div>
                                         </div>
                                     </div>
@@ -50,8 +50,8 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="fw-bold">Tanggal</label>
-                                        <input class="form-control" v-model="form.date" :class="{ 'is-invalid': form.errors.date }" type="date">
+                                        <label class="fw-bold">Tanggal <span class="text-danger">*</span></label>
+                                        <input class="form-control" v-model="form.date" :class="{ 'is-invalid': form.errors.date }" type="date" required>
                                         <div v-if="form.errors.date" class="invalid-feedback d-block">{{ form.errors.date }}</div>
                                     </div>
 
@@ -91,6 +91,14 @@ export default {
         const submit = () => {
             form.post('/apps/stock-ins', {
                 onSuccess: () => Swal.fire({ title: 'Berhasil!', text: 'Material masuk dicatat.', icon: 'success', showConfirmButton: false, timer: 2000 }),
+                onError: () => {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan saat menyimpan. Periksa kembali form Anda.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
         };
 

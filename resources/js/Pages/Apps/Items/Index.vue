@@ -7,32 +7,35 @@
                     <div class="card border-0 rounded-3 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span class="font-weight-bold"><i class="fa fa-box-seam me-1"></i> DATA ITEMS/MATERIAL</span>
-<Link href="/apps/items/create" class="btn btn-primary btn-sm">                                <i class="fa fa-plus-circle me-2"></i> NEW
+                            <Link v-if="hasAnyPermission(['items.create'])" href="/apps/items/create" class="btn btn-primary btn-sm">                                <i class="fa fa-plus-circle me-2"></i> NEW
                             </Link>
                         </div>
                         <div class="card-body">
                             <div class="d-flex gap-2 mb-3">
-                                <select class="form-select" style="max-width: 220px;" v-model="filterDepartment" @change="onDepartmentChange">
+                                <select class="form-select" style="max-width: 220px;" v-model="filterDepartment" @change="onDepartmentChange" :disabled="isLoading">
                                     <option value="">Semua Department</option>
                                     <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
                                 </select>
-                                <select class="form-select" style="max-width: 220px;" v-model="filterCategory" @change="applyFilter">
+                                <select class="form-select" style="max-width: 220px;" v-model="filterCategory" @change="applyFilter" :disabled="isLoading">
                                     <option value="">Semua Kategori</option>
                                     <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                                 </select>
+                                <span v-if="isLoading" class="spinner-border spinner-border-sm text-primary ms-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
                             </div>
 
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Kode</th>
-                                        <th>Nama</th>
-                                        <th>Kategori</th>
-                                        <th>Lokasi</th>
-                                        <th>Stok</th>
-                                        <th>Min. Stok</th>
-                                        <th>Status</th>
-                                        <th class="text-center" style="width:15%">Actions</th>
+                                        <th scope="col">Kode</th>
+                                        <th scope="col">Nama</th>
+                                        <th scope="col">Kategori</th>
+                                        <th scope="col">Lokasi</th>
+                                        <th scope="col">Stok</th>
+                                        <th scope="col">Min. Stok</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col" class="text-center" style="width:15%">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -52,11 +55,11 @@
                                             <span v-else class="badge bg-success">Aman</span>
                                         </td>
                                         <td class="text-center">
-                                            <Link v-if="hasAnyPermission(['items.edit'])" :href="`/apps/items/${item.id}/edit`" class="btn btn-success btn-sm me-2">
-                                                <i class="fa fa-pencil-alt"></i>
+                                            <Link v-if="hasAnyPermission(['items.edit'])" :href="`/apps/items/${item.id}/edit`" class="btn btn-success btn-sm me-2" aria-label="Edit Material">
+                                                <i class="fa fa-pencil-alt" aria-hidden="true"></i>
                                             </Link>
-                                            <button v-if="hasAnyPermission(['items.delete'])" class="btn btn-danger btn-sm" @click="handleDelete(item.id)">
-                                                <i class="fa fa-trash"></i>
+                                            <button v-if="hasAnyPermission(['items.delete'])" class="btn btn-danger btn-sm" aria-label="Hapus Material" @click="handleDelete(item.id)">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -85,6 +88,7 @@ export default {
     setup(props) {
         const filterDepartment = ref(props.filters?.department_id ?? '');
         const filterCategory = ref(props.filters?.category_id ?? '');
+        const isLoading = ref(false);
 
         const onDepartmentChange = () => {
             // Reset kategori setiap kali department berubah, karena daftar
@@ -94,19 +98,29 @@ export default {
         };
 
         const applyFilter = () => {
+            isLoading.value = true;
             router.get('/apps/items', {
                 department_id: filterDepartment.value || undefined,
                 category_id: filterCategory.value || undefined,
-            }, { preserveState: true });
+            }, {
+                preserveState: true,
+                onFinish: () => { isLoading.value = false; }
+            });
         };
 
         const handleDelete = async (id) => {
             if (await confirmDelete('Material ini akan dihapus permanen.')) {
-                router.delete(`/apps/items/${id}`);
+                isLoading.value = true;
+                router.delete(`/apps/items/${id}`, {
+                    onFinish: () => { isLoading.value = false; },
+                    onError: () => {
+                        isLoading.value = false;
+                    }
+                });
             }
         };
 
-        return { filterDepartment, filterCategory, onDepartmentChange, applyFilter, handleDelete };
+        return { filterDepartment, filterCategory, onDepartmentChange, applyFilter, handleDelete, isLoading };
     },
 };
 </script>

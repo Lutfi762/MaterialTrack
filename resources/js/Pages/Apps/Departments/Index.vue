@@ -60,6 +60,7 @@
 import LayoutApp from '@/Layouts/App.vue';
 import Pagination from '@/Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { confirmDelete } from '@/Utils/confirmDialog';
 
 export default {
@@ -67,12 +68,20 @@ export default {
     components: { Head, Link, Pagination },
     props: { departments: Object },
     setup() {
+        const isLoading = ref(false);
+
         const handleDelete = async (id) => {
             if (await confirmDelete('Department ini akan dihapus permanen.')) {
-                router.delete(`/apps/departments/${id}`);
+                isLoading.value = true;
+                router.delete(`/apps/departments/${id}`, {
+                    onFinish: () => { isLoading.value = false; },
+                    onError: () => {
+                        isLoading.value = false;
+                    }
+                });
             }
         };
-        return { handleDelete };
+        return { handleDelete, isLoading };
     },
 };
 </script>

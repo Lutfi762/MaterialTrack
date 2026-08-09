@@ -53,6 +53,7 @@
 import LayoutApp from '../../../Layouts/App.vue';
 import Pagination from '../../../Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { confirmDelete } from '@/Utils/confirmDialog';
 
 export default {
@@ -60,12 +61,20 @@ export default {
     components: { Head, Link, Pagination },
     props: { locations: Object },
     setup() {
+        const isLoading = ref(false);
+
         const handleDelete = async (id) => {
             if (await confirmDelete('Lokasi gudang ini akan dihapus permanen.')) {
-                router.delete(`/apps/locations/${id}`);
+                isLoading.value = true;
+                router.delete(`/apps/locations/${id}`, {
+                    onFinish: () => { isLoading.value = false; },
+                    onError: () => {
+                        isLoading.value = false;
+                    }
+                });
             }
         };
-        return { handleDelete };
+        return { handleDelete, isLoading };
     },
 };
 </script>

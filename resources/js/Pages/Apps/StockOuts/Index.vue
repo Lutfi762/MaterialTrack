@@ -8,12 +8,12 @@
                 <p class="text-muted mb-0 small">Riwayat pengeluaran material dari gudang</p>
             </div>
             <div class="d-flex gap-2">
-                <a href="/apps/stock-outs/export/excel" class="btn-modern btn-modern-outline">
+                <a v-if="hasAnyPermission(['stock-outs.export', 'stock-outs.index'])" href="/apps/stock-outs/export/excel" class="btn-modern btn-modern-outline">
                     <i class="fa fa-file-excel me-2"></i>Export Excel
                 </a>
-                <a href="/apps/stock-outs/download-all/pdf" class="btn-modern btn-modern-outline">
-    <i class="fa fa-file-pdf me-2"></i>Download Semua PDF
-</a>
+                <a v-if="hasAnyPermission(['stock-outs.export', 'stock-outs.index'])" href="/apps/stock-outs/download-all/pdf" class="btn-modern btn-modern-outline">
+                    <i class="fa fa-file-pdf me-2"></i>Download Semua PDF
+                </a>
                 <Link v-if="hasAnyPermission(['stock_outs.create'])" href="/apps/stock-outs/create" class="btn-modern btn-modern-danger">
                     <i class="fa fa-plus me-2"></i>Input Baru
                 </Link>
@@ -23,28 +23,29 @@
         <div class="filter-bar mb-4">
             <div class="filter-item">
                 <i class="fa fa-box text-muted"></i>
-                <select v-model="filterItem" class="filter-select">
+                <select v-model="filterItem" class="filter-select" :disabled="isLoading">
                     <option value="">Semua Material</option>
                     <option v-for="item in items" :key="item.id" :value="item.id">{{ item.name }}</option>
                 </select>
             </div>
             <div class="filter-item">
                 <i class="fa fa-calendar text-muted"></i>
-                <input type="date" v-model="filterFrom" class="filter-select">
+                <input type="date" v-model="filterFrom" class="filter-select" :disabled="isLoading">
             </div>
             <div class="filter-item">
                 <span class="text-muted small">s/d</span>
-                <input type="date" v-model="filterTo" class="filter-select">
+                <input type="date" v-model="filterTo" class="filter-select" :disabled="isLoading">
             </div>
-            <button class="btn-modern btn-modern-primary" @click="applyFilter">
-                <i class="fa fa-filter me-2"></i>Terapkan
+            <button class="btn-modern btn-modern-primary" @click="applyFilter" :disabled="isLoading">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i v-else class="fa fa-filter me-2"></i>Terapkan
             </button>
         </div>
 
         <div v-if="stockOuts.data.length > 0" class="transaction-list">
             <div v-for="row in stockOuts.data" :key="row.id" class="transaction-card">
-                <div class="transaction-icon">
-                    <i class="fa fa-arrow-up-right-from-square"></i>
+                <div class="transaction-icon" role="img" aria-label="Material Keluar">
+                    <i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>
                 </div>
                 <div class="transaction-main">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
@@ -52,26 +53,26 @@
                             <div class="transaction-ref">{{ row.reference_no }}</div>
                             <div class="transaction-item-name">{{ row.item?.name }}</div>
                         </div>
-                        <div class="transaction-qty">
+                        <div class="transaction-qty" aria-label="Quantity">
                             <span>{{ row.qty }}</span> {{ row.item?.unit }}
                         </div>
                     </div>
                     <div class="transaction-meta">
-                        <span class="meta-badge"><i class="fa fa-building me-1"></i>{{ row.department?.name }}</span>
-                        <span class="meta-badge"><i class="fa fa-user me-1"></i>{{ row.pic?.name }}</span>
-                        <span class="meta-badge"><i class="fa fa-clipboard me-1"></i>{{ row.purpose }}</span>
-                        <span class="meta-badge"><i class="fa fa-calendar me-1"></i>{{ row.date }}</span>
+                        <span class="meta-badge"><i class="fa fa-building me-1" aria-hidden="true"></i>{{ row.department?.name }}</span>
+                        <span class="meta-badge"><i class="fa fa-user me-1" aria-hidden="true"></i>{{ row.pic?.name }}</span>
+                        <span class="meta-badge"><i class="fa fa-clipboard me-1" aria-hidden="true"></i>{{ row.purpose }}</span>
+                        <span class="meta-badge"><i class="fa fa-calendar me-1" aria-hidden="true"></i>{{ row.date }}</span>
                     </div>
                 </div>
                 <div class="transaction-actions">
-                    <a :href="`/apps/stock-outs/${row.id}/pdf`" target="_blank" class="act-btn act-btn-neutral" title="Download PDF">
-                        <i class="fa fa-file-pdf"></i>
+                    <a :href="`/apps/stock-outs/${row.id}/pdf`" target="_blank" class="act-btn act-btn-neutral" title="Download PDF" aria-label="Download PDF">
+                        <i class="fa fa-file-pdf" aria-hidden="true"></i>
                     </a>
-                    <Link v-if="hasAnyPermission(['stock_outs.edit'])" :href="`/apps/stock-outs/${row.id}/edit`" class="act-btn act-btn-success" title="Edit">
-                        <i class="fa fa-pencil-alt"></i>
+                    <Link v-if="hasAnyPermission(['stock_outs.edit'])" :href="`/apps/stock-outs/${row.id}/edit`" class="act-btn act-btn-success" title="Edit" aria-label="Edit Transaksi">
+                        <i class="fa fa-pencil-alt" aria-hidden="true"></i>
                     </Link>
-                    <button v-if="hasAnyPermission(['stock_outs.delete'])" class="act-btn act-btn-danger" title="Batalkan" @click="handleDelete(row.id)">
-                        <i class="fa fa-undo"></i>
+                    <button v-if="hasAnyPermission(['stock_outs.delete'])" class="act-btn act-btn-danger" title="Batalkan" aria-label="Batalkan Transaksi" @click="handleDelete(row.id)">
+                        <i class="fa fa-undo" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -102,22 +103,33 @@ export default {
         const filterItem = ref(props.filters?.item_id ?? '');
         const filterFrom = ref(props.filters?.date_from ?? '');
         const filterTo = ref(props.filters?.date_to ?? '');
+        const isLoading = ref(false);
 
         const applyFilter = () => {
+            isLoading.value = true;
             router.get('/apps/stock-outs', {
                 item_id: filterItem.value || undefined,
                 date_from: filterFrom.value || undefined,
                 date_to: filterTo.value || undefined,
-            }, { preserveState: true });
+            }, {
+                preserveState: true,
+                onFinish: () => { isLoading.value = false; }
+            });
         };
 
         const handleDelete = async (id) => {
             if (await confirmDelete('Transaksi ini akan dibatalkan dan stok dikembalikan.')) {
-                router.delete(`/apps/stock-outs/${id}`);
+                isLoading.value = true;
+                router.delete(`/apps/stock-outs/${id}`, {
+                    onFinish: () => { isLoading.value = false; },
+                    onError: () => {
+                        isLoading.value = false;
+                    }
+                });
             }
         };
 
-        return { filterItem, filterFrom, filterTo, applyFilter, handleDelete };
+        return { filterItem, filterFrom, filterTo, applyFilter, handleDelete, isLoading };
     },
 };
 </script>

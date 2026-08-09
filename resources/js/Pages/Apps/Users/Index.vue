@@ -13,8 +13,11 @@
 
         <div class="search-bar mb-4">
             <i class="fa fa-search text-muted"></i>
-            <input v-model="search" @keyup.enter="handleSearch" type="text" placeholder="Cari nama atau email...">
-            <button class="btn-modern btn-modern-primary" @click="handleSearch">Cari</button>
+            <input v-model="search" @keyup.enter="handleSearch" type="text" placeholder="Cari nama atau email..." :disabled="isLoading">
+            <button class="btn-modern btn-modern-primary" @click="handleSearch" :disabled="isLoading">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <span v-else>Cari</span>
+            </button>
         </div>
 
         <div class="row g-3" v-if="users.data.length > 0">
@@ -61,14 +64,26 @@ export default {
     props: { users: Object },
     setup() {
         const search = ref((new URL(document.location)).searchParams.get('q') ?? '');
+        const isLoading = ref(false);
 
         const handleSearch = () => {
-            router.get('/apps/users', { q: search.value }, { preserveState: true, replace: true });
+            isLoading.value = true;
+            router.get('/apps/users', { q: search.value }, {
+                preserveState: true,
+                replace: true,
+                onFinish: () => { isLoading.value = false; }
+            });
         };
 
         const handleDelete = async (id) => {
             if (await confirmDelete('User ini akan dihapus permanen.')) {
-                router.delete(`/apps/users/${id}`);
+                isLoading.value = true;
+                router.delete(`/apps/users/${id}`, {
+                    onFinish: () => { isLoading.value = false; },
+                    onError: () => {
+                        isLoading.value = false;
+                    }
+                });
             }
         };
 
@@ -78,7 +93,7 @@ export default {
             return parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].substring(0, 2).toUpperCase();
         };
 
-        return { search, handleSearch, handleDelete, initials };
+        return { search, handleSearch, handleDelete, initials, isLoading };
     },
 };
 </script>
