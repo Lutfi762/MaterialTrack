@@ -43,6 +43,8 @@ class PermissionsTableSeeder extends Seeder
             'stock_opnames.index', 'stock_opnames.create', 'stock_opnames.export',
             // 13. Reports
             'reports.index',
+            // 14. AI Assistant
+            'ai_assistant.use',
         ];
 
         foreach ($permissions as $permission) {

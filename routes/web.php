@@ -15,6 +15,7 @@ use App\Http\Controllers\Apps\StockOpnameController;
 use App\Http\Controllers\Apps\DepartmentController;
 use App\Http\Controllers\Apps\PicController;
 use App\Http\Controllers\Apps\LocationController;
+use App\Http\Controllers\Apps\AIAssistantController;
 
 // Halaman Utama → Login
 Route::get('/', function () {
@@ -123,5 +124,13 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
     // Locations
     Route::resource('/locations', LocationController::class, ['as' => 'apps'])
         ->middleware('permission:locations.index|locations.create|locations.edit|locations.delete');
+
+    // AI Assistant
+    Route::get('/ai-assistant', [AIAssistantController::class, 'index'])
+        ->name('apps.ai-assistant.index')
+        ->middleware('permission:ai_assistant.use');
+    Route::post('/ai-assistant/chat', [AIAssistantController::class, 'chat'])
+        ->name('apps.ai-assistant.chat')
+        ->middleware(['permission:ai_assistant.use', 'throttle:' . config('ai.assistant.rate_limit', '20,1')]);
 
 });

@@ -13,15 +13,18 @@
                 MaterialTrack &copy; 2026 — Sistem Manajemen Stok & Pengeluaran Material Gudang
             </footer>
         </div>
+
+        <FloatingAIChat />
     </div>
 </template>
 
 <script>
 import Header from '../Components/Header.vue';
 import Sidebar from '../Components/Sidebar.vue';
+import FloatingAIChat from '../Components/FloatingAIChat.vue';
 
 export default {
-    components: { Header, Sidebar },
+    components: { Header, Sidebar, FloatingAIChat },
     data() {
         return { collapsed: false };
     },
