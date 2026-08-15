@@ -337,14 +337,20 @@ class InventoryAITools
     }
 
     /**
-     * Get top outgoing materials.
+     * Get top outgoing materials with optional period filter.
      */
-    public function getTopOutgoingMaterials(int $limit = 10): array
+    public function getTopOutgoingMaterials(int $limit = 10, string $period = 'all'): array
     {
         $query = StockOut::with('item')
             ->select('item_id', DB::raw('SUM(qty) as total_qty'), DB::raw('COUNT(*) as total_transactions'))
             ->groupBy('item_id')
             ->orderBy('total_qty', 'desc');
+
+        // Apply period filter if not 'all'
+        if ($period !== 'all') {
+            [$startDate, $endDate] = $this->getPeriodDates($period);
+            $query->whereBetween('date', [$startDate, $endDate]);
+        }
 
         if (!$this->isAdmin && $this->departmentId) {
             $query->where('department_id', $this->departmentId);
@@ -362,7 +368,6 @@ class InventoryAITools
             ];
         })->toArray();
     }
-
     /**
      * Parse period string to date range.
      */
@@ -374,6 +379,8 @@ class InventoryAITools
             'today', 'hari ini' => [$today->format('Y-m-d'), $today->format('Y-m-d')],
             'week', 'minggu ini' => [Carbon::now()->startOfWeek()->format('Y-m-d'), Carbon::now()->endOfWeek()->format('Y-m-d')],
             'month', 'bulan ini' => [Carbon::now()->startOfMonth()->format('Y-m-d'), Carbon::now()->endOfMonth()->format('Y-m-d')],
+            'semester' => [Carbon::now()->subMonths(6)->format('Y-m-d'), $today->format('Y-m-d')],
+            'year', 'tahun ini' => [Carbon::now()->startOfYear()->format('Y-m-d'), Carbon::now()->endOfYear()->format('Y-m-d')],
             default => [$today->format('Y-m-d'), $today->format('Y-m-d')],
         };
     }

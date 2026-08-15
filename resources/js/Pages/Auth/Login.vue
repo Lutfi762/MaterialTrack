@@ -2,131 +2,178 @@
     <Head><title>Login - MaterialTrack</title></Head>
     <div class="login-page">
         <div class="login-visual">
-            <!-- Animated background particles -->
-            <div class="particles">
-                <span v-for="n in 20" :key="n" class="particle" :style="particleStyle(n)"></span>
+            <!-- Warehouse grid background -->
+            <div class="warehouse-grid"></div>
+
+            <!-- Floating warehouse elements -->
+            <div class="warehouse-element element-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6z"/>
+                </svg>
+            </div>
+            <div class="warehouse-element element-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11z"/>
+                    <path d="M4.5 4a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-1zm3 0a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-1zm3 0a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-1z"/>
+                </svg>
+            </div>
+            <div class="warehouse-element element-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
             </div>
 
-            <!-- Floating geometric shapes -->
-            <div class="floating-shape shape-1"></div>
-            <div class="floating-shape shape-2"></div>
-            <div class="floating-shape shape-3"></div>
+            <!-- Animated particles -->
+            <div class="particles-container">
+                <span v-for="n in 25" :key="n" class="particle" :style="particleStyle(n)"></span>
+            </div>
 
             <div class="login-visual-content" :class="{ 'visible': mounted }">
                 <div class="brand-logo">
-                    <div class="brand-icon-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white" viewBox="0 0 16 16">
-                            <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zm-7.5 10.522V6.84L1 4.24v7.922l6.5 2.6z"/>
-                        </svg>
-                    </div>
-                    <span>MaterialTrack</span>
+                    <img :src="logoUrl" alt="MaterialTrack" class="brand-logo-img" />
                 </div>
 
                 <h2 class="visual-title">
-                    Kelola Stok Gudang<br>
-                    <span class="gradient-text">dengan Lebih Cerdas</span>
+                    Sistem Manajemen Stok<br>
+                    <span class="gradient-text">untuk Gudang Modern</span>
                 </h2>
-                <p class="visual-sub">Pantau material masuk, keluar, dan stok kritis secara real-time dalam satu sistem terintegrasi.</p>
+                <p class="visual-sub">Monitor real-time material masuk & keluar. Kelola stok kritis. Laporan instan. Semua dalam satu platform terintegrasi.</p>
 
                 <div class="feature-list">
                     <div class="feature-item" v-for="(f, i) in features" :key="i" :style="{ transitionDelay: (i * 0.1 + 0.3) + 's' }">
-                        <div class="feature-icon"><i :class="f.icon"></i></div>
-                        <span>{{ f.text }}</span>
+                        <div class="feature-icon">
+                            <i :class="f.icon"></i>
+                        </div>
+                        <div class="feature-text">
+                            <div class="feature-title">{{ f.title }}</div>
+                            <div class="feature-desc">{{ f.desc }}</div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="stats-row">
-                    <div class="stat-mini">
-                        <div class="stat-mini-value"><span class="counter-num">{{ animatedStats.uptime }}</span>%</div>
-                        <div class="stat-mini-label">Uptime</div>
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            <span class="counter-num">{{ animatedStats.items }}</span>K+
+                        </div>
+                        <div class="stat-label">Items Tracked</div>
                     </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-mini">
-                        <div class="stat-mini-value"><span class="counter-num">{{ animatedStats.speed }}</span>ms</div>
-                        <div class="stat-mini-label">Response</div>
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            <span class="counter-num">{{ animatedStats.transactions }}</span>K+
+                        </div>
+                        <div class="stat-label">Transactions</div>
                     </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-mini">
-                        <div class="stat-mini-value"><span class="counter-num">{{ animatedStats.secure }}</span>%</div>
-                        <div class="stat-mini-label">Secure</div>
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            <span class="counter-num">{{ animatedStats.uptime }}</span>%
+                        </div>
+                        <div class="stat-label">System Uptime</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="login-form-side">
-            <div class="login-form-box" :class="{ 'visible': mounted }">
-                <div class="mobile-brand d-lg-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#3b82f6" viewBox="0 0 16 16">
-                        <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zm-7.5 10.522V6.84L1 4.24v7.922l6.5 2.6z"/>
-                    </svg>
-                    <span>MaterialTrack</span>
+            <div class="login-form-box" :class="{ 'visible': mounted, 'shake-error': hasErrors }">
+                <div class="mobile-brand">
+                    <img :src="logoUrl" alt="MaterialTrack" class="mobile-logo" />
                 </div>
 
-                <div class="form-icon-badge">
-                    <i class="fa fa-shield-halved"></i>
+                <div class="form-header">
+                    <div class="form-icon-badge">
+                        <i class="fa fa-shield-halved"></i>
+                    </div>
+                    <h3 class="form-title">Selamat Datang Kembali</h3>
+                    <p class="form-sub">Silakan masuk untuk melanjutkan ke dashboard Anda</p>
                 </div>
 
-                <h3 class="form-title">Selamat Datang Kembali</h3>
-                <p class="form-sub">Masuk ke akun Anda untuk melanjutkan</p>
-
-                <form @submit.prevent="submit">
-                    <div class="input-modern mb-3" :class="{ 'focused': focusEmail, 'has-value': form.email }">
-                        <label>Alamat Email</label>
-                        <div class="input-wrap">
-                            <i class="fa fa-envelope"></i>
+                <form @submit.prevent="submit" novalidate>
+                    <div class="input-group" :class="{ 'focused': focusEmail, 'has-value': form.email, 'has-error': form.errors.email }">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fa fa-envelope input-icon"></i>
                             <input
+                                id="email"
                                 v-model="form.email"
                                 type="email"
-                                placeholder="nama@materialtrack.com"
-                                :class="{ 'is-invalid': form.errors.email }"
+                                placeholder="nama@perusahaan.com"
+                                autocomplete="email"
                                 @focus="focusEmail = true"
                                 @blur="focusEmail = false"
                             >
                         </div>
-                        <div v-if="form.errors.email" class="invalid-feedback d-block">{{ form.errors.email }}</div>
+                        <div v-if="form.errors.email" class="error-message">
+                            <i class="fa fa-circle-exclamation"></i>
+                            {{ form.errors.email }}
+                        </div>
                     </div>
 
-                    <div class="input-modern mb-3" :class="{ 'focused': focusPassword, 'has-value': form.password }">
-                        <label>Password</label>
-                        <div class="input-wrap">
-                            <i class="fa fa-lock"></i>
+                    <div class="input-group" :class="{ 'focused': focusPassword, 'has-value': form.password, 'has-error': form.errors.password }">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa fa-lock input-icon"></i>
                             <input
+                                id="password"
                                 v-model="form.password"
                                 :type="showPassword ? 'text' : 'password'"
-                                placeholder="••••••••"
-                                :class="{ 'is-invalid': form.errors.password }"
+                                placeholder="Masukkan password Anda"
+                                autocomplete="current-password"
                                 @focus="focusPassword = true"
                                 @blur="focusPassword = false"
                             >
-                            <button type="button" class="toggle-password" @click="showPassword = !showPassword">
+                            <button type="button" class="toggle-password" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'">
                                 <i class="fa" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                             </button>
                         </div>
-                        <div v-if="form.errors.password" class="invalid-feedback d-block">{{ form.errors.password }}</div>
+                        <div v-if="form.errors.password" class="error-message">
+                            <i class="fa fa-circle-exclamation"></i>
+                            {{ form.errors.password }}
+                        </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <label class="remember-check">
+                    <div class="form-footer-row">
+                        <label class="custom-checkbox">
                             <input type="checkbox" v-model="form.remember">
-                            <span class="check-box"></span>
-                            <span>Ingat Saya</span>
+                            <span class="checkbox-mark">
+                                <i class="fa fa-check"></i>
+                            </span>
+                            <span class="checkbox-label">Ingat saya</span>
                         </label>
-                        <Link href="/forgot-password" class="forgot-link">Lupa Password?</Link>
+                        <Link href="/forgot-password" class="forgot-link">Lupa password?</Link>
                     </div>
 
-                    <button type="submit" class="btn-login" :disabled="form.processing">
-                        <span class="btn-content" v-if="!form.processing">
-                            Masuk <i class="fa fa-arrow-right ms-2"></i>
+                    <button type="submit" class="btn-submit" :disabled="form.processing">
+                        <span class="btn-spinner" v-if="form.processing">
+                            <i class="fa fa-circle-notch fa-spin"></i>
                         </span>
-                        <span class="btn-content" v-else>
-                            <i class="fa fa-spinner fa-spin me-2"></i>Memproses...
+                        <span class="btn-text">
+                            {{ form.processing ? 'Memverifikasi...' : 'Masuk ke Dashboard' }}
                         </span>
+                        <i class="fa fa-arrow-right btn-arrow" v-if="!form.processing"></i>
                         <span class="btn-shine"></span>
                     </button>
                 </form>
 
-                <p class="footer-note">© 2026 MaterialTrack. Sistem Manajemen Stok Gudang.</p>
+                <div class="form-divider">
+                    <span>atau</span>
+                </div>
+
+                <div class="alt-login-hint">
+                    <i class="fa fa-info-circle"></i>
+                    Belum punya akses? Hubungi administrator sistem Anda.
+                </div>
+
+                <div class="footer-branding">
+                    <div class="footer-logo">
+                        <img :src="logoUrl" alt="MaterialTrack" />
+                    </div>
+                    <div class="footer-text">
+                        <div class="footer-title">MaterialTrack</div>
+                        <div class="footer-copy">© 2026 • Warehouse Management System</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -134,33 +181,63 @@
 
 <script>
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import logoUrl from '@/assets/logo-materialtrack.png';
 
 export default {
     components: { Head, Link },
     data() {
         return {
+            logoUrl,
             showPassword: false,
             focusEmail: false,
             focusPassword: false,
             mounted: false,
-            animatedStats: { uptime: 0, speed: 0, secure: 0 },
+            hasErrors: false,
+            animatedStats: { items: 0, transactions: 0, uptime: 0 },
             features: [
-                { icon: 'fa fa-chart-line', text: 'Dashboard real-time & laporan otomatis' },
-                { icon: 'fa fa-users', text: 'Manajemen akses per departemen' },
-                { icon: 'fa fa-file-export', text: 'Export PDF & Excel otomatis' },
+                {
+                    icon: 'fa fa-boxes-stacked',
+                    title: 'Real-time Stock Tracking',
+                    desc: 'Monitor stok gudang live, update otomatis setiap transaksi'
+                },
+                {
+                    icon: 'fa fa-chart-line',
+                    title: 'Smart Analytics',
+                    desc: 'Dashboard interaktif dengan insight stok kritis & trending'
+                },
+                {
+                    icon: 'fa fa-users-gear',
+                    title: 'Multi-department Access',
+                    desc: 'Role-based permissions untuk setiap departemen'
+                },
             ],
         };
     },
+    watch: {
+        'form.errors': {
+            handler(newErrors) {
+                if (Object.keys(newErrors).length > 0) {
+                    this.hasErrors = true;
+                    setTimeout(() => {
+                        this.hasErrors = false;
+                    }, 600);
+                }
+            },
+            deep: true,
+        },
+    },
     mounted() {
-        setTimeout(() => { this.mounted = true; }, 100);
-        this.animateStats();
+        setTimeout(() => {
+            this.mounted = true;
+            this.animateStats();
+        }, 100);
     },
     methods: {
         particleStyle(n) {
-            const size = 2 + (n % 5);
-            const left = (n * 37) % 100;
-            const duration = 12 + (n % 10);
-            const delay = (n % 8) * 0.7;
+            const size = 3 + (n % 4);
+            const left = (n * 29) % 100;
+            const duration = 15 + (n % 12);
+            const delay = (n % 10) * 0.8;
             return {
                 width: size + 'px',
                 height: size + 'px',
@@ -170,16 +247,16 @@ export default {
             };
         },
         animateStats() {
-            const targets = { uptime: 99, speed: 120, secure: 100 };
-            const duration = 1200;
+            const targets = { items: 150, transactions: 500, uptime: 99 };
+            const duration = 1500;
             const startTime = performance.now();
 
             const step = (now) => {
                 const progress = Math.min((now - startTime) / duration, 1);
                 const eased = 1 - Math.pow(1 - progress, 3);
+                this.animatedStats.items = Math.round(targets.items * eased);
+                this.animatedStats.transactions = Math.round(targets.transactions * eased);
                 this.animatedStats.uptime = Math.round(targets.uptime * eased);
-                this.animatedStats.speed = Math.round(targets.speed * eased);
-                this.animatedStats.secure = Math.round(targets.secure * eased);
                 if (progress < 1) requestAnimationFrame(step);
             };
             requestAnimationFrame(step);

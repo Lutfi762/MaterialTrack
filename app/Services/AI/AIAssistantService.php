@@ -46,7 +46,6 @@ class AIAssistantService
             // Build context-aware message
             $contextMessage = $this->buildContextMessage($userMessage, $toolResult);
 
-            // Get AI response
             $response = $this->provider->chat(
                 $this->systemPrompt,
                 array_merge($limitedHistory, [
@@ -58,6 +57,7 @@ class AIAssistantService
                 'success' => true,
                 'message' => $response['text'],
                 'tool_used' => $toolResult['tool'] ?? null,
+                'chart_data' => $this->buildChartData($toolResult['tool'] ?? null, $toolResult['result'] ?? []),
             ];
 
         } catch (\Exception $e) {
@@ -142,13 +142,14 @@ class AIAssistantService
             ];
         }
 
-        // Top materials
-        if (preg_match('/(paling sering|paling banyak|top|terbanyak|populer)/i', $queryLower)) {
-            return [
-                'tool' => 'getTopOutgoingMaterials',
-                'result' => $this->tools->getTopOutgoingMaterials(),
-            ];
-        }
+       // Top materials
+if (preg_match('/(paling sering|paling banyak|top|terbanyak|populer)/i', $queryLower)) {
+    $period = $this->extractPeriodOrAll($query);
+    return [
+        'tool' => 'getTopOutgoingMaterials',
+        'result' => $this->tools->getTopOutgoingMaterials(10, $period),
+    ];
+}
 
         // Category inventory
         if (preg_match('/(kategori|category)/i', $queryLower)) {
@@ -188,6 +189,114 @@ class AIAssistantService
 
         return $context;
     }
+    /**
+ * Build chart data structure for tools whose data is suitable for visualization.
+ * Returns null when the tool's data doesn't make sense as a chart.
+ */
+protected function buildChartData(?string $tool, array $result): ?array
+{
+    if (!$tool || empty($result)) {
+        return null;
+    }
+
+    return match ($tool) {
+        'getTopOutgoingMaterials' => $this->chartFromTopMaterials($result),
+        'getLowStockItems' => $this->chartFromStockLevels($result),
+        'getStockSummary' => $this->chartFromStockSummary($result),
+        'getCategoryInventory' => $this->chartFromCategoryInventory($result),
+        'getLocationInventory' => $this->chartFromLocationInventory($result),
+        default => null,
+    };
+}
+
+protected function chartFromTopMaterials(array $result): ?array
+{
+    if (empty($result)) {
+        return null;
+    }
+
+    return [
+        'type' => 'bar',
+        'title' => 'Material Paling Sering Keluar',
+        'labels' => array_column($result, 'material'),
+        'series' => [[
+            'name' => 'Qty Keluar',
+            'data' => array_column($result, 'total_qty'),
+        ]],
+    ];
+}
+
+protected function chartFromStockLevels(array $result): ?array
+{
+    if (empty($result)) {
+        return null;
+    }
+
+    // Batasi 10 item teratas supaya bar chart tidak terlalu padat.
+    $limited = array_slice($result, 0, 10);
+
+    return [
+        'type' => 'bar',
+        'title' => 'Stok Menipis',
+        'labels' => array_column($limited, 'name'),
+        'series' => [[
+            'name' => 'Stok Saat Ini',
+            'data' => array_column($limited, 'current_stock'),
+        ]],
+    ];
+}
+
+protected function chartFromStockSummary(array $result): ?array
+{
+    if (empty($result) || !isset($result['stock_aman'])) {
+        return null;
+    }
+
+    return [
+        'type' => 'donut',
+        'title' => 'Status Stok Material',
+        'labels' => ['Aman', 'Menipis', 'Habis'],
+        'series' => [
+            $result['stock_aman'] ?? 0,
+            $result['stock_menipis'] ?? 0,
+            $result['stock_habis'] ?? 0,
+        ],
+    ];
+}
+
+protected function chartFromCategoryInventory(array $result): ?array
+{
+    if (empty($result)) {
+        return null;
+    }
+
+    return [
+        'type' => 'bar',
+        'title' => 'Jumlah Material per Kategori',
+        'labels' => array_column($result, 'category'),
+        'series' => [[
+            'name' => 'Total Material',
+            'data' => array_column($result, 'total_materials'),
+        ]],
+    ];
+}
+
+protected function chartFromLocationInventory(array $result): ?array
+{
+    if (empty($result)) {
+        return null;
+    }
+
+    return [
+        'type' => 'bar',
+        'title' => 'Jumlah Material per Lokasi',
+        'labels' => array_column($result, 'location'),
+        'series' => [[
+            'name' => 'Total Material',
+            'data' => array_column($result, 'total_materials'),
+        ]],
+    ];
+}
 
     /**
      * Extract search term from query.
@@ -217,6 +326,29 @@ class AIAssistantService
         }
         return 'today';
     }
+    /**
+ * Extract period from query, default to 'all' (bukan 'today') supaya top materials
+ * tidak salah asumsi "hari ini" kalau user tidak sebutkan periode sama sekali.
+ */
+protected function extractPeriodOrAll(string $query): string
+{
+    if (preg_match('/(hari ini|today)/i', $query)) {
+        return 'today';
+    }
+    if (preg_match('/(minggu ini|week|this week)/i', $query)) {
+        return 'week';
+    }
+    if (preg_match('/(bulan ini|month|this month)/i', $query)) {
+        return 'month';
+    }
+    if (preg_match('/(semester)/i', $query)) {
+        return 'semester';
+    }
+    if (preg_match('/(tahun ini|year|this year)/i', $query)) {
+        return 'year';
+    }
+    return 'all';
+}
 
     /**
      * Build system prompt.

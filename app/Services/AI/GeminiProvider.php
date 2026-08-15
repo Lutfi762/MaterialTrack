@@ -18,7 +18,7 @@ class GeminiProvider implements AIProviderInterface
     public function __construct()
     {
         $this->apiKey = config('ai.gemini.api_key', '');
-        $this->model = config('ai.gemini.model', 'gemini-1.5-flash');
+        $this->model = config('ai.gemini.model', 'gemini-3.6-flash');
         $this->apiUrl = config('ai.gemini.api_url');
         $this->timeout = config('ai.gemini.timeout', 30);
         $this->maxTokens = config('ai.gemini.max_tokens', 2048);
@@ -50,17 +50,27 @@ class GeminiProvider implements AIProviderInterface
         }
 
         try {
-            $url = "{$this->apiUrl}/{$this->model}:generateContent?key={$this->apiKey}";
+            $url = "{$this->apiUrl}/{$this->model}:generateContent";
 
             $response = Http::timeout($this->timeout)
+                ->withHeaders([
+                    'x-goog-api-key' => $this->apiKey,
+                    'Content-Type' => 'application/json',
+                ])
                 ->post($url, $payload);
 
             if (!$response->successful()) {
+                $errorBody = $response->json();
+                $errorMessage = $errorBody['error']['message'] ?? 'Unknown error';
+                $errorStatus = $errorBody['error']['status'] ?? 'UNKNOWN';
+
                 Log::error('Gemini API error', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
+                    'http_status' => $response->status(),
+                    'error_status' => $errorStatus,
+                    'error_message' => $errorMessage,
+                    'model' => $this->model,
                 ]);
-                throw new \Exception('Gemini API request failed.');
+                throw new \Exception("Gemini API error: {$errorMessage}");
             }
 
             $data = $response->json();
@@ -70,6 +80,7 @@ class GeminiProvider implements AIProviderInterface
         } catch (\Exception $e) {
             Log::error('Gemini provider exception', [
                 'message' => $e->getMessage(),
+                'model' => $this->model,
             ]);
             throw $e;
         }
@@ -115,14 +126,49 @@ class GeminiProvider implements AIProviderInterface
 
     protected function parseResponse(array $data): array
     {
-        if (empty($data['candidates'][0]['content']['parts'][0]['text'])) {
-            throw new \Exception('Invalid response from Gemini API.');
+        // Handle blocked or empty response
+        if (empty($data['candidates'])) {
+            Log::warning('Gemini response has no candidates', [
+                'model' => $this->model,
+                'prompt_feedback' => $data['promptFeedback'] ?? null,
+            ]);
+            throw new \Exception('Response was blocked or empty.');
         }
 
-        $text = $data['candidates'][0]['content']['parts'][0]['text'];
+        $candidate = $data['candidates'][0];
+
+        // Check if response was blocked
+        if (isset($candidate['finishReason']) && $candidate['finishReason'] !== 'STOP') {
+            Log::warning('Gemini response blocked', [
+                'finish_reason' => $candidate['finishReason'],
+                'safety_ratings' => $candidate['safetyRatings'] ?? null,
+            ]);
+        }
+
+        // Extract text from parts
+        if (empty($candidate['content']['parts'])) {
+            throw new \Exception('Invalid response structure from Gemini API.');
+        }
+
+        $text = '';
+        foreach ($candidate['content']['parts'] as $part) {
+            if (isset($part['text'])) {
+                $text .= $part['text'];
+            }
+        }
+
+        if (empty($text)) {
+            throw new \Exception('No text content in Gemini response.');
+        }
 
         // Check for function call
-        $functionCall = $data['candidates'][0]['content']['parts'][0]['functionCall'] ?? null;
+        $functionCall = null;
+        foreach ($candidate['content']['parts'] as $part) {
+            if (isset($part['functionCall'])) {
+                $functionCall = $part['functionCall'];
+                break;
+            }
+        }
 
         return [
             'text' => $text,

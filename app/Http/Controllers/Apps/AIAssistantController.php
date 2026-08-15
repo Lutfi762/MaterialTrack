@@ -69,6 +69,11 @@ class AIAssistantController extends Controller
             return response()->json($result);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('AI Assistant chat error', [
+                'message' => $e->getMessage(),
+                'user_id' => $user->id,
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan pada AI Assistant. Silakan coba kembali.',

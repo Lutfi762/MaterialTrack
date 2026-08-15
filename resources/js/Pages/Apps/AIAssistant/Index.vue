@@ -43,7 +43,18 @@
                         <div v-if="msg.role === 'assistant'" class="message-avatar">
                             <i class="fa fa-robot"></i>
                         </div>
-                        <div class="message-content" v-html="formatMessage(msg.content)"></div>
+                        <div class="message-stack">
+                            <div v-if="msg.chart_data" class="chart-card">
+                                <div class="chart-card-title">{{ msg.chart_data.title }}</div>
+                                <apexchart
+                                    :type="msg.chart_data.type"
+                                    height="260"
+                                    :options="buildChartOptions(msg.chart_data)"
+                                    :series="msg.chart_data.series"
+                                />
+                            </div>
+                            <div class="message-content" v-html="formatMessage(msg.content)"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -124,6 +135,7 @@ export default {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     },
                     body: JSON.stringify({
@@ -135,18 +147,24 @@ export default {
                 const data = await response.json();
 
                 if (data.success) {
-                    this.messages.push({ role: 'assistant', content: data.message });
+                    this.messages.push({
+                        role: 'assistant',
+                        content: data.message,
+                        chart_data: data.chart_data ?? null,
+                    });
                 } else {
                     this.messages.push({
                         role: 'assistant',
-                        content: data.message || 'Maaf, terjadi kesalahan. Silakan coba kembali.'
+                        content: data.message || 'Maaf, terjadi kesalahan. Silakan coba kembali.',
+                        chart_data: null,
                     });
                 }
 
             } catch (error) {
                 this.messages.push({
                     role: 'assistant',
-                    content: 'Koneksi ke AI Assistant gagal. Silakan coba kembali.'
+                    content: 'Koneksi ke AI Assistant gagal. Silakan coba kembali.',
+                    chart_data: null,
                 });
             } finally {
                 this.isLoading = false;
@@ -166,10 +184,62 @@ export default {
             }));
         },
 
-        formatMessage(content) {
-            return content
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br>');
+       formatMessage(content) {
+    let html = content;
+
+    // Heading (### Judul) -> <strong> dengan sedikit jarak, bukan <h3> besar
+    html = html.replace(/^###\s+(.+)$/gm, '<div class="msg-heading">$1</div>');
+    html = html.replace(/^##\s+(.+)$/gm, '<div class="msg-heading">$1</div>');
+
+    // Bold **text**
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+    // List item baris yang diawali "* " atau "- "
+    html = html.replace(/^[*-]\s+(.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/gs, '<ul class="msg-list">$1</ul>');
+
+    // Garis pemisah ---
+    html = html.replace(/^---$/gm, '<hr class="msg-divider">');
+
+    // Sisa newline jadi <br>, tapi jangan dobel di dalam elemen block yang sudah dibuat
+    html = html.replace(/\n(?!<)/g, '<br>');
+
+    return html;
+},
+
+        buildChartOptions(chartData) {
+            const baseOptions = {
+                chart: { toolbar: { show: false }, background: 'transparent' },
+                labels: chartData.labels ?? [],
+                xaxis: { categories: chartData.labels ?? [] },
+                dataLabels: { enabled: chartData.type !== 'bar' },
+                tooltip: { theme: 'light' },
+            };
+
+            if (chartData.type === 'donut') {
+                return {
+                    ...baseOptions,
+                    colors: ['#10b981', '#f59e0b', '#ef4444'],
+                    legend: { position: 'bottom', fontSize: '12px' },
+                    plotOptions: { pie: { donut: { size: '65%' } } },
+                };
+            }
+
+            if (chartData.type === 'bar') {
+                return {
+                    ...baseOptions,
+                    colors: ['#7c3aed'],
+                    plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '60%' } },
+                    dataLabels: { enabled: true, style: { fontSize: '11px' } },
+                };
+            }
+
+            // line chart fallback
+            return {
+                ...baseOptions,
+                colors: ['#7c3aed'],
+                stroke: { curve: 'smooth', width: 3 },
+            };
         },
 
         scrollToBottom() {
@@ -188,6 +258,27 @@ export default {
 .ai-assistant-page {
     max-width: 1200px;
     margin: 0 auto;
+}
+.message-content :deep(.msg-heading) {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1e293b;
+    margin: 10px 0 6px;
+}
+.message-content :deep(.msg-heading:first-child) {
+    margin-top: 0;
+}
+.message-content :deep(.msg-list) {
+    margin: 6px 0;
+    padding-left: 18px;
+}
+.message-content :deep(.msg-list li) {
+    margin-bottom: 4px;
+}
+.message-content :deep(.msg-divider) {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 12px 0;
 }
 
 .config-error-card {
@@ -342,6 +433,28 @@ export default {
     color: white;
     font-size: 16px;
     flex-shrink: 0;
+}
+
+.message-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.chart-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    min-width: 320px;
+}
+
+.chart-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
 }
 
 .message-content {

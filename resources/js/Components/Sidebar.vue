@@ -1,13 +1,10 @@
 <template>
     <div class="sidebar" :class="{ 'sidebar-collapsed': collapsed }">
         <div class="sidebar-brand">
-            <div class="brand-icon">
-                <img :src="logoUrl" alt="MaterialTrack" class="brand-logo-img" />
-            </div>
-            <span class="brand-name">MaterialTrack</span>
-            <button class="sidebar-toggle" @click="toggle">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+            <img :src="logoUrl" alt="MaterialTrack" class="brand-logo" />
+            <button class="sidebar-collapse-btn" @click="toggle" :title="collapsed ? 'Expand' : 'Collapse'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zm0 4a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zm0 4a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"/>
                 </svg>
             </button>
         </div>
@@ -224,52 +221,54 @@ export default {
 .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
     padding: 20px 16px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
     min-height: 70px;
+    position: relative;
 }
 
-.brand-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+.brand-logo {
+    height: 36px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.sidebar-collapsed .brand-logo {
+    height: 32px;
+    max-width: 32px;
+}
+
+.sidebar-collapse-btn {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    background: white;
-    padding: 4px;
-}
-.brand-logo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    transition: all 0.2s;
+    z-index: 10;
 }
 
-.brand-name {
+.sidebar-collapse-btn:hover {
+    background: #334155;
     color: white;
-    font-size: 16px;
-    font-weight: 700;
-    white-space: nowrap;
-    transition: opacity 0.3s;
+    border-color: rgba(255,255,255,0.25);
 }
 
-.sidebar-collapsed .brand-name { opacity: 0; width: 0; }
-
-.sidebar-toggle {
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.5);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 6px;
-    flex-shrink: 0;
-    transition: color 0.2s;
+.sidebar-collapsed .sidebar-collapse-btn {
+    right: -12px;
 }
-
-.sidebar-toggle:hover { color: white; background: rgba(255,255,255,0.08); }
 
 .sidebar-nav {
     flex: 1;
