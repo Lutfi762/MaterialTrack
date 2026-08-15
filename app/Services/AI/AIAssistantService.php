@@ -80,6 +80,15 @@ class AIAssistantService
     {
         $queryLower = strtolower($query);
 
+        // Top materials (check first before "keluar" pattern)
+        if (preg_match('/(paling sering|paling banyak|top|terbanyak|populer)/i', $queryLower)) {
+            $period = $this->extractPeriodOrAll($query);
+            return [
+                'tool' => 'getTopOutgoingMaterials',
+                'result' => $this->tools->getTopOutgoingMaterials(10, $period),
+            ];
+        }
+
         // Stock summary
         if (preg_match('/(ringkasan|summary|kondisi|berapa total|gambaran|overview)/i', $queryLower)) {
             return [
@@ -134,22 +143,13 @@ class AIAssistantService
         }
 
         // Stock out summary
-        if (preg_match('/(stock out|stok keluar|keluar|pengeluaran|pemakaian)/i', $queryLower)) {
+        if (preg_match('/(stock out|stok keluar|pengeluaran|pemakaian)/i', $queryLower)) {
             $period = $this->extractPeriod($query);
             return [
                 'tool' => 'getStockOutSummary',
                 'result' => $this->tools->getStockOutSummary($period),
             ];
         }
-
-       // Top materials
-if (preg_match('/(paling sering|paling banyak|top|terbanyak|populer)/i', $queryLower)) {
-    $period = $this->extractPeriodOrAll($query);
-    return [
-        'tool' => 'getTopOutgoingMaterials',
-        'result' => $this->tools->getTopOutgoingMaterials(10, $period),
-    ];
-}
 
         // Category inventory
         if (preg_match('/(kategori|category)/i', $queryLower)) {
