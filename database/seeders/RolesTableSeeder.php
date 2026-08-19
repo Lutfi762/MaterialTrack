@@ -17,5 +17,6 @@ class RolesTableSeeder extends Seeder
         // Gunakan firstOrCreate agar tidak error jika role sudah ada
         Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'department_user', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'auditor', 'guard_name' => 'web']);
     }
 }

@@ -17,8 +17,11 @@
         "@inertiajs/vue3": "^3.6.1",
         "@vitejs/plugin-vue": "^6.0.8",
         "apexcharts": "^6.5.0",
+        "html5-qrcode": "^2.3.8",
+        "qrcode": "^1.5.4",
         "sweetalert2": "^11.26.25",
         "vue": "^3.5.40",
+        "vue-i18n": "^11.4.8",
         "vue3-apexcharts": "^1.11.1"
     }
 }

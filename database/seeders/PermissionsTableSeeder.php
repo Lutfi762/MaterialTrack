@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermissionsTableSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class PermissionsTableSeeder extends Seeder
     public function run(): void
     {
         // Reset cache permission Spatie
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions = [
             // 1. Dashboard
@@ -36,15 +37,21 @@ class PermissionsTableSeeder extends Seeder
             // 9. Transaksi - Stock In
             'stock_ins.index', 'stock_ins.create', 'stock_ins.edit', 'stock_ins.delete', 'stock_ins.export',
             // 10. Transaksi - Stock Out
-            'stock_outs.index', 'stock_outs.create', 'stock_outs.edit', 'stock_outs.delete', 'stock_outs.export',
+            'stock_outs.index', 'stock_outs.create', 'stock_outs.edit', 'stock_outs.delete', 'stock_outs.export', 'stock_outs.approve',
             // 11. Stock Movements (Read-only audit log)
             'stock_movements.index', 'stock_movements.export',
             // 12. Stock Opnames
-            'stock_opnames.index', 'stock_opnames.create', 'stock_opnames.export',
+            'stock_opnames.index', 'stock_opnames.create', 'stock_opnames.export', 'stock_opnames.verify',
             // 13. Reports
             'reports.index',
             // 14. AI Assistant
             'ai_assistant.use',
+            // 15. Stock Transfers
+            'stock_transfers.index', 'stock_transfers.create',
+            // 16. Stock Adjustments (koreksi stok ber-approval)
+            'stock_adjustments.index', 'stock_adjustments.create', 'stock_adjustments.approve',
+            // 17. Audit Trail
+            'activity_logs.index', 'activity_logs.export',
         ];
 
         foreach ($permissions as $permission) {
@@ -61,6 +68,23 @@ class PermissionsTableSeeder extends Seeder
             'items.index',
             'stock_outs.index',
             'stock_outs.create',
+            'ai_assistant.use',
+        ]);
+
+        // Role auditor: akses baca penuh untuk verifikasi independen
+        $auditorRole = Role::firstOrCreate(['name' => 'auditor', 'guard_name' => 'web']);
+        $auditorRole->syncPermissions([
+            'dashboard.index', 'dashboard.total_items', 'dashboard.min_stock_alert',
+            'items.index', 'categories.index', 'departments.index', 'locations.index', 'pics.index',
+            'users.index', 'roles.index', 'permissions.index',
+            'stock_ins.index', 'stock_ins.export',
+            'stock_outs.index', 'stock_outs.export',
+            'stock_movements.index', 'stock_movements.export',
+            'stock_opnames.index', 'stock_opnames.export',
+            'stock_transfers.index',
+            'stock_adjustments.index',
+            'reports.index',
+            'activity_logs.index', 'activity_logs.export',
         ]);
     }
 }

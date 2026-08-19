@@ -57,10 +57,20 @@
                 </div>
 
                 <div class="panel-input">
+                    <button
+                        v-if="speechSupported"
+                        @click="toggleVoice"
+                        class="voice-btn-sm"
+                        :class="{ recording: isRecording }"
+                        :title="isRecording ? 'Hentikan' : 'Rekam suara'"
+                        type="button"
+                    >
+                        <i class="fa" :class="isRecording ? 'fa-stop' : 'fa-microphone'"></i>
+                    </button>
                     <input
                         v-model="userInput"
                         @keydown.enter="sendMessage"
-                        placeholder="Tanyakan..."
+                        :placeholder="isRecording ? 'Mendengarkan...' : 'Tanyakan...'"
                         :disabled="isLoading || !isConfigured"
                         maxlength="500"
                     />
@@ -97,7 +107,18 @@ export default {
                 'Material habis',
                 'Stock Out hari ini',
             ],
+            isRecording: false,
+            speechSupported: false,
+            recognition: null,
         };
+    },
+    mounted() {
+        this.initSpeech();
+    },
+    beforeUnmount() {
+        if (this.recognition) {
+            this.recognition.abort();
+        }
     },
     computed: {
         hasPermission() {
@@ -105,6 +126,50 @@ export default {
         },
     },
     methods: {
+        initSpeech() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return;
+            this.speechSupported = true;
+            this.recognition = new SpeechRecognition();
+            this.recognition.continuous = false;
+            this.recognition.interimResults = true;
+            this.recognition.lang = 'id-ID';
+            this.recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (finalTranscript) {
+                    this.userInput = (this.userInput ? this.userInput + ' ' : '') + finalTranscript;
+                } else if (interimTranscript) {
+                    this.userInput = interimTranscript;
+                }
+            };
+            this.recognition.onend = () => {
+                this.isRecording = false;
+            };
+            this.recognition.onerror = (event) => {
+                this.isRecording = false;
+            };
+        },
+
+        toggleVoice() {
+            if (!this.recognition) return;
+            if (this.isRecording) {
+                this.recognition.stop();
+                this.isRecording = false;
+            } else {
+                this.userInput = '';
+                this.recognition.start();
+                this.isRecording = true;
+            }
+        },
+
         togglePanel() {
             this.isOpen = !this.isOpen;
             if (this.isOpen) {
@@ -180,9 +245,18 @@ export default {
         },
 
         formatMessage(content) {
-            return content
+            return this.escapeHtml(content || '')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n/g, '<br>');
+        },
+
+        escapeHtml(content) {
+            return String(content)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         },
 
         scrollToBottom() {
@@ -441,6 +515,7 @@ export default {
     gap: 8px;
     padding: 12px;
     border-top: 1px solid #e5e7eb;
+    align-items: center;
 }
 
 .panel-input input {
@@ -454,6 +529,39 @@ export default {
 .panel-input input:focus {
     outline: none;
     border-color: #7c3aed;
+}
+
+.voice-btn-sm {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1.5px solid #e5e7eb;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.voice-btn-sm:hover {
+    background: #e0e7ff;
+    color: #7c3aed;
+}
+
+.voice-btn-sm.recording {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+    animation: pulse-rec 1.5s infinite;
+}
+
+@keyframes pulse-rec {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
 }
 
 .mini-send {

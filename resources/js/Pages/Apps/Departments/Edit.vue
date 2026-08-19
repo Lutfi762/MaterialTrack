@@ -7,30 +7,30 @@
                     <div class="col-md-6">
                         <div class="card border-0 rounded-3 shadow">
                             <div class="card-header">
-                                <span class="font-weight-bold"><i class="fa fa-building me-1"></i> EDIT DEPARTMENT</span>
+                                <span class="font-weight-bold"><i class="fa fa-building me-1"></i> {{ $t('departments.edit') }}</span>
                             </div>
                             <div class="card-body">
                                 <form @submit.prevent="submit">
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Nama Department <span class="text-danger">*</span></label>
+                                        <label class="form-label fw-semibold">{{ $t('departments.name') }} <span class="text-danger">*</span></label>
                                         <input v-model="form.name" type="text" class="form-control" :class="{ 'is-invalid': form.errors.name }">
                                         <div class="invalid-feedback">{{ form.errors.name }}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Kode Department</label>
+                                        <label class="form-label fw-semibold">{{ $t('departments.code') }}</label>
                                         <input v-model="form.code" type="text" class="form-control" :class="{ 'is-invalid': form.errors.code }">
                                         <div class="invalid-feedback">{{ form.errors.code }}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Status</label>
+                                        <label class="form-label fw-semibold">{{ $t('common.status') }}</label>
                                         <select v-model="form.status" class="form-select" :class="{ 'is-invalid': form.errors.status }">
-                                            <option value="active">Aktif</option>
-                                            <option value="inactive">Non Aktif</option>
+                                            <option value="active">{{ $t('common.active') }}</option>
+                                            <option value="inactive">{{ $t('common.inactive') }}</option>
                                         </select>
                                         <div class="invalid-feedback">{{ form.errors.status }}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Deskripsi</label>
+                                        <label class="form-label fw-semibold">{{ $t('common.description') }}</label>
                                         <textarea v-model="form.description" class="form-control" rows="3"></textarea>
                                     </div>
                                     <div class="d-flex gap-2">
@@ -38,7 +38,7 @@
                                             <span v-if="form.processing" class="spinner-border spinner-border-sm me-1"></span>
                                             Update
                                         </button>
-                                        <Link href="/apps/departments" class="btn btn-secondary">Batal</Link>
+                                        <Link href="/apps/departments" class="btn btn-secondary">{{ $t('common.cancel') }}</Link>
                                     </div>
                                 </form>
                             </div>

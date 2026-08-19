@@ -8,9 +8,9 @@
                 <div class="col-md-12">
                     <div class="card border-0 rounded-3 shadow border-top-purple">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-user-edit me-1"></i> EDIT USER</span>
+                            <span class="font-weight-bold"><i class="fa fa-user-edit me-1"></i> {{ $t('users.edit') }}</span>
                             <Link href="/apps/users" class="btn btn-sm btn-secondary">
-                                <i class="fa fa-arrow-left me-1"></i> Kembali
+                                <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
                             </Link>
                         </div>
                         <div class="card-body">
@@ -18,7 +18,7 @@
                             <form @submit.prevent="submit">
 
                                 <div class="mb-3">
-                                    <label class="fw-bold">Nama</label>
+                                    <label class="fw-bold">{{ $t('users.name') }}</label>
                                     <input
                                         class="form-control"
                                         v-model="form.name"
@@ -41,23 +41,23 @@
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="fw-bold">Password Baru</label>
+                                        <label class="fw-bold">{{ $t('users.password_new') }}</label>
                                         <input
                                             class="form-control"
                                             v-model="form.password"
                                             :class="{ 'is-invalid': form.errors.password }"
                                             type="password"
-                                            placeholder="Kosongkan jika tidak diubah"
+                                            :placeholder="$t('users.password_new_placeholder')"
                                         >
                                         <div v-if="form.errors.password" class="invalid-feedback d-block">{{ form.errors.password }}</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="fw-bold">Konfirmasi Password Baru</label>
+                                        <label class="fw-bold">{{ $t('users.password_confirm') }}</label>
                                         <input
                                             class="form-control"
                                             v-model="form.password_confirmation"
                                             type="password"
-                                            placeholder="Kosongkan jika tidak diubah"
+                                            :placeholder="$t('users.password_new_placeholder')"
                                         >
                                     </div>
                                 </div>
@@ -69,7 +69,7 @@
                                         v-model="form.department_id"
                                         :class="{ 'is-invalid': form.errors.department_id }"
                                     >
-                                        <option :value="null">- Tidak ada / Admin -</option>
+                                        <option :value="null">{{ $t('users.department_none') }}</option>
                                         <option v-for="dept in departments" :key="dept.id" :value="dept.id">
                                             {{ dept.name }}
                                         </option>
@@ -102,7 +102,7 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <button class="btn btn-primary shadow-sm rounded-sm" type="submit" :disabled="form.processing">
-                                            <span v-if="form.processing">Menyimpan...</span>
+                                            <span v-if="form.processing">{{ $t('common.saving') }}</span>
                                             <span v-else>UPDATE</span>
                                         </button>
                                     </div>
@@ -150,7 +150,7 @@ export default {
             form.put(`/apps/users/${props.user.id}`, {
                 onSuccess: () => {
                     Swal.fire({
-                        title: 'Berhasil!',
+                        title: $t('common.saved_success'),
                         text: 'User berhasil diperbarui.',
                         icon: 'success',
                         showConfirmButton: false,

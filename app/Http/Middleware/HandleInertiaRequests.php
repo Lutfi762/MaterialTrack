@@ -49,6 +49,7 @@ class HandleInertiaRequests extends Middleware
                     'id'            => $request->user()->id,
                     'name'          => $request->user()->name,
                     'email'         => $request->user()->email,
+                    'locale'        => $request->user()->locale,
                     'department_id' => $request->user()->department_id,
                     'department'    => $request->user()->department ? [
                         'id'   => $request->user()->department->id,

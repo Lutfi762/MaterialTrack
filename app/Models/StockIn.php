@@ -16,9 +16,12 @@ class StockIn extends Model
         'department_id',
         'user_id',
         'reference_no',
+        'po_number',
         'qty',
         'source',
+        'supplier_id',
         'notes',
+        'expiry_date',
         'date',
     ];
 
@@ -45,5 +48,10 @@ class StockIn extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

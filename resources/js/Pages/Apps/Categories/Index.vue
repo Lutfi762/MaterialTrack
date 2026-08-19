@@ -1,6 +1,6 @@
 <template>
     <Head>
-        <title>Kategori Material - MaterialTrack</title>
+        <title>{{ $t('categories.heading') }} - MaterialTrack</title>
     </Head>
 
     <main>
@@ -14,7 +14,7 @@
 
                             <span class="font-weight-bold">
                                 <i class="fa fa-folder me-1"></i>
-                                KATEGORI MATERIAL
+                                {{ $t('categories.heading') }}
                             </span>
 
 
@@ -37,9 +37,9 @@
 
                                 <thead>
                                     <tr>
-                                        <th scope="col">Nama</th>
-                                        <th scope="col">Deskripsi</th>
-                                        <th scope="col">Jumlah Item</th>
+                                         <th scope="col">{{ $t('categories.col_name') }}</th>
+                                         <th scope="col">{{ $t('categories.col_description') }}</th>
+                                         <th scope="col">{{ $t('categories.col_items') }}</th>
                                         <th scope="col" width="15%" class="text-center">
                                             Actions
                                         </th>
@@ -53,7 +53,7 @@
                                     <tr v-if="categories.data.length === 0">
 
                                         <td colspan="4" class="text-center">
-                                            Tidak ada data.
+                                             {{ $t('categories.empty') }}
                                         </td>
 
                                     </tr>
@@ -86,7 +86,7 @@
                                                 v-if="hasAnyPermission(['categories.edit'])"
                                                 :href="`/apps/categories/${cat.id}/edit`"
                                                 class="btn btn-success btn-sm me-2"
-                                                aria-label="Edit Kategori"
+                                                :aria-label="$t('categories.edit')"
                                             >
                                                 <i class="fa fa-pencil-alt" aria-hidden="true"></i>
                                             </Link>
@@ -96,7 +96,7 @@
                                             <button
                                                 v-if="hasAnyPermission(['categories.delete'])"
                                                 class="btn btn-danger btn-sm"
-                                                aria-label="Hapus Kategori"
+                                                :aria-label="$t('common.delete')"
                                                 @click="handleDelete(cat.id)"
                                             >
 
@@ -150,6 +150,7 @@ import {
 
 import { ref } from 'vue';
 import { confirmDelete } from '@/Utils/confirmDialog';
+import { useI18n } from 'vue-i18n';
 
 
 export default {
@@ -172,12 +173,13 @@ export default {
 
     setup(){
 
+        const { t } = useI18n();
         const isLoading = ref(false);
 
         const handleDelete = async (id) => {
 
 
-            if (await confirmDelete('Yakin ingin menghapus kategori ini?')) {
+            if (await confirmDelete(t('categories.delete_confirm'))) {
 
                 isLoading.value = true;
                 router.delete(

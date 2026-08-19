@@ -1,28 +1,57 @@
 <template>
-    <Head><title>Material Masuk - MaterialTrack</title></Head>
+    <Head><title>{{ $t('stock_in.title') }} - MaterialTrack</title></Head>
     <div class="stockins-page">
 
         <div class="page-header-card mb-4">
             <div>
-                <h4 class="mb-1"><i class="fa fa-arrow-down-left me-2 text-success"></i>Material Masuk</h4>
-                <p class="text-muted mb-0 small">Riwayat penerimaan/restock material ke gudang</p>
+                <h4 class="mb-1"><i class="fa fa-arrow-down-left me-2 text-success"></i>{{ $t('stock_in.title') }}</h4>
+                <p class="text-muted mb-0 small">{{ $t('stock_in.subtitle') }}</p>
             </div>
             <div class="d-flex gap-2">
                 <a v-if="hasAnyPermission(['stock_ins.export', 'stock_ins.index'])" href="/apps/stock-ins/export/excel" class="btn-modern btn-modern-outline">
-                    <i class="fa fa-file-excel me-2"></i>Export Excel
+                    <i class="fa fa-file-excel me-2"></i>{{ $t('stock_in.export_excel') }}
                 </a>
                 <a v-if="hasAnyPermission(['stock_ins.export', 'stock_ins.index'])" href="/apps/stock-ins/download-all/pdf" class="btn-modern btn-modern-outline">
-                    <i class="fa fa-file-pdf me-2"></i>Download Semua PDF
+                    <i class="fa fa-file-pdf me-2"></i>{{ $t('stock_in.download_all_pdf') }}
                 </a>
                 <Link v-if="hasAnyPermission(['stock_ins.create'])" href="/apps/stock-ins/create" class="btn-modern btn-modern-success">
-                    <i class="fa fa-plus me-2"></i>Input Baru
+                    <i class="fa fa-plus me-2"></i>{{ $t('stock_in.add') }}
                 </Link>
             </div>
         </div>
 
+        <div class="filter-bar mb-4">
+            <div class="filter-item">
+                <i class="fa fa-building text-muted"></i>
+                <select v-model="filterDepartment" class="filter-select" :disabled="isLoading">
+                    <option value="">{{ $t('stock_in.filter_all_dept') }}</option>
+                    <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <i class="fa fa-box text-muted"></i>
+                <select v-model="filterItem" class="filter-select" :disabled="isLoading">
+                    <option value="">{{ $t('stock_in.filter_all_material') }}</option>
+                    <option v-for="item in items" :key="item.id" :value="item.id">{{ item.name }}</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <i class="fa fa-calendar text-muted"></i>
+                <input type="date" v-model="filterFrom" class="filter-select" :disabled="isLoading">
+            </div>
+            <div class="filter-item">
+                <span class="text-muted small">{{ $t('stock_in.date_range') }}</span>
+                <input type="date" v-model="filterTo" class="filter-select" :disabled="isLoading">
+            </div>
+            <button class="btn-modern btn-modern-primary" @click="applyFilter" :disabled="isLoading">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i v-else class="fa fa-filter me-2"></i>{{ $t('common.apply') }}
+            </button>
+        </div>
+
         <div v-if="stockIns.data.length > 0" class="transaction-list">
             <div v-for="row in stockIns.data" :key="row.id" class="transaction-card">
-                <div class="transaction-icon" role="img" aria-label="Material Masuk">
+                <div class="transaction-icon" role="img" :aria-label="$t('stock_in.title')">
                     <i class="fa fa-arrow-down-left" aria-hidden="true"></i>
                 </div>
                 <div class="transaction-main">
@@ -36,8 +65,10 @@
                         </div>
                     </div>
                     <div class="transaction-meta">
+                        <span class="meta-badge" v-if="row.po_number"><i class="fa fa-file-invoice me-1" aria-hidden="true"></i>PO: {{ row.po_number }}</span>
+                        <span class="meta-badge" v-if="row.supplier"><i class="fa fa-truck me-1" aria-hidden="true"></i>{{ row.supplier.name }}</span>
                         <span class="meta-badge" v-if="row.department"><i class="fa fa-building me-1" aria-hidden="true"></i>{{ row.department.name }}</span>
-                        <span class="meta-badge"><i class="fa fa-truck me-1" aria-hidden="true"></i>{{ row.source ?? '-' }}</span>
+                        <span class="meta-badge" v-if="!row.supplier && row.source"><i class="fa fa-tag me-1" aria-hidden="true"></i>{{ row.source }}</span>
                         <span class="meta-badge"><i class="fa fa-calendar me-1" aria-hidden="true"></i>{{ row.date }}</span>
                     </div>
                 </div>
@@ -45,10 +76,10 @@
                     <a :href="`/apps/stock-ins/${row.id}/pdf`" target="_blank" class="act-btn act-btn-neutral" title="Download PDF" aria-label="Download PDF">
                         <i class="fa fa-file-pdf" aria-hidden="true"></i>
                     </a>
-                    <Link v-if="hasAnyPermission(['stock_ins.edit'])" :href="`/apps/stock-ins/${row.id}/edit`" class="act-btn act-btn-success" title="Edit" aria-label="Edit Transaksi">
+                    <Link v-if="hasAnyPermission(['stock_ins.edit'])" :href="`/apps/stock-ins/${row.id}/edit`" class="act-btn act-btn-success" :title="$t('common.edit')" :aria-label="$t('stock_in.edit')">
                         <i class="fa fa-pencil-alt" aria-hidden="true"></i>
                     </Link>
-                    <button v-if="hasAnyPermission(['stock_ins.delete'])" class="act-btn act-btn-danger" title="Batalkan" aria-label="Batalkan Transaksi" @click="handleDelete(row.id)">
+                    <button v-if="hasAnyPermission(['stock_ins.delete'])" class="act-btn act-btn-danger" :title="$t('common.cancel')" :aria-label="$t('common.cancel')" @click="handleDelete(row.id)">
                         <i class="fa fa-undo" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -57,8 +88,8 @@
 
         <div v-else class="empty-state">
             <i class="fa fa-inbox"></i>
-            <p class="mb-0 fw-semibold">Belum ada transaksi material masuk</p>
-            <p class="text-muted small">Klik "Input Baru" untuk mencatat restock pertama</p>
+            <p class="mb-0 fw-semibold">{{ $t('stock_in.empty') }}</p>
+            <p class="text-muted small">{{ $t('stock_in.empty_desc') }}</p>
         </div>
 
         <Pagination v-if="stockIns.data.length > 0" :links="stockIns.links" align="center" />
@@ -68,18 +99,38 @@
 <script>
 import Pagination from '../../../Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { confirmDelete } from '@/Utils/confirmDialog';
 import LayoutApp from '../../../Layouts/App.vue';
 
 export default {
     layout: LayoutApp,
     components: { Head, Link, Pagination },
-    props: { stockIns: Object, items: Array, filters: Object },
-    setup() {
+    props: { stockIns: Object, items: Array, departments: Array, filters: Object },
+    setup(props) {
+        const { t } = useI18n();
+        const filterDepartment = ref(props.filters?.department_id ?? '');
+        const filterItem = ref(props.filters?.item_id ?? '');
+        const filterFrom = ref(props.filters?.date_from ?? '');
+        const filterTo = ref(props.filters?.date_to ?? '');
         const isLoading = ref(false);
 
+        const applyFilter = () => {
+            isLoading.value = true;
+            router.get('/apps/stock-ins', {
+                department_id: filterDepartment.value || undefined,
+                item_id: filterItem.value || undefined,
+                date_from: filterFrom.value || undefined,
+                date_to: filterTo.value || undefined,
+            }, {
+                preserveState: true,
+                onFinish: () => { isLoading.value = false; }
+            });
+        };
+
         const handleDelete = async (id) => {
-            if (await confirmDelete('Transaksi ini akan dibatalkan dan stok dikurangi kembali.')) {
+            if (await confirmDelete(t('stock_in.cancel_confirm'))) {
                 isLoading.value = true;
                 router.delete(`/apps/stock-ins/${id}`, {
                     onFinish: () => { isLoading.value = false; },
@@ -89,7 +140,7 @@ export default {
                 });
             }
         };
-        return { handleDelete, isLoading };
+        return { filterDepartment, filterItem, filterFrom, filterTo, applyFilter, handleDelete, isLoading };
     },
 };
 </script>
@@ -110,6 +161,16 @@ export default {
 .btn-modern-success:hover { color: white; }
 .btn-modern-outline { background: white; color: #059669; border: 1.5px solid #d1fae5; }
 .btn-modern-outline:hover { color: #059669; background: #f0fdf4; }
+
+.filter-bar {
+    background: white; border-radius: 14px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.filter-item { display: flex; align-items: center; gap: 8px; }
+.filter-select { border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 7px 12px; font-size: 13px; }
+.btn-modern-primary { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
+.btn-modern-primary:hover { color: white; }
 
 .transaction-list { display: flex; flex-direction: column; gap: 12px; }
 .transaction-card {

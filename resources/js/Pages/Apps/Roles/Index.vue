@@ -9,7 +9,7 @@
                     <div class="card border-0 rounded-3 shadow">
                         <div class="card-header">
                             <span class="font-weight-bold">
-                                <i class="fa fa-shield-alt"></i> ROLES
+                                <i class="fa fa-shield-alt"></i> {{ $t('roles.heading') }}
                             </span>
                         </div>
                         <div class="card-body">
@@ -27,7 +27,7 @@
                                         type="text"
                                         class="form-control"
                                         v-model="search"
-                                        placeholder="Search by role name..."
+                                        :placeholder="$t('roles.search_placeholder')"
                                     />
                                     <button class="btn btn-primary input-group-text" type="submit">
                                         <i class="fa fa-search me-2"></i> SEARCH
@@ -38,20 +38,20 @@
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Role Name</th>
-                                        <th style="width:50%">Permissions</th>
-                                        <th style="width:20%" class="text-center">Actions</th>
+                                        <th>{{ $t('roles.col_name') }}</th>
+                                        <th style="width:50%">{{ $t('roles.col_permissions') }}</th>
+                                        <th style="width:20%" class="text-center">{{ $t('common.action') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-if="roles.data.length === 0">
-                                        <td colspan="3" class="text-center">Tidak ada data.</td>
+                                        <td colspan="3" class="text-center">{{ $t('common.no_data') }}</td>
                                     </tr>
                                     <tr v-for="(role, index) in roles.data" :key="index">
                                         <td>
                                             {{ role.name }}
                                             <span v-if="isLockedRole(role.name)" class="badge bg-secondary ms-2">
-                                                <i class="fa fa-lock me-1"></i> Terkunci
+                                                <i class="fa fa-lock me-1"></i> {{ $t('roles.locked') }}
                                             </span>
                                         </td>
                                         <td>
@@ -133,7 +133,7 @@ export default {
         };
 
         const handleDelete = async (id) => {
-            if (await confirmDelete('Role ini akan dihapus permanen.')) {
+            if (await confirmDelete($t('roles.delete_confirm'))) {
                 router.delete(`/apps/roles/${id}`);
             }
         };

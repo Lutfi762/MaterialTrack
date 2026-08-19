@@ -14,6 +14,7 @@ class GeminiProvider implements AIProviderInterface
     protected int $timeout;
     protected int $maxTokens;
     protected float $temperature;
+    protected array $fallbackModels;
 
     public function __construct()
     {
@@ -23,6 +24,7 @@ class GeminiProvider implements AIProviderInterface
         $this->timeout = config('ai.gemini.timeout', 30);
         $this->maxTokens = config('ai.gemini.max_tokens', 2048);
         $this->temperature = config('ai.gemini.temperature', 0.7);
+        $this->fallbackModels = config('ai.gemini.fallback_models', []);
     }
 
     public function chat(string $systemPrompt, array $messages, array $tools = []): array
@@ -31,16 +33,21 @@ class GeminiProvider implements AIProviderInterface
             throw new \Exception('Gemini API key is not configured.');
         }
 
-        // Build Gemini request format
-        $contents = $this->buildContents($systemPrompt, $messages);
-
         $payload = [
-            'contents' => $contents,
+            'contents' => $this->buildContents($messages),
             'generationConfig' => [
                 'temperature' => $this->temperature,
                 'maxOutputTokens' => $this->maxTokens,
             ],
         ];
+
+        if (!empty($systemPrompt)) {
+            $payload['systemInstruction'] = [
+                'parts' => [
+                    ['text' => $systemPrompt],
+                ],
+            ];
+        }
 
         // Add tools if provided
         if (!empty($tools)) {
@@ -50,28 +57,7 @@ class GeminiProvider implements AIProviderInterface
         }
 
         try {
-            $url = "{$this->apiUrl}/{$this->model}:generateContent";
-
-            $response = Http::timeout($this->timeout)
-                ->withHeaders([
-                    'x-goog-api-key' => $this->apiKey,
-                    'Content-Type' => 'application/json',
-                ])
-                ->post($url, $payload);
-
-            if (!$response->successful()) {
-                $errorBody = $response->json();
-                $errorMessage = $errorBody['error']['message'] ?? 'Unknown error';
-                $errorStatus = $errorBody['error']['status'] ?? 'UNKNOWN';
-
-                Log::error('Gemini API error', [
-                    'http_status' => $response->status(),
-                    'error_status' => $errorStatus,
-                    'error_message' => $errorMessage,
-                    'model' => $this->model,
-                ]);
-                throw new \Exception("Gemini API error: {$errorMessage}");
-            }
+            $response = $this->sendWithFallback($payload);
 
             $data = $response->json();
 
@@ -86,6 +72,58 @@ class GeminiProvider implements AIProviderInterface
         }
     }
 
+    protected function sendWithFallback(array $payload)
+    {
+        $models = array_values(array_unique(array_filter(array_merge([$this->model], $this->fallbackModels))));
+        $lastErrorMessage = 'Unknown error';
+
+        foreach ($models as $model) {
+            $url = "{$this->apiUrl}/{$model}:generateContent";
+
+            $response = Http::timeout($this->timeout)
+                ->withHeaders([
+                    'x-goog-api-key' => $this->apiKey,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post($url, $payload);
+
+            if ($response->successful()) {
+                if ($model !== $this->model) {
+                    Log::info('Gemini fallback model succeeded', [
+                        'primary_model' => $this->model,
+                        'fallback_model' => $model,
+                    ]);
+                }
+
+                return $response;
+            }
+
+            $errorBody = $response->json();
+            $errorMessage = $errorBody['error']['message'] ?? 'Unknown error';
+            $errorStatus = $errorBody['error']['status'] ?? 'UNKNOWN';
+            $lastErrorMessage = $errorMessage;
+
+            Log::error('Gemini API error', [
+                'http_status' => $response->status(),
+                'error_status' => $errorStatus,
+                'error_message' => $errorMessage,
+                'model' => $model,
+            ]);
+
+            if (!$this->shouldTryFallback($response->status(), $errorStatus)) {
+                break;
+            }
+        }
+
+        throw new \Exception("Gemini API error: {$lastErrorMessage}");
+    }
+
+    protected function shouldTryFallback(int $httpStatus, string $errorStatus): bool
+    {
+        return in_array($httpStatus, [429, 500, 502, 503, 504], true)
+            || in_array($errorStatus, ['RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'INTERNAL', 'DEADLINE_EXCEEDED'], true);
+    }
+
     public function isConfigured(): bool
     {
         return !empty($this->apiKey);
@@ -96,29 +134,24 @@ class GeminiProvider implements AIProviderInterface
         return 'gemini';
     }
 
-    protected function buildContents(string $systemPrompt, array $messages): array
+    protected function buildContents(array $messages): array
     {
         $contents = [];
 
-        // Add system prompt as first user message
-        if (!empty($systemPrompt)) {
-            $contents[] = [
-                'role' => 'user',
-                'parts' => [['text' => $systemPrompt]],
-            ];
-            $contents[] = [
-                'role' => 'model',
-                'parts' => [['text' => 'Understood. I will follow these instructions.']],
-            ];
-        }
-
-        // Add conversation history
         foreach ($messages as $message) {
+            if (empty($message['content'])) {
+                continue;
+            }
+
             $role = $message['role'] === 'user' ? 'user' : 'model';
             $contents[] = [
                 'role' => $role,
                 'parts' => [['text' => $message['content']]],
             ];
+        }
+
+        if (empty($contents)) {
+            throw new \Exception('No message content was provided to Gemini.');
         }
 
         return $contents;
@@ -137,10 +170,11 @@ class GeminiProvider implements AIProviderInterface
 
         $candidate = $data['candidates'][0];
 
-        // Check if response was blocked
-        if (isset($candidate['finishReason']) && $candidate['finishReason'] !== 'STOP') {
+        $finishReason = $candidate['finishReason'] ?? null;
+
+        if ($finishReason && !in_array($finishReason, ['STOP', 'MAX_TOKENS'], true)) {
             Log::warning('Gemini response blocked', [
-                'finish_reason' => $candidate['finishReason'],
+                'finish_reason' => $finishReason,
                 'safety_ratings' => $candidate['safetyRatings'] ?? null,
             ]);
         }
@@ -157,10 +191,6 @@ class GeminiProvider implements AIProviderInterface
             }
         }
 
-        if (empty($text)) {
-            throw new \Exception('No text content in Gemini response.');
-        }
-
         // Check for function call
         $functionCall = null;
         foreach ($candidate['content']['parts'] as $part) {
@@ -168,6 +198,10 @@ class GeminiProvider implements AIProviderInterface
                 $functionCall = $part['functionCall'];
                 break;
             }
+        }
+
+        if (empty($text)) {
+            throw new \Exception($functionCall ? 'Gemini returned a function call without text content.' : 'No text content in Gemini response.');
         }
 
         return [

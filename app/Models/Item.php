@@ -19,13 +19,16 @@ class Item extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_id', 'location_id', 'code', 'name', 'description',
-        'unit', 'min_stock', 'current_stock', 'image',
+        'category_id', 'location_id', 'warehouse_id', 'code', 'name', 'description',
+        'unit', 'unit_alt', 'conversion_factor', 'min_stock', 'current_stock', 'price', 'image', 'photos',
     ];
 
     protected $casts = [
         'current_stock' => 'integer',
         'min_stock' => 'integer',
+        'price' => 'decimal:2',
+        'conversion_factor' => 'decimal:2',
+        'photos' => 'array',
     ];
 
     /**
@@ -58,6 +61,11 @@ class Item extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     public function stockIns(): HasMany

@@ -6,25 +6,25 @@
                 <div class="col-md-12">
                     <div class="card border-0 rounded-3 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-clipboard-check me-1"></i> INPUT STOCK OPNAME</span>
+                            <span class="font-weight-bold"><i class="fa fa-clipboard-check me-1"></i> {{ $t('stock_opname.add') }}</span>
                             <Link :href="`/apps/stock-opnames?period=${form.period}`" class="btn btn-sm btn-secondary">
-                                <i class="fa fa-arrow-left me-1"></i> Kembali
+                                <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
                             </Link>
                         </div>
                         <div class="card-body">
                             <div class="row g-2 mb-3">
                                 <div class="col-md-3">
-                                    <label class="form-label">Periode</label>
+                                    <label class="form-label">{{ $t('stock_opname.period') }}</label>
                                     <input v-model="form.period" type="month" class="form-control" />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label">Tanggal Opname</label>
+                                    <label class="form-label">{{ $t('stock_opname.date') }}</label>
                                     <input v-model="form.date" type="date" class="form-control" />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label">Filter Kategori</label>
+                                    <label class="form-label">{{ $t('stock_opname.filter_category') }}</label>
                                     <select v-model="selectedCategory" class="form-select">
-                                        <option value="">-- Semua Kategori --</option>
+                                        <option value="">{{ $t('stock_opname.filter_all') }}</option>
                                         <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                                     </select>
                                 </div>
@@ -37,10 +37,10 @@
                                             <th>Kode</th>
                                             <th>Nama Material</th>
                                             <th>Kategori</th>
-                                            <th class="text-end">Stok Sistem</th>
-                                            <th style="width: 150px;">Stok Fisik</th>
-                                            <th class="text-center" style="width: 100px;">Selisih</th>
-                                            <th>Catatan</th>
+                                            <th class="text-end">{{ $t('stock_opname.col_system_stock') }}</th>
+                                            <th style="width: 150px;">{{ $t('stock_opname.col_physical_stock') }}</th>
+                                            <th class="text-center" style="width: 100px;">{{ $t('stock_opname.col_diff') }}</th>
+                                            <th>{{ $t('stock_opname.col_notes') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -56,7 +56,7 @@
                                                     type="number" min="0"
                                                     class="form-control form-control-sm"
                                                 />
-                                                <span v-else class="text-muted small">Sudah diopname</span>
+                                                <span v-else class="text-muted small">{{ $t('stock_opname.already_opnamed') }}</span>
                                             </td>
                                             <td class="text-center">
                                                 <span v-if="!alreadyDone.includes(row.item.id)"
@@ -70,7 +70,7 @@
                                                     v-model="row.notes"
                                                     type="text"
                                                     class="form-control form-control-sm"
-                                                    placeholder="Opsional"
+                                                    :placeholder="$t('common.optional')"
                                                 />
                                             </td>
                                         </tr>
@@ -79,7 +79,7 @@
                             </div>
 
                             <button @click="submit" class="btn btn-primary" :disabled="submitting">
-                                <i class="fa fa-save me-1"></i> Simpan Hasil Opname
+                                <i class="fa fa-save me-1"></i> {{ $t('stock_opname.save_opname') }}
                             </button>
                         </div>
                     </div>
@@ -135,7 +135,7 @@ export default {
         },
         diffLabel(row) {
             const d = this.diff(row);
-            if (d === 0) return 'Sesuai';
+            if (d === 0) return this.$t('stock_opname.diff_match');
             return d > 0 ? `+${d}` : `${d}`;
         },
         diffClass(row) {
@@ -153,7 +153,7 @@ export default {
                 }));
 
             if (entries.length === 0) {
-                alert('Tidak ada item untuk disimpan.');
+                alert(this.$t('stock_opname.no_items_save'));
                 return;
             }
 

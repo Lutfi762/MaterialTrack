@@ -9,9 +9,9 @@
                     <div class="col-md-12">
                         <div class="card border-0 rounded-3 shadow border-top-purple">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold"><i class="fa fa-shield-halved me-1"></i> TAMBAH ROLE</span>
+                                <span class="font-weight-bold"><i class="fa fa-shield-halved me-1"></i> {{ $t('roles.add') }}</span>
                                 <Link href="/apps/roles" class="btn btn-sm btn-secondary">
-                                    <i class="fa fa-arrow-left me-1"></i> Kembali
+                                    <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
                                 </Link>
                             </div>
                             <div class="card-body">
@@ -19,13 +19,13 @@
                                 <form @submit.prevent="submit">
 
                                     <div class="mb-3">
-                                        <label class="fw-bold">Nama Role</label>
+                                        <label class="fw-bold">{{ $t('roles.name') }}</label>
                                         <input
                                             class="form-control"
                                             v-model="form.name"
                                             :class="{ 'is-invalid': form.errors.name }"
                                             type="text"
-                                            placeholder="Contoh: Admin Gudang, Department"
+                                            :placeholder="$t('roles.name_placeholder')"
                                         >
                                         <div v-if="form.errors.name" class="invalid-feedback d-block">
                                             {{ form.errors.name }}
@@ -65,7 +65,7 @@
                                                 type="submit"
                                                 :disabled="form.processing"
                                             >
-                                                <span v-if="form.processing">Menyimpan...</span>
+                                                <span v-if="form.processing">{{ $t('common.saving') }}</span>
                                                 <span v-else>SIMPAN</span>
                                             </button>
                                             <button
@@ -115,7 +115,7 @@ export default {
             form.post('/apps/roles', {
                 onSuccess: () => {
                     Swal.fire({
-                        title: 'Berhasil!',
+                        title: $t('common.saved_success'),
                         text: 'Role berhasil disimpan.',
                         icon: 'success',
                         showConfirmButton: false,

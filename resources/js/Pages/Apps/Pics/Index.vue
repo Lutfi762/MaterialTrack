@@ -6,11 +6,11 @@
                 <div class="col-12">
                     <div class="page-header-card">
                         <div>
-                            <h4 class="mb-1"><i class="fa fa-id-badge me-2 text-primary"></i>Data PIC</h4>
-                            <p class="text-muted mb-0 small">Penanggung jawab pengambilan material per departemen</p>
+                            <h4 class="mb-1"><i class="fa fa-id-badge me-2 text-primary"></i>{{ $t('pics.heading') }}</h4>
+                            <p class="text-muted mb-0 small">{{ $t('pics.subtitle') }}</p>
                         </div>
                         <Link v-if="hasAnyPermission(['pics.create'])" href="/apps/pics/create" class="btn btn-primary btn-modern">
-                            <i class="fa fa-plus-circle me-2"></i> Tambah PIC
+                            <i class="fa fa-plus-circle me-2"></i> {{ $t('pics.add') }}
                         </Link>
                     </div>
                 </div>
@@ -37,15 +37,15 @@
                                 <i class="fa fa-envelope text-muted"></i> {{ pic.email }}
                             </div>
                             <div class="pic-info-row text-muted" v-if="!pic.nik && !pic.phone && !pic.email">
-                                <i class="fa fa-circle-info"></i> Belum ada info kontak
+                                <i class="fa fa-circle-info"></i> {{ $t('pics.empty_contact') }}
                             </div>
                         </div>
                         <div class="pic-card-footer">
                             <Link v-if="hasAnyPermission(['pics.edit'])" :href="`/apps/pics/${pic.id}/edit`" class="btn btn-sm btn-outline-success flex-fill">
-                                <i class="fa fa-pencil-alt me-1"></i> Edit
+                                <i class="fa fa-pencil-alt me-1"></i> {{ $t('common.edit') }}
                             </Link>
                             <button v-if="hasAnyPermission(['pics.delete'])" class="btn btn-sm btn-outline-danger flex-fill" @click="handleDelete(pic.id)">
-                                <i class="fa fa-trash me-1"></i> Hapus
+                                <i class="fa fa-trash me-1"></i> {{ $t('common.delete') }}
                             </button>
                         </div>
                     </div>
@@ -54,8 +54,8 @@
 
             <div class="empty-state" v-else>
                 <i class="fa fa-id-badge"></i>
-                <p class="mb-0 fw-semibold">Belum ada data PIC</p>
-                <p class="text-muted small">Tambahkan PIC untuk mulai mencatat pengambilan material</p>
+                <p class="mb-0 fw-semibold">{{ $t('pics.empty') }}</p>
+                <p class="text-muted small">{{ $t('pics.add_desc') }}</p>
             </div>
 
             <Pagination v-if="pics.data.length > 0" :links="pics.links" align="center" />
@@ -86,7 +86,7 @@ export default {
         };
 
         const handleDelete = async (id) => {
-            if (await confirmDelete('PIC ini akan dihapus permanen.')) {
+            if (await confirmDelete($t('pics.delete_confirm'))) {
                 isLoading.value = true;
                 router.delete(`/apps/pics/${id}`, {
                     onFinish: () => { isLoading.value = false; },

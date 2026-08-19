@@ -8,15 +8,15 @@
                         <div class="form-card-header">
                             <Link href="/apps/pics" class="back-btn"><i class="fa fa-arrow-left"></i></Link>
                             <div>
-                                <h5 class="mb-0">Tambah PIC Baru</h5>
-                                <p class="text-muted small mb-0">Daftarkan penanggung jawab pengambilan material</p>
+                                <h5 class="mb-0">{{ $t('pics.add_heading') }}</h5>
+                                <p class="text-muted small mb-0">{{ $t('pics.add_desc') }}</p>
                             </div>
                         </div>
 
                         <form @submit.prevent="submit" class="form-card-body">
                             <div class="form-floating-modern mb-3">
                                 <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.name }" type="text" placeholder=" ">
-                                <label>Nama Lengkap</label>
+                                <label>{{ $t('pics.full_name') }}</label>
                                 <div v-if="form.errors.name" class="invalid-feedback d-block">{{ form.errors.name }}</div>
                             </div>
 
@@ -24,21 +24,21 @@
                                 <div class="col-md-6 mb-3">
                                     <div class="form-floating-modern">
                                         <input class="form-control" v-model="form.nik" :class="{ 'is-invalid': form.errors.nik }" type="text" placeholder=" ">
-                                        <label>NIK / No. Karyawan</label>
+                                        <label>{{ $t('pics.nik') }}</label>
                                         <div v-if="form.errors.nik" class="invalid-feedback d-block">{{ form.errors.nik }}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <div class="form-floating-modern">
                                         <input class="form-control" v-model="form.phone" type="text" placeholder=" ">
-                                        <label>No. Telepon</label>
+                                        <label>{{ $t('pics.phone') }}</label>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-floating-modern mb-3">
                                 <input class="form-control" v-model="form.email" :class="{ 'is-invalid': form.errors.email }" type="email" placeholder=" ">
-                                <label>Email (opsional)</label>
+                                <label>{{ $t('pics.email') }}</label>
                                 <div v-if="form.errors.email" class="invalid-feedback d-block">{{ form.errors.email }}</div>
                             </div>
 
@@ -48,13 +48,13 @@
                                     <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
                                 </select>
                                 <small v-if="lockedDepartmentId !== null" class="text-muted d-block mt-1">
-                                    <i class="fa fa-lock me-1"></i> Otomatis sesuai departemen akun Anda
+                                    <i class="fa fa-lock me-1"></i> {{ $t('pics.department_auto') }}
                                 </small>
                             </div>
 
                             <button class="btn btn-primary btn-modern w-100" type="submit" :disabled="form.processing">
-                                <span v-if="form.processing"><i class="fa fa-spinner fa-spin me-2"></i>Menyimpan...</span>
-                                <span v-else><i class="fa fa-check me-2"></i>Simpan PIC</span>
+                                <span v-if="form.processing"><i class="fa fa-spinner fa-spin me-2"></i>{{ $t('common.saving') }}</span>
+                                <span v-else><i class="fa fa-check me-2"></i>{{ $t('pics.save') }}</span>
                             </button>
                         </form>
                     </div>
@@ -85,7 +85,7 @@ export default {
         const submit = () => {
             form.post('/apps/pics', {
                 onSuccess: () => Swal.fire({
-                    title: 'Berhasil!',
+                    title: $t('common.saved_success'),
                     text: 'PIC baru berhasil ditambahkan.',
                     icon: 'success',
                     showConfirmButton: false,

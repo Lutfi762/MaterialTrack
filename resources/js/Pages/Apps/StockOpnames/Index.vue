@@ -6,7 +6,7 @@
                 <div class="col-md-12">
                     <div class="card border-0 rounded-3 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-clipboard-check me-1"></i> STOCK OPNAME</span>
+                            <span class="font-weight-bold"><i class="fa fa-clipboard-check me-1"></i> {{ $t('stock_opname.heading') }}</span>
                             <div class="d-flex gap-2">
                                 <a v-if="hasAnyPermission(['stock_opnames.export', 'stock_opnames.index'])" :href="`/apps/stock-opnames/export/excel?period=${currentPeriod}`" class="btn btn-success btn-sm">
                                     <i class="fa fa-file-excel me-1"></i> Export Excel
@@ -15,7 +15,7 @@
                                     <i class="fa fa-file-pdf me-1"></i> Download Semua PDF
                                 </a>
                                 <Link v-if="hasAnyPermission(['stock_opnames.create'])" :href="`/apps/stock-opnames/create?period=${currentPeriod}`" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-plus-circle me-2"></i> INPUT OPNAME
+                                    <i class="fa fa-plus-circle me-2"></i> {{ $t('stock_opname.add') }}
                                 </Link>
                             </div>
                         </div>
@@ -24,7 +24,7 @@
                                 <div class="col-md-3">
                                     <select v-model="selectedPeriod" @change="changePeriod" class="form-select form-select-sm">
                                         <option :value="currentPeriod" v-if="!availablePeriods.includes(currentPeriod)">
-                                            {{ currentPeriod }} (belum ada data)
+                                            {{ currentPeriod }} ({{ $t('stock_opname.empty') }})
                                         </option>
                                         <option v-for="p in availablePeriods" :key="p" :value="p">{{ p }}</option>
                                     </select>
@@ -36,20 +36,21 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th>Ref</th>
-                                            <th>Tanggal</th>
-                                            <th>Material</th>
-                                            <th>Kategori</th>
-                                            <th class="text-end">Stok Sistem</th>
-                                            <th class="text-end">Stok Fisik</th>
-                                            <th class="text-center">Selisih</th>
-                                            <th>Catatan</th>
-                                            <th>Oleh</th>
-                                            <th class="text-center">Aksi</th>
+                                            <th>{{ $t('stock_opname.col_date') }}</th>
+                                            <th>{{ $t('stock_opname.col_material') }}</th>
+                                            <th>{{ $t('stock_opname.col_category') }}</th>
+                                            <th class="text-end">{{ $t('stock_opname.col_system_stock') }}</th>
+                                            <th class="text-end">{{ $t('stock_opname.col_physical_stock') }}</th>
+                                            <th class="text-center">{{ $t('stock_opname.col_diff') }}</th>
+                                            <th>{{ $t('stock_opname.col_notes') }}</th>
+                                            <th>{{ $t('stock_opname.col_by') }}</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">{{ $t('stock_opname.col_action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-if="opnames.data.length === 0">
-                                            <td colspan="10" class="text-center text-muted py-4">Belum ada data opname untuk periode ini.</td>
+                                            <td colspan="11" class="text-center text-muted py-4">{{ $t('stock_opname.empty') }}</td>
                                         </tr>
                                         <tr v-for="op in opnames.data" :key="op.id">
                                             <td class="text-nowrap">{{ op.reference_no }}</td>
@@ -62,16 +63,42 @@
                                             <td class="text-end">{{ op.system_stock }}</td>
                                             <td class="text-end">{{ op.physical_stock }}</td>
                                             <td class="text-center">
-                                                <span v-if="op.difference === 0" class="badge bg-success">Sesuai</span>
-                                                <span v-else-if="op.difference > 0" class="badge bg-info">+{{ op.difference }} (surplus)</span>
-                                                <span v-else class="badge bg-danger">{{ op.difference }} (defisit)</span>
+                                                <span v-if="op.difference === 0" class="badge bg-success">{{ $t('stock_opname.diff_match') }}</span>
+                                                <span v-else-if="op.difference > 0" class="badge bg-info">+{{ op.difference }} ({{ $t('stock_opname.diff_surplus') }})</span>
+                                                <span v-else class="badge bg-danger">{{ op.difference }} ({{ $t('stock_opname.diff_deficit') }})</span>
                                             </td>
                                             <td>{{ op.notes ?? '-' }}</td>
-                                            <td>{{ op.user?.name ?? '-' }}</td>
+                                            <td>
+                                                <div>{{ op.user?.name ?? '-' }}</div>
+                                                <div v-if="op.status === 'verified'" class="small text-muted">
+                                                    <i class="fa fa-check-circle text-success me-1"></i>{{ op.verified_by?.name ? op.verified_by.name : 'diverifikasi' }}
+                                                </div>
+                                            </td>
                                             <td class="text-center">
-                                                <a :href="`/apps/stock-opnames/${op.id}/pdf`" class="btn btn-outline-danger btn-sm" title="Download PDF">
-                                                    <i class="fa fa-file-pdf"></i>
-                                                </a>
+                                                <span v-if="op.status === 'pending'" class="badge bg-warning text-dark">
+                                                    <i class="fa fa-clock me-1"></i>Menunggu Verifikasi
+                                                </span>
+                                                <span v-else class="badge bg-success">
+                                                    <i class="fa fa-check me-1"></i>Terverifikasi
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm">
+                                                    <Link :href="`/apps/stock-opnames/${op.id}`" class="btn btn-outline-info" :title="$t('stock_opname.view')">
+                                                        <i class="fa fa-eye"></i>
+                                                    </Link>
+                                                    <Link v-if="op.status === 'pending'" :href="`/apps/stock-opnames/${op.id}/edit`" class="btn btn-outline-warning" :title="$t('stock_opname.revision')">
+                                                        <i class="fa fa-edit"></i>
+                                                    </Link>
+                                                    <form v-if="op.status === 'pending' && hasAnyPermission(['stock_opnames.verify'])" @submit.prevent="verify(op)">
+                                                        <button class="btn btn-outline-success" :title="'Verifikasi opname'">
+                                                            <i class="fa fa-check-double"></i>
+                                                        </button>
+                                                    </form>
+                                                    <a :href="`/apps/stock-opnames/${op.id}/pdf`" class="btn btn-outline-danger" :title="$t('common.print')">
+                                                        <i class="fa fa-file-pdf"></i>
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -116,6 +143,11 @@ export default {
     methods: {
         changePeriod() {
             router.get('/apps/stock-opnames', { period: this.selectedPeriod }, { preserveState: true });
+        },
+        verify(op) {
+            if (confirm(`Verifikasi opname ${op.reference_no}? Stok sistem akan disesuaikan dari ${op.system_stock} ke ${op.physical_stock}.`)) {
+                router.patch(`/apps/stock-opnames/${op.id}/verify`);
+            }
         },
         formatDate(dateStr) {
             return new Date(dateStr).toLocaleDateString('id-ID', {

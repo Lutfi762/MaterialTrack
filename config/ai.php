@@ -26,6 +26,7 @@ return [
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
+        'fallback_models' => array_filter(array_map('trim', explode(',', env('GEMINI_FALLBACK_MODELS', 'gemini-3.6-flash,gemini-3.7-flash,gemini-flash-lite-latest')))),
         'api_url' => 'https://generativelanguage.googleapis.com/v1beta/models',
         'timeout' => 30,
         'max_tokens' => 2048,

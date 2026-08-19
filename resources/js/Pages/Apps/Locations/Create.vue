@@ -6,26 +6,26 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6">
                         <div class="card border-0 rounded-3 shadow">
-                            <div class="card-header"><span class="font-weight-bold">TAMBAH LOKASI GUDANG</span></div>
+                            <div class="card-header"><span class="font-weight-bold">{{ $t('locations.add') }}</span></div>
                             <div class="card-body">
                                 <form @submit.prevent="submit">
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Nama Lokasi <span class="text-danger">*</span></label>
+                                        <label class="form-label fw-semibold">{{ $t('locations.name') }} <span class="text-danger">*</span></label>
                                         <input v-model="form.name" type="text" class="form-control" :class="{ 'is-invalid': form.errors.name }">
                                         <div class="invalid-feedback">{{ form.errors.name }}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Kode Lokasi</label>
+                                        <label class="form-label fw-semibold">{{ $t('locations.code') }}</label>
                                         <input v-model="form.code" type="text" class="form-control" :class="{ 'is-invalid': form.errors.code }">
                                         <div class="invalid-feedback">{{ form.errors.code }}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Alamat</label>
+                                        <label class="form-label fw-semibold">{{ $t('locations.address') }}</label>
                                         <textarea v-model="form.address" class="form-control" rows="3"></textarea>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary" :disabled="form.processing">Simpan</button>
-                                        <Link href="/apps/locations" class="btn btn-secondary">Batal</Link>
+                                        <button type="submit" class="btn btn-primary" :disabled="form.processing">{{ $t('common.save') }}</button>
+                                        <Link href="/apps/locations" class="btn btn-secondary">{{ $t('common.cancel') }}</Link>
                                     </div>
                                 </form>
                             </div>

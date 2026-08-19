@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChatConversation;
+use App\Models\ChatMessage;
 use App\Services\AI\AIAssistantService;
 use App\Services\AI\GeminiProvider;
 use Illuminate\Http\Request;
@@ -11,9 +13,6 @@ use Inertia\Inertia;
 
 class AIAssistantController extends Controller
 {
-    /**
-     * Display AI Assistant page.
-     */
     public function index()
     {
         return Inertia::render('Apps/AIAssistant/Index', [
@@ -21,14 +20,12 @@ class AIAssistantController extends Controller
         ]);
     }
 
-    /**
-     * Process chat message.
-     */
     public function chat(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'message' => 'required|string|max:' . config('ai.assistant.max_query_length', 2000),
             'conversation_history' => 'nullable|array|max:' . config('ai.assistant.max_conversation_history', 10),
+            'conversation_id' => 'nullable|integer|exists:chat_conversations,id',
         ]);
 
         if ($validator->fails()) {
@@ -39,7 +36,6 @@ class AIAssistantController extends Controller
             ], 422);
         }
 
-        // Check if AI is configured
         if (empty(config('ai.gemini.api_key'))) {
             return response()->json([
                 'success' => false,
@@ -51,11 +47,30 @@ class AIAssistantController extends Controller
         $isAdmin = $user->hasRole('admin');
         $departmentId = null;
 
-        // Get department ID for non-admin users
         if (!$isAdmin && $user->hasRole('department_user')) {
-            // Get first department from user's categories
             $departmentId = $user->department_id ?? null;
         }
+
+        // Load or create conversation
+        $conversationId = $request->input('conversation_id');
+        if ($conversationId) {
+            $conversation = ChatConversation::where('id', $conversationId)
+                ->where('user_id', $user->id)
+                ->first();
+        } else {
+            $conversation = ChatConversation::create([
+                'user_id' => $user->id,
+                'title' => mb_substr($request->input('message'), 0, 80),
+            ]);
+            $conversationId = $conversation->id;
+        }
+
+        // Save user message
+        ChatMessage::create([
+            'conversation_id' => $conversationId,
+            'role' => 'user',
+            'content' => $request->input('message'),
+        ]);
 
         try {
             $provider = new GeminiProvider();
@@ -66,7 +81,19 @@ class AIAssistantController extends Controller
                 $request->input('conversation_history', [])
             );
 
-            return response()->json($result);
+            // Save assistant message
+            if ($result['success']) {
+                ChatMessage::create([
+                    'conversation_id' => $conversationId,
+                    'role' => 'assistant',
+                    'content' => $result['message'],
+                    'chart_data' => $result['chart_data'] ?? null,
+                ]);
+            }
+
+            $result['conversation_id'] = $conversationId;
+
+            return response()->json($result, $result['success'] ? 200 : 503);
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('AI Assistant chat error', [
@@ -79,5 +106,35 @@ class AIAssistantController extends Controller
                 'message' => 'Terjadi kesalahan pada AI Assistant. Silakan coba kembali.',
             ], 500);
         }
+    }
+
+    public function conversations(Request $request)
+    {
+        $conversations = ChatConversation::where('user_id', $request->user()->id)
+            ->withCount('messages')
+            ->orderByDesc('updated_at')
+            ->limit(50)
+            ->get();
+
+        return response()->json($conversations);
+    }
+
+    public function loadConversation(Request $request, int $id)
+    {
+        $conversation = ChatConversation::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->with('messages')
+            ->firstOrFail();
+
+        return response()->json($conversation);
+    }
+
+    public function deleteConversation(Request $request, int $id)
+    {
+        ChatConversation::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->delete();
+
+        return response()->json(['success' => true]);
     }
 }

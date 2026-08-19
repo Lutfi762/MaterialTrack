@@ -6,7 +6,7 @@
                 <div class="col-md-12">
                     <div class="card border-0 rounded-3 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-location-dot me-1"></i> LOKASI GUDANG</span>
+                            <span class="font-weight-bold"><i class="fa fa-location-dot me-1"></i> {{ $t('locations.heading') }}</span>
                             <Link v-if="hasAnyPermission(['locations.create'])" href="/apps/locations/create" class="btn btn-primary btn-sm">
                                 <i class="fa fa-plus-circle me-2"></i> NEW
                             </Link>
@@ -15,15 +15,15 @@
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama Lokasi</th>
-                                        <th>Zona Gudang</th>
-                                        <th class="text-center" style="width:15%">Aksi</th>
+                                        <th>{{ $t('locations.col_no') }}</th>
+                                        <th>{{ $t('locations.col_name') }}</th>
+                                        <th>{{ $t('locations.col_zone') }}</th>
+                                        <th class="text-center" style="width:15%">{{ $t('common.action') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-if="locations.data.length === 0">
-                                        <td colspan="4" class="text-center">Belum ada data lokasi gudang.</td>
+                                        <td colspan="4" class="text-center">{{ $t('locations.empty') }}</td>
                                     </tr>
                                     <tr v-for="(loc, i) in locations.data" :key="loc.id">
                                         <td>{{ i + 1 }}</td>
@@ -64,7 +64,7 @@ export default {
         const isLoading = ref(false);
 
         const handleDelete = async (id) => {
-            if (await confirmDelete('Lokasi gudang ini akan dihapus permanen.')) {
+            if (await confirmDelete($t('locations.delete_confirm'))) {
                 isLoading.value = true;
                 router.delete(`/apps/locations/${id}`, {
                     onFinish: () => { isLoading.value = false; },

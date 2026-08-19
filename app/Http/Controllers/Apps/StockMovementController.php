@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Department;
 use App\Models\Item;
 use App\Models\StockMovement;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Excel as ExcelFacade;
@@ -36,6 +37,9 @@ class StockMovementController extends Controller
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -55,7 +59,8 @@ class StockMovementController extends Controller
                     'department_ids' => $item->category?->departments->pluck('id') ?? [],
                 ]),
             'categories'  => Category::with('departments:id')->orderBy('name')->get(['id', 'name']),
-            'filters'     => $request->only(['item_id', 'type', 'date_from', 'date_to', 'category_id', 'department_id']),
+            'users'       => User::orderBy('name')->get(['id', 'name']),
+            'filters'     => $request->only(['item_id', 'type', 'user_id', 'date_from', 'date_to', 'category_id', 'department_id']),
         ]);
     }
 
@@ -78,6 +83,9 @@ class StockMovementController extends Controller
         }
         if ($request->filled('type')) {
             $query->where('type', $request->type);
+        }
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
@@ -115,6 +123,9 @@ class StockMovementController extends Controller
         }
         if ($request->filled('type')) {
             $query->where('type', $request->type);
+        }
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);

@@ -3,20 +3,20 @@
     <div class="users-page">
         <div class="page-header-card mb-4">
             <div>
-                <h4 class="mb-1"><i class="fa fa-users me-2 text-primary"></i>Manajemen Users</h4>
-                <p class="text-muted mb-0 small">Kelola akun pengguna sistem</p>
+                <h4 class="mb-1"><i class="fa fa-users me-2 text-primary"></i>{{ $t('users.heading') }}</h4>
+                <p class="text-muted mb-0 small">{{ $t('users.subtitle') }}</p>
             </div>
             <Link v-if="hasAnyPermission(['users.create'])" href="/apps/users/create" class="btn-modern btn-modern-primary">
-                <i class="fa fa-user-plus me-2"></i>Tambah User
+                <i class="fa fa-user-plus me-2"></i>{{ $t('users.add') }}
             </Link>
         </div>
 
         <div class="search-bar mb-4">
             <i class="fa fa-search text-muted"></i>
-            <input v-model="search" @keyup.enter="handleSearch" type="text" placeholder="Cari nama atau email..." :disabled="isLoading">
+            <input v-model="search" @keyup.enter="handleSearch" type="text" :placeholder="$t('users.search_placeholder')" :disabled="isLoading">
             <button class="btn-modern btn-modern-primary" @click="handleSearch" :disabled="isLoading">
                 <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                <span v-else>Cari</span>
+                <span v-else>{{ $t('common.search') }}</span>
             </button>
         </div>
 
@@ -46,7 +46,7 @@
 
         <div v-else class="empty-state">
             <i class="fa fa-users"></i>
-            <p class="mb-0 fw-semibold">Tidak ada user ditemukan</p>
+            <p class="mb-0 fw-semibold">{{ $t('users.empty') }}</p>
         </div>
 
         <Pagination v-if="users.data.length > 0" :links="users.links" align="center" />
@@ -76,7 +76,7 @@ export default {
         };
 
         const handleDelete = async (id) => {
-            if (await confirmDelete('User ini akan dihapus permanen.')) {
+            if (await confirmDelete($t('users.delete_confirm'))) {
                 isLoading.value = true;
                 router.delete(`/apps/users/${id}`, {
                     onFinish: () => { isLoading.value = false; },

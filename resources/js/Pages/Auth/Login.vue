@@ -1,181 +1,163 @@
 <template>
     <Head><title>Login - MaterialTrack</title></Head>
+
     <div class="login-page">
-        <div class="login-visual">
-            <!-- Warehouse grid background -->
-            <div class="warehouse-grid"></div>
-
-            <!-- Floating warehouse elements -->
-            <div class="warehouse-element element-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6z"/>
-                </svg>
-            </div>
-            <div class="warehouse-element element-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11z"/>
-                    <path d="M4.5 4a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-1zm3 0a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-1zm3 0a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-1z"/>
-                </svg>
-            </div>
-            <div class="warehouse-element element-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
-                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                </svg>
+        <section class="login-story" aria-label="MaterialTrack overview">
+            <div class="story-bg" aria-hidden="true">
+                <div class="glow glow-large"></div>
+                <div class="glow glow-small"></div>
+                <div class="light-sweep"></div>
             </div>
 
-            <!-- Animated particles -->
-            <div class="particles-container">
-                <span v-for="n in 25" :key="n" class="particle" :style="particleStyle(n)"></span>
-            </div>
-
-            <div class="login-visual-content" :class="{ 'visible': mounted }">
-                <div class="brand-logo">
-                    <img :src="logoUrl" alt="MaterialTrack" class="brand-logo-img" />
+            <div class="story-content">
+                <div class="story-icons" aria-hidden="true">
+                    <i class="fa fa-box"></i>
+                    <i class="fa fa-barcode"></i>
+                    <i class="fa fa-location-dot"></i>
                 </div>
 
-                <h2 class="visual-title">
-                    Sistem Manajemen Stok<br>
-                    <span class="gradient-text">untuk Gudang Modern</span>
-                </h2>
-                <p class="visual-sub">Monitor real-time material masuk & keluar. Kelola stok kritis. Laporan instan. Semua dalam satu platform terintegrasi.</p>
+                <h1>
+                    {{ $t('auth.hero_title') }}
+                    <span>{{ $t('auth.hero_subtitle') }}</span>
+                </h1>
 
-                <div class="feature-list">
-                    <div class="feature-item" v-for="(f, i) in features" :key="i" :style="{ transitionDelay: (i * 0.1 + 0.3) + 's' }">
+                <p class="story-copy">
+                    {{ $t('auth.hero_description') }}
+                </p>
+
+                <ul class="feature-list">
+                    <li
+                        v-for="(feature, index) in features"
+                        :key="feature.title"
+                        class="feature-item"
+                        :style="{ transitionDelay: `${240 + index * 100}ms` }"
+                    >
                         <div class="feature-icon">
-                            <i :class="f.icon"></i>
+                            <i :class="feature.icon"></i>
                         </div>
-                        <div class="feature-text">
-                            <div class="feature-title">{{ f.title }}</div>
-                            <div class="feature-desc">{{ f.desc }}</div>
+                        <div>
+                            <h2>{{ $t(feature.titleKey) }}</h2>
+                            <p>{{ $t(feature.descKey) }}</p>
                         </div>
-                    </div>
-                </div>
+                    </li>
+                </ul>
+            </div>
 
-                <div class="stats-row">
-                    <div class="stat-card">
-                        <div class="stat-value">
-                            <span class="counter-num">{{ animatedStats.items }}</span>K+
-                        </div>
-                        <div class="stat-label">Items Tracked</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">
-                            <span class="counter-num">{{ animatedStats.transactions }}</span>K+
-                        </div>
-                        <div class="stat-label">Transactions</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">
-                            <span class="counter-num">{{ animatedStats.uptime }}</span>%
-                        </div>
-                        <div class="stat-label">System Uptime</div>
-                    </div>
+            <div class="story-stats">
+                <div>
+                    <strong>150K+</strong>
+                    <span>{{ $t('auth.stat_items') }}</span>
+                </div>
+                <div>
+                    <strong>500K+</strong>
+                    <span>{{ $t('auth.stat_transactions') }}</span>
+                </div>
+                <div>
+                    <strong>99%</strong>
+                    <span>{{ $t('auth.stat_uptime') }}</span>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="login-form-side">
-            <div class="login-form-box" :class="{ 'visible': mounted, 'shake-error': hasErrors }">
-                <div class="mobile-brand">
-                    <img :src="logoUrl" alt="MaterialTrack" class="mobile-logo" />
+        <main class="login-main">
+            <div class="login-card">
+                <div class="security-badge" aria-hidden="true">
+                    <i class="fa fa-shield-halved"></i>
                 </div>
 
-                <div class="form-header">
-                    <div class="form-icon-badge">
-                        <i class="fa fa-shield-halved"></i>
-                    </div>
-                    <h3 class="form-title">Selamat Datang Kembali</h3>
-                    <p class="form-sub">Silakan masuk untuk melanjutkan ke dashboard Anda</p>
-                </div>
+                <header class="form-heading">
+                    <h2>{{ $t('auth.welcome_back') }}</h2>
+                    <p>{{ $t('auth.login_subtitle') }}</p>
+                </header>
 
-                <form @submit.prevent="submit" novalidate>
-                    <div class="input-group" :class="{ 'focused': focusEmail, 'has-value': form.email, 'has-error': form.errors.email }">
-                        <label for="email">Email Address</label>
-                        <div class="input-wrapper">
-                            <i class="fa fa-envelope input-icon"></i>
+                <form class="login-form" @submit.prevent="submit" novalidate>
+                    <div class="field-group">
+                        <label for="email">{{ $t('auth.email') }}</label>
+                        <div class="field-shell" :class="{ 'has-error': form.errors.email }">
+                            <i class="fa fa-envelope field-icon" aria-hidden="true"></i>
                             <input
                                 id="email"
                                 v-model="form.email"
                                 type="email"
                                 placeholder="nama@perusahaan.com"
                                 autocomplete="email"
-                                @focus="focusEmail = true"
-                                @blur="focusEmail = false"
+                                required
                             >
                         </div>
-                        <div v-if="form.errors.email" class="error-message">
-                            <i class="fa fa-circle-exclamation"></i>
+                        <p v-if="form.errors.email" class="field-error">
+                            <i class="fa fa-circle-exclamation" aria-hidden="true"></i>
                             {{ form.errors.email }}
-                        </div>
+                        </p>
                     </div>
 
-                    <div class="input-group" :class="{ 'focused': focusPassword, 'has-value': form.password, 'has-error': form.errors.password }">
-                        <label for="password">Password</label>
-                        <div class="input-wrapper">
-                            <i class="fa fa-lock input-icon"></i>
+                    <div class="field-group">
+                        <label for="password">{{ $t('auth.password') }}</label>
+                        <div class="field-shell" :class="{ 'has-error': form.errors.password }">
+                            <i class="fa fa-lock field-icon" aria-hidden="true"></i>
                             <input
                                 id="password"
                                 v-model="form.password"
                                 :type="showPassword ? 'text' : 'password'"
-                                placeholder="Masukkan password Anda"
+                                :placeholder="$t('auth.password_placeholder')"
                                 autocomplete="current-password"
-                                @focus="focusPassword = true"
-                                @blur="focusPassword = false"
+                                required
                             >
-                            <button type="button" class="toggle-password" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'">
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                @click="showPassword = !showPassword"
+                            >
                                 <i class="fa" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                             </button>
                         </div>
-                        <div v-if="form.errors.password" class="error-message">
-                            <i class="fa fa-circle-exclamation"></i>
+                        <p v-if="form.errors.password" class="field-error">
+                            <i class="fa fa-circle-exclamation" aria-hidden="true"></i>
                             {{ form.errors.password }}
-                        </div>
+                        </p>
                     </div>
 
-                    <div class="form-footer-row">
-                        <label class="custom-checkbox">
-                            <input type="checkbox" v-model="form.remember">
-                            <span class="checkbox-mark">
-                                <i class="fa fa-check"></i>
+                    <div class="form-options">
+                        <label class="remember-option" for="remember-me">
+                            <input id="remember-me" v-model="form.remember" type="checkbox">
+                            <span class="check-visual">
+                                <i class="fa fa-check" aria-hidden="true"></i>
                             </span>
-                            <span class="checkbox-label">Ingat saya</span>
+                            <span>{{ $t('auth.remember') }}</span>
                         </label>
-                        <Link href="/forgot-password" class="forgot-link">Lupa password?</Link>
+
+                        <Link href="/forgot-password" class="forgot-link">
+                            {{ $t('auth.forgot_password') }}
+                        </Link>
                     </div>
 
-                    <button type="submit" class="btn-submit" :disabled="form.processing">
-                        <span class="btn-spinner" v-if="form.processing">
-                            <i class="fa fa-circle-notch fa-spin"></i>
+                    <button class="submit-button" type="submit" :disabled="form.processing">
+                        <span v-if="form.processing" class="spinner">
+                            <i class="fa fa-circle-notch fa-spin" aria-hidden="true"></i>
                         </span>
-                        <span class="btn-text">
-                            {{ form.processing ? 'Memverifikasi...' : 'Masuk ke Dashboard' }}
-                        </span>
-                        <i class="fa fa-arrow-right btn-arrow" v-if="!form.processing"></i>
-                        <span class="btn-shine"></span>
+                        <span>{{ form.processing ? $t('auth.verifying') : $t('auth.sign_in_button') }}</span>
+                        <i v-if="!form.processing" class="fa fa-arrow-right submit-arrow" aria-hidden="true"></i>
                     </button>
+
+                    <div class="divider">
+                        <span>{{ $t('auth.or') }}</span>
+                    </div>
+
+                    <p class="access-note">
+                        <i class="fa fa-circle-info" aria-hidden="true"></i>
+                        {{ $t('auth.no_access') }}
+                    </p>
                 </form>
 
-                <div class="form-divider">
-                    <span>atau</span>
-                </div>
-
-                <div class="alt-login-hint">
-                    <i class="fa fa-info-circle"></i>
-                    Belum punya akses? Hubungi administrator sistem Anda.
-                </div>
-
-                <div class="footer-branding">
-                    <div class="footer-logo">
-                        <img :src="logoUrl" alt="MaterialTrack" />
-                    </div>
-                    <div class="footer-text">
-                        <div class="footer-title">MaterialTrack</div>
-                        <div class="footer-copy">© 2026 • Warehouse Management System</div>
-                    </div>
+                <div class="brand-lockup">
+                    <img :src="logoUrl" alt="MaterialTrack" />
                 </div>
             </div>
-        </div>
+
+            <footer class="login-footer">
+                MaterialTrack &copy; 2026 &bull; {{ $t('auth.footer_text') }}
+            </footer>
+        </main>
     </div>
 </template>
 
@@ -185,83 +167,31 @@ import logoUrl from '@/assets/logo-materialtrack.png';
 
 export default {
     components: { Head, Link },
+
     data() {
         return {
             logoUrl,
             showPassword: false,
-            focusEmail: false,
-            focusPassword: false,
-            mounted: false,
-            hasErrors: false,
-            animatedStats: { items: 0, transactions: 0, uptime: 0 },
             features: [
                 {
-                    icon: 'fa fa-boxes-stacked',
-                    title: 'Real-time Stock Tracking',
-                    desc: 'Monitor stok gudang live, update otomatis setiap transaksi'
+                    icon: 'fa fa-cube',
+                    titleKey: 'auth.feature_1_title',
+                    descKey: 'auth.feature_1_desc',
                 },
                 {
                     icon: 'fa fa-chart-line',
-                    title: 'Smart Analytics',
-                    desc: 'Dashboard interaktif dengan insight stok kritis & trending'
+                    titleKey: 'auth.feature_2_title',
+                    descKey: 'auth.feature_2_desc',
                 },
                 {
                     icon: 'fa fa-users-gear',
-                    title: 'Multi-department Access',
-                    desc: 'Role-based permissions untuk setiap departemen'
+                    titleKey: 'auth.feature_3_title',
+                    descKey: 'auth.feature_3_desc',
                 },
             ],
         };
     },
-    watch: {
-        'form.errors': {
-            handler(newErrors) {
-                if (Object.keys(newErrors).length > 0) {
-                    this.hasErrors = true;
-                    setTimeout(() => {
-                        this.hasErrors = false;
-                    }, 600);
-                }
-            },
-            deep: true,
-        },
-    },
-    mounted() {
-        setTimeout(() => {
-            this.mounted = true;
-            this.animateStats();
-        }, 100);
-    },
-    methods: {
-        particleStyle(n) {
-            const size = 3 + (n % 4);
-            const left = (n * 29) % 100;
-            const duration = 15 + (n % 12);
-            const delay = (n % 10) * 0.8;
-            return {
-                width: size + 'px',
-                height: size + 'px',
-                left: left + '%',
-                animationDuration: duration + 's',
-                animationDelay: delay + 's',
-            };
-        },
-        animateStats() {
-            const targets = { items: 150, transactions: 500, uptime: 99 };
-            const duration = 1500;
-            const startTime = performance.now();
 
-            const step = (now) => {
-                const progress = Math.min((now - startTime) / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                this.animatedStats.items = Math.round(targets.items * eased);
-                this.animatedStats.transactions = Math.round(targets.transactions * eased);
-                this.animatedStats.uptime = Math.round(targets.uptime * eased);
-                if (progress < 1) requestAnimationFrame(step);
-            };
-            requestAnimationFrame(step);
-        },
-    },
     setup() {
         const form = useForm({
             email: '',
@@ -277,335 +207,584 @@ export default {
 
         return { form, submit };
     },
-}
+};
 </script>
 
 <style scoped>
-* { box-sizing: border-box; }
-
 .login-page {
+    --brand-navy: #0f172a;
+    --brand-primary: #7c3aed;
+    --brand-primary-dark: #6d28d9;
+    --brand-bg: #f8fafc;
+    --success: #16a34a;
+    --gray-900: #0f172a;
+    --gray-700: #334155;
+    --gray-600: #475569;
+    --gray-500: #64748b;
+    --gray-400: #94a3b8;
+    --gray-300: #cbd5e1;
+    --gray-200: #e2e8f0;
+    --gray-100: #f1f5f9;
+
     min-height: 100vh;
     display: flex;
+    background: white;
+    color: var(--gray-900);
+    font-family: Inter, 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     overflow: hidden;
 }
 
-/* ===== LEFT VISUAL PANEL ===== */
-.login-visual {
-    flex: 1.1;
-    background: linear-gradient(145deg, #1a2942 0%, #0f1f35 60%, #0a1628 100%);
+.login-story {
+    width: 50%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     position: relative;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    padding: 60px;
+    padding: 64px;
+    background: var(--brand-navy);
+    color: white;
 }
 
-/* Floating particles animation */
-.particles {
+.story-bg {
     position: absolute;
     inset: 0;
-    overflow: hidden;
-}
-.particle {
-    position: absolute;
-    bottom: -10px;
-    background: rgba(96, 165, 250, 0.4);
-    border-radius: 50%;
-    animation: floatUp linear infinite;
-}
-@keyframes floatUp {
-    0% { transform: translateY(0) translateX(0); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 0.6; }
-    100% { transform: translateY(-100vh) translateX(30px); opacity: 0; }
+    pointer-events: none;
 }
 
-/* Floating geometric shapes */
-.floating-shape {
+.glow {
     position: absolute;
-    border-radius: 30%;
-    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(96,165,250,0.05));
-    border: 1px solid rgba(96,165,250,0.15);
-}
-.shape-1 {
-    width: 200px; height: 200px;
-    top: -60px; right: -60px;
-    animation: rotateFloat 20s ease-in-out infinite;
-}
-.shape-2 {
-    width: 120px; height: 120px;
-    bottom: 60px; right: 100px;
-    border-radius: 50%;
-    animation: rotateFloat 15s ease-in-out infinite reverse;
-}
-.shape-3 {
-    width: 80px; height: 80px;
-    top: 40%; right: 20px;
-    animation: rotateFloat 18s ease-in-out infinite;
-}
-@keyframes rotateFloat {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(-15px, 20px) rotate(10deg); }
-    66% { transform: translate(10px, -15px) rotate(-8deg); }
+    border-radius: 999px;
+    filter: blur(64px);
+    background: var(--brand-primary);
+    mix-blend-mode: screen;
 }
 
-.login-visual-content {
+.glow-large {
+    width: 384px;
+    height: 384px;
+    top: 22%;
+    left: 20%;
+    opacity: 0.28;
+    animation: softPulse 5s ease-in-out infinite;
+}
+
+.glow-small {
+    width: 256px;
+    height: 256px;
+    right: 15%;
+    bottom: 22%;
+    opacity: 0.18;
+}
+
+.light-sweep {
+    position: absolute;
+    width: 200%;
+    height: 128px;
+    top: -38%;
+    left: 0;
+    transform: rotate(-45deg);
+    transform-origin: left;
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.16), transparent);
+}
+
+.story-content,
+.story-stats {
     position: relative;
-    z-index: 2;
-    color: white;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.login-visual-content.visible {
-    opacity: 1;
-    transform: translateY(0);
+    z-index: 1;
 }
 
-.brand-logo {
+.story-content {
+    max-width: 540px;
+    margin-top: 32px;
+    animation: enterUp 650ms ease-out both;
+}
+
+.story-icons {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 20px;
-    font-weight: 700;
+    gap: 18px;
     margin-bottom: 48px;
-}
-.brand-icon-wrap {
-    width: 42px; height: 42px;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 20px rgba(37,99,235,0.4);
-    animation: pulseGlow 3s ease-in-out infinite;
-}
-@keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
-    50% { box-shadow: 0 8px 30px rgba(37,99,235,0.7); }
+    color: rgba(203, 213, 225, 0.55);
+    font-size: 30px;
 }
 
-.visual-title {
-    font-size: 34px;
-    font-weight: 700;
-    line-height: 1.3;
-    margin-bottom: 16px;
-}
-.gradient-text {
-    background: linear-gradient(90deg, #60a5fa, #93c5fd, #60a5fa);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 3s linear infinite;
-}
-@keyframes shimmer {
-    to { background-position: 200% center; }
+.story-content h1 {
+    margin: 0 0 18px;
+    font-size: clamp(36px, 4vw, 52px);
+    line-height: 1.08;
+    font-weight: 750;
+    letter-spacing: 0;
 }
 
-.visual-sub {
-    font-size: 14px;
-    color: rgba(255,255,255,0.6);
-    max-width: 380px;
-    margin-bottom: 40px;
-    line-height: 1.6;
+.story-content h1 span {
+    display: block;
+    color: #c4b5fd;
 }
 
-.feature-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
-.feature-item {
-    display: flex; align-items: center; gap: 14px;
-    font-size: 13px; color: rgba(255,255,255,0.85);
-    opacity: 0;
-    transform: translateX(-15px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-.login-visual-content.visible .feature-item {
-    opacity: 1;
-    transform: translateX(0);
-}
-.feature-icon {
-    width: 38px; height: 38px;
-    background: rgba(59,130,246,0.2);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: #60a5fa;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-}
-.feature-item:hover .feature-icon {
-    transform: scale(1.1) rotate(-5deg);
-    background: rgba(59,130,246,0.35);
+.story-copy {
+    margin: 0 0 48px;
+    color: #cbd5e1;
+    font-size: 18px;
+    line-height: 1.7;
 }
 
-.stats-row {
+.feature-list {
     display: flex;
-    align-items: center;
-    gap: 20px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
-.stat-mini-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: #60a5fa;
-}
-.stat-mini-label {
-    font-size: 10px;
-    color: rgba(255,255,255,0.5);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 2px;
-}
-.stat-divider {
-    width: 1px; height: 30px;
-    background: rgba(255,255,255,0.15);
+    flex-direction: column;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-/* ===== RIGHT FORM PANEL ===== */
-.login-form-side {
-    flex: 1;
-    background: #fafbfc;
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: enterUp 560ms ease-out forwards;
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px;
-}
-
-.login-form-box {
-    width: 100%;
-    max-width: 380px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
-}
-.login-form-box.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.mobile-brand {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 18px; font-weight: 700; color: #1a2942;
-    margin-bottom: 24px;
-}
-
-.form-icon-badge {
-    width: 52px; height: 52px;
-    background: linear-gradient(135deg, #eff6ff, #dbeafe);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    color: #2563eb;
-    font-size: 20px;
-    margin-bottom: 20px;
-    animation: bounceIn 0.6s ease 0.3s both;
-}
-@keyframes bounceIn {
-    0% { transform: scale(0); opacity: 0; }
-    60% { transform: scale(1.15); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.form-title { font-size: 24px; font-weight: 700; color: #1a2942; margin-bottom: 4px; }
-.form-sub { font-size: 13px; color: #94a3b8; margin-bottom: 32px; }
-
-.input-modern { position: relative; }
-.input-modern label {
-    font-size: 12px; font-weight: 600; color: #475569;
-    margin-bottom: 6px; display: block;
-    transition: color 0.2s ease;
-}
-.input-modern.focused label { color: #2563eb; }
-
-.input-wrap { position: relative; display: flex; align-items: center; }
-.input-wrap i.fa-envelope, .input-wrap i.fa-lock {
-    position: absolute; left: 14px; color: #94a3b8; font-size: 14px;
-    transition: color 0.2s ease;
-}
-.input-modern.focused .input-wrap i.fa-envelope,
-.input-modern.focused .input-wrap i.fa-lock { color: #2563eb; }
-
-.input-wrap input {
-    width: 100%;
-    height: 48px;
+    margin-top: 4px;
     border-radius: 10px;
-    border: 1.5px solid #e2e8f0;
-    padding: 0 44px;
-    font-size: 14px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(196, 181, 253, 0.25);
+    background: rgba(124, 58, 237, 0.18);
+    color: #c4b5fd;
+    font-size: 18px;
+    transition: transform 180ms ease-out, background 180ms ease-out;
 }
-.input-wrap input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
-}
-.toggle-password {
-    position: absolute; right: 12px;
-    background: none; border: none; color: #94a3b8; cursor: pointer;
-    transition: color 0.2s ease;
-}
-.toggle-password:hover { color: #3b82f6; }
 
-.remember-check {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: #64748b; cursor: pointer;
+.feature-item:hover .feature-icon {
+    transform: translateY(-2px);
+    background: rgba(124, 58, 237, 0.28);
+}
+
+.feature-item h2 {
+    margin: 0;
+    color: white;
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.feature-item p {
+    margin: 5px 0 0;
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.story-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding-top: 32px;
+    margin-top: 48px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    animation: enterUp 700ms ease-out 320ms both;
+}
+
+.story-stats strong {
+    display: block;
+    color: white;
+    font-size: 26px;
+    line-height: 1;
+}
+
+.story-stats span {
+    display: block;
+    margin-top: 8px;
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+.login-main {
+    width: 50%;
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 72px 80px;
+    background: white;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 430px;
+    animation: enterUp 650ms ease-out 120ms both;
+}
+
+.security-badge {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    border-radius: 16px;
+    background: #f5f3ff;
+    color: var(--brand-primary);
+    font-size: 22px;
+}
+
+.form-heading {
+    margin-bottom: 40px;
+}
+
+.form-heading h2 {
+    margin: 0 0 8px;
+    color: var(--gray-900);
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 750;
+    letter-spacing: 0;
+}
+
+.form-heading p {
+    margin: 0;
+    color: var(--gray-500);
+    font-size: 15px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.field-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--gray-700);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.field-shell {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.field-icon {
+    position: absolute;
+    left: 13px;
+    color: var(--gray-400);
+    font-size: 16px;
+    pointer-events: none;
+    transition: color 180ms ease-out;
+}
+
+.field-shell input {
+    width: 100%;
+    height: 44px;
+    padding: 0 42px 0 40px;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    background: white;
+    color: var(--gray-900);
+    font-size: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.field-shell input::placeholder {
+    color: var(--gray-400);
+}
+
+.field-shell input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.field-shell:focus-within .field-icon {
+    color: var(--brand-primary);
+}
+
+.field-shell.has-error input {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0;
+    inset-block: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    border: 0;
+    background: transparent;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: color 180ms ease-out;
+}
+
+.password-toggle:hover {
+    color: var(--gray-600);
+}
+
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 8px 0 0;
+    color: #dc2626;
+    font-size: 12px;
+}
+
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.remember-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray-600);
+    font-size: 14px;
+    cursor: pointer;
     user-select: none;
 }
-.remember-check input { display: none; }
-.check-box {
-    width: 16px; height: 16px;
-    border: 1.5px solid #cbd5e1;
-    border-radius: 4px;
-    display: inline-flex; align-items: center; justify-content: center;
-    transition: all 0.2s ease;
-}
-.remember-check input:checked + .check-box {
-    background: #3b82f6;
-    border-color: #3b82f6;
-}
-.remember-check input:checked + .check-box::after {
-    content: '✓';
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-}
 
-.forgot-link { font-size: 13px; color: #3b82f6; text-decoration: none; font-weight: 500; }
-.forgot-link:hover { text-decoration: underline; }
-
-.btn-login {
-    width: 100%;
-    height: 48px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 0 6px 16px rgba(37,99,235,0.3);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    position: relative;
-    overflow: hidden;
-}
-.btn-login:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(37,99,235,0.4);
-}
-.btn-login:active:not(:disabled) { transform: translateY(0); }
-.btn-login:disabled { opacity: 0.75; cursor: not-allowed; }
-
-.btn-content { position: relative; z-index: 1; }
-.btn-shine {
+.remember-option input {
     position: absolute;
-    top: 0; left: -100%;
-    width: 60%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.6s ease;
+    opacity: 0;
+    pointer-events: none;
 }
-.btn-login:hover .btn-shine { left: 130%; }
 
-.footer-note { text-align: center; font-size: 11px; color: #cbd5e1; margin-top: 32px; }
+.check-visual {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    background: white;
+    color: white;
+    font-size: 10px;
+    transition: border-color 180ms ease-out, background 180ms ease-out;
+}
 
-@media (max-width: 991px) {
-    .login-visual { display: none; }
-    .login-form-side { padding: 24px; }
+.remember-option input:checked + .check-visual {
+    border-color: var(--brand-primary);
+    background: var(--brand-primary);
+}
+
+.forgot-link {
+    color: var(--brand-primary);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 180ms ease-out;
+}
+
+.forgot-link:hover {
+    color: var(--brand-primary-dark);
+    text-decoration: none;
+}
+
+.submit-button {
+    width: 100%;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--brand-primary);
+    color: white;
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(124, 58, 237, 0.24);
+    transition: background 180ms ease-out, transform 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.submit-button:hover:not(:disabled) {
+    background: var(--brand-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(124, 58, 237, 0.28);
+}
+
+.submit-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.72;
+}
+
+.submit-arrow {
+    transition: transform 180ms ease-out;
+}
+
+.submit-button:hover .submit-arrow {
+    transform: translateX(3px);
+}
+
+.divider {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--gray-200);
+}
+
+.divider span {
+    position: relative;
+    padding: 0 10px;
+    background: white;
+    color: var(--gray-500);
+    font-size: 14px;
+}
+
+.access-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin: 0;
+    color: var(--gray-500);
+    font-size: 14px;
+    text-align: center;
+}
+
+.access-note i {
+    color: var(--gray-400);
+}
+
+.brand-lockup {
+    display: flex;
+    justify-content: center;
+    margin-top: 56px;
+}
+
+.brand-lockup img {
+    width: min(220px, 70%);
+    height: auto;
+    object-fit: contain;
+}
+
+.login-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    color: var(--gray-400);
+    font-size: 12px;
+    text-align: center;
+}
+
+@keyframes enterUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes softPulse {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.24;
+    }
+    50% {
+        transform: scale(1.08);
+        opacity: 0.34;
+    }
+}
+
+@media (max-width: 1023px) {
+    .login-page {
+        display: block;
+        min-height: 100vh;
+        background: var(--brand-bg);
+    }
+
+    .login-story {
+        display: none;
+    }
+
+    .login-main {
+        width: 100%;
+        min-height: 100vh;
+        padding: 48px 24px 72px;
+        background: var(--brand-bg);
+    }
+
+    .login-card {
+        max-width: 420px;
+        padding: 32px;
+        border: 1px solid var(--gray-200);
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .security-badge {
+        margin-inline: auto;
+    }
+
+    .form-heading {
+        text-align: center;
+    }
+}
+
+@media (max-width: 520px) {
+    .login-main {
+        align-items: flex-start;
+        padding: 24px 16px 72px;
+    }
+
+    .login-card {
+        padding: 24px;
+    }
+
+    .form-options {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-heading h2 {
+        font-size: 26px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 </style>

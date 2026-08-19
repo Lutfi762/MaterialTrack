@@ -8,7 +8,7 @@
             <div class="col-md-12">
                 <div class="chart-card">
                     <div class="chart-card-header">
-                        <span class="chart-icon">🔑</span> PERMISSIONS
+                        <span class="chart-icon">🔑</span> {{ $t('permissions.heading') }}
                     </div>
                     <div class="chart-card-body">
 
@@ -19,10 +19,10 @@
                                     type="text"
                                     class="form-control"
                                     v-model="search"
-                                    placeholder="Cari permission..."
+                                    :placeholder="$t('permissions.search_placeholder')"
                                 >
                                 <button class="btn btn-primary" type="submit">
-                                    <i class="fa fa-search me-1"></i> Cari
+                                    <i class="fa fa-search me-1"></i> {{ $t('common.search') }}
                                 </button>
                             </div>
                         </form>
@@ -38,7 +38,7 @@
                                 </thead>
                                 <tbody>
                                     <tr v-if="permissions.data.length === 0">
-                                        <td colspan="2" class="text-center text-muted">Tidak ada data permission.</td>
+                                        <td colspan="2" class="text-center text-muted">{{ $t('permissions.empty') }}</td>
                                     </tr>
                                     <tr v-for="(permission, index) in permissions.data" :key="permission.id">
                                         <td>{{ permissions.from + index }}</td>

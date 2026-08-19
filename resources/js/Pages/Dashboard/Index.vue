@@ -3,231 +3,332 @@
 
     <div class="dashboard-page">
 
-        <!-- Header Section -->
+        <!-- Header: Greeting + Filters + Actions -->
         <div class="dash-header">
-            <div class="header-left">
-                <h1 class="dash-title">{{ greeting }}, {{ userName }}</h1>
-                <p class="dash-subtitle">{{ todayFormatted }} · <span class="live-time">{{ liveClock }}</span></p>
+            <div class="header-top">
+                <div class="header-left">
+                    <h1 class="dash-title">{{ greeting }}, {{ userName }}</h1>
+                    <p class="dash-subtitle">{{ todayFormatted }} · <span class="live-time">{{ liveClock }}</span></p>
+                </div>
+                <div class="header-actions">
+                    <a href="/apps/dashboard/pdf" target="_blank" class="action-btn btn-outline-red">
+                        <i class="fa fa-file-pdf"></i> PDF
+                    </a>
+                    <Link href="/apps/stock-ins/create" class="action-btn btn-secondary">
+                        <i class="fa fa-arrow-down"></i>
+                        {{ $t('dashboard.actions.stock_in') }}
+                    </Link>
+                    <Link href="/apps/stock-outs/create" class="action-btn btn-primary">
+                        <i class="fa fa-arrow-up"></i>
+                        {{ $t('dashboard.actions.stock_out') }}
+                    </Link>
+                </div>
             </div>
-            <div class="header-actions">
-                <Link href="/apps/stock-ins/create" class="action-btn btn-secondary">
-                    <i class="fa fa-arrow-down"></i>
-                    Stock In
-                </Link>
-                <Link href="/apps/stock-outs/create" class="action-btn btn-primary">
-                    <i class="fa fa-arrow-up"></i>
-                    Stock Out
-                </Link>
+            <div class="header-filters">
+                <div class="filter-group">
+                    <i class="fa fa-building filter-icon"></i>
+                    <select v-if="is_admin" class="filter-select" v-model="selectedDepartment" @change="onDepartmentChange">
+                        <option :value="null">{{ $t('dashboard.filter.all_departments') }}</option>
+                        <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
+                    </select>
+                </div>
+                <div class="filter-separator">
+                    <span class="filter-label">{{ $t('dashboard.period.label') }}</span>
+                </div>
+                <div class="filter-group">
+                    <i class="fa fa-calendar filter-icon"></i>
+                    <input type="date" class="filter-date" v-model="filterDateFrom" @change="applyDateFilter">
+                    <span class="filter-dash">—</span>
+                    <input type="date" class="filter-date" v-model="filterDateTo" @change="applyDateFilter">
+                </div>
+                <button class="filter-reset" @click="resetDateFilter">
+                    <i class="fa fa-undo"></i>
+                </button>
             </div>
+        </div>
+
+        <!-- Pending Approval Banner -->
+        <div v-if="!is_admin && my_pending_approvals > 0" class="pending-banner">
+            <div class="pending-icon"><i class="fa fa-clock"></i></div>
+            <div class="pending-text">
+                <strong>{{ $t('dashboard.pending_approval', { count: my_pending_approvals }) }}</strong>
+            </div>
+            <Link href="/apps/stock-outs?status=pending" class="pending-link">
+                {{ $t('dashboard.view_all') }} <i class="fa fa-arrow-right"></i>
+            </Link>
         </div>
 
         <!-- KPI Cards -->
-        <div class="kpi-grid fade-in-stagger">
-            <div class="kpi-card" data-stagger="0">
+        <div class="kpi-grid">
+            <div class="kpi-card" v-for="(kpi, idx) in kpiCards" :key="idx" :class="kpi.alert ? 'kpi-alert' : ''">
                 <div class="kpi-header">
-                    <span class="kpi-label">Total Materials</span>
-                    <div class="kpi-icon icon-blue">
-                        <i class="fa fa-box"></i>
+                    <span class="kpi-label">{{ kpi.label }}</span>
+                    <div class="kpi-icon" :class="kpi.iconClass">
+                        <i :class="kpi.icon"></i>
                     </div>
                 </div>
-                <div class="kpi-value">{{ animatedTotalMaterials }}</div>
+                <div class="kpi-value">{{ kpi.value }}</div>
                 <div class="kpi-footer">
-                    <span class="status-dot dot-blue"></span>
-                    Active items in inventory
-                </div>
-            </div>
-
-            <div class="kpi-card" data-stagger="1">
-                <div class="kpi-header">
-                    <span class="kpi-label">Available Stock</span>
-                    <div class="kpi-icon icon-green">
-                        <i class="fa fa-check-circle"></i>
-                    </div>
-                </div>
-                <div class="kpi-value">{{ animatedAvailableStock }}</div>
-                <div class="kpi-footer">
-                    <span class="status-dot dot-green"></span>
-                    {{ stock_status.data[0] || 0 }} items safe level
-                </div>
-            </div>
-
-            <div class="kpi-card" data-stagger="2" :class="{ 'kpi-alert': low_stock_count > 0 }">
-                <div class="kpi-header">
-                    <span class="kpi-label">Low Stock Alert</span>
-                    <div class="kpi-icon" :class="low_stock_count > 0 ? 'icon-orange' : 'icon-green'">
-                        <i class="fa" :class="low_stock_count > 0 ? 'fa-exclamation-triangle' : 'fa-check-circle'"></i>
-                    </div>
-                </div>
-                <div class="kpi-value">{{ animatedLowStock }}</div>
-                <div class="kpi-footer">
-                    <span class="status-dot" :class="low_stock_count > 0 ? 'dot-orange' : 'dot-green'"></span>
-                    {{ low_stock_count > 0 ? 'Requires attention' : 'All stock healthy' }}
-                </div>
-            </div>
-
-            <div class="kpi-card" data-stagger="3">
-                <div class="kpi-header">
-                    <span class="kpi-label">Monthly Stock Out</span>
-                    <div class="kpi-icon icon-purple">
-                        <i class="fa fa-arrow-trend-up"></i>
-                    </div>
-                </div>
-                <div class="kpi-value">{{ animatedMonthlyOut }}</div>
-                <div class="kpi-footer">
-                    <span class="status-dot dot-purple"></span>
-                    {{ material_out_today.total_transaction }} transactions today
+                    <span class="status-dot" :class="kpi.dotClass"></span>
+                    {{ kpi.footer }}
                 </div>
             </div>
         </div>
 
-        <!-- AI Insight Card + Quick Actions -->
-        <div class="content-grid fade-in-stagger">
+        <!-- Row: Period Comparison + Alerts -->
+        <div class="row-2-1">
+            <!-- Period Comparison -->
+            <div class="period-comparison">
+                <div class="period-card">
+                    <div class="period-header">
+                        <div class="period-icon icon-green"><i class="fa fa-arrow-down"></i></div>
+                        <div>
+                            <div class="period-label">{{ $t('dashboard.period.stock_in_this_month') }}</div>
+                            <div class="period-value">{{ period_comparison.stock_in.this_month }}</div>
+                        </div>
+                    </div>
+                    <div class="period-footer">
+                        <span v-if="period_comparison.stock_in.change > 0" class="change-badge change-up">
+                            <i class="fa fa-arrow-up"></i> +{{ period_comparison.stock_in.change }}%
+                        </span>
+                        <span v-else-if="period_comparison.stock_in.change < 0" class="change-badge change-down">
+                            <i class="fa fa-arrow-down"></i> {{ period_comparison.stock_in.change }}%
+                        </span>
+                        <span v-else class="change-badge change-flat">
+                            <i class="fa fa-minus"></i> 0%
+                        </span>
+                        <span class="change-label">{{ $t('dashboard.period.vs_last_month', { count: period_comparison.stock_in.last_month }) }}</span>
+                    </div>
+                </div>
+                <div class="period-card">
+                    <div class="period-header">
+                        <div class="period-icon icon-red"><i class="fa fa-arrow-up"></i></div>
+                        <div>
+                            <div class="period-label">{{ $t('dashboard.period.stock_out_this_month') }}</div>
+                            <div class="period-value">{{ period_comparison.stock_out.this_month }}</div>
+                        </div>
+                    </div>
+                    <div class="period-footer">
+                        <span v-if="period_comparison.stock_out.change > 0" class="change-badge change-up">
+                            <i class="fa fa-arrow-up"></i> +{{ period_comparison.stock_out.change }}%
+                        </span>
+                        <span v-else-if="period_comparison.stock_out.change < 0" class="change-badge change-down">
+                            <i class="fa fa-arrow-down"></i> {{ period_comparison.stock_out.change }}%
+                        </span>
+                        <span v-else class="change-badge change-flat">
+                            <i class="fa fa-minus"></i> 0%
+                        </span>
+                        <span class="change-label">{{ $t('dashboard.period.vs_last_month', { count: period_comparison.stock_out.last_month }) }}</span>
+                    </div>
+                </div>
+            </div>
 
-            <!-- AI Insight -->
-            <div class="card ai-insight-card" data-stagger="4">
+            <!-- Expiry Alert OR Recent Movements -->
+            <div v-if="expiring_items && expiring_items.length > 0" class="card expiry-card">
                 <div class="card-header">
                     <div class="header-content">
-                        <div class="ai-icon">
-                            <i class="fa fa-sparkles"></i>
-                        </div>
+                        <div class="section-icon icon-amber"><i class="fa fa-clock"></i></div>
                         <div>
-                            <h3 class="card-title">AI Insights</h3>
-                            <p class="card-subtitle">Powered by MaterialTrack AI</p>
+                            <h3 class="card-title">{{ $t('dashboard.expiry.title') }}</h3>
+                            <p class="card-subtitle">{{ $t('dashboard.expiry.subtitle', { count: expiring_items.length }) }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="insight-item">
-                        <i class="fa fa-chart-line insight-icon"></i>
-                        <div class="insight-content">
-                            <div class="insight-label">Inventory Prediction</div>
-                            <div class="insight-value">{{ low_stock_count }} items need restocking within 7 days</div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ $t('dashboard.expiry.col_material') }}</th>
+                                    <th>{{ $t('dashboard.expiry.col_code') }}</th>
+                                    <th>{{ $t('dashboard.expiry.col_qty') }}</th>
+                                    <th>{{ $t('dashboard.expiry.col_expiry') }}</th>
+                                    <th>{{ $t('dashboard.expiry.col_days_left') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in expiring_items" :key="item.id">
+                                    <td>
+                                        <div class="material-info">
+                                            <div class="material-icon icon-amber"><i class="fa fa-box"></i></div>
+                                            <span class="material-name">{{ item.item_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td><code class="item-code">{{ item.item_code }}</code></td>
+                                    <td>{{ item.qty }} {{ item.unit }}</td>
+                                    <td>{{ item.expiry_date }}</td>
+                                    <td>
+                                        <span class="status-badge" :class="item.days_left <= 7 ? 'badge-red' : 'badge-orange'">
+                                            {{ item.days_left }} {{ $t('dashboard.expiry.days') }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="!is_admin && recent_movements.length" class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ $t('dashboard.recent_movements.title') }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ $t('dashboard.recent_movements.time') }}</th>
+                                    <th>{{ $t('dashboard.recent_movements.item') }}</th>
+                                    <th>{{ $t('dashboard.recent_movements.type') }}</th>
+                                    <th>{{ $t('dashboard.recent_movements.quantity') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="m in recent_movements" :key="m.id">
+                                    <td>{{ m.created_at }}</td>
+                                    <td>{{ m.item_name }}</td>
+                                    <td>
+                                        <span class="status-badge" :class="m.type === 'in' ? 'badge-green' : 'badge-red'">
+                                            {{ m.type === 'in' ? $t('dashboard.recent_movements.in') : $t('dashboard.recent_movements.out') }}
+                                        </span>
+                                    </td>
+                                    <td>{{ m.qty }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else class="card empty-alert-card">
+                <div class="empty-state">
+                    <i class="fa fa-check-circle"></i>
+                    <p>{{ $t('dashboard.kpi.all_healthy') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row: AI Insight + Quick Actions -->
+        <div class="row-equal">
+            <!-- AI Insight -->
+            <div class="card ai-insight-card">
+                <div class="card-header">
+                    <div class="header-content">
+                        <div class="ai-icon"><i class="fa fa-robot"></i></div>
+                        <div>
+                            <h3 class="card-title">{{ $t('dashboard.ai_insights.title') }}</h3>
+                            <p class="card-subtitle">{{ $t('dashboard.ai_insights.subtitle') }}</p>
                         </div>
                     </div>
-                    <div class="insight-item">
-                        <i class="fa fa-lightbulb insight-icon"></i>
-                        <div class="insight-content">
-                            <div class="insight-label">Restock Recommendation</div>
-                            <div class="insight-value">Order top {{ Math.min(5, low_stock_count) }} priority items</div>
+                </div>
+                <div class="card-body">
+                    <div v-if="restock_suggestions && restock_suggestions.length > 0">
+                        <div class="restock-label">{{ $t('dashboard.restock.label') }}</div>
+                        <div v-for="item in restock_suggestions" :key="item.id" class="restock-item">
+                            <div class="restock-info">
+                                <div class="restock-name">{{ item.name }}</div>
+                                <div class="restock-meta">
+                                    {{ $t('dashboard.restock.stock') }} {{ item.current_stock }} {{ item.unit }}
+                                    · {{ $t('dashboard.restock.min') }} {{ item.min_stock }}
+                                    <span v-if="item.days_left !== null"> · {{ $t('dashboard.restock.days_left', { count: item.days_left }) }}</span>
+                                </div>
+                            </div>
+                            <div class="restock-qty">+{{ item.reorder_qty }} {{ item.unit }}</div>
                         </div>
                     </div>
-                    <div class="insight-item">
-                        <i class="fa fa-brain insight-icon"></i>
-                        <div class="insight-content">
-                            <div class="insight-label">AI Analysis</div>
-                            <div class="insight-value">Stock movement patterns stable</div>
+                    <div v-else class="restock-empty">
+                        <i class="fa fa-check-circle" style="color: #10b981;"></i>
+                        <div>
+                            <div class="restock-empty-title">{{ $t('dashboard.restock.status_label') }}</div>
+                            <div class="restock-empty-text">{{ $t('dashboard.restock.all_safe') }}</div>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer">
                     <Link v-if="hasAnyPermission(['ai_assistant.use'])" href="/apps/ai-assistant" class="ai-btn">
                         <i class="fa fa-robot"></i>
-                        Open AI Assistant
+                        {{ $t('dashboard.ai_insights.open_assistant') }}
                         <i class="fa fa-arrow-right"></i>
                     </Link>
-                    <span v-else class="ai-disabled">AI Assistant requires permission</span>
+                    <span v-else class="ai-disabled">{{ $t('dashboard.ai_insights.permission_required') }}</span>
                 </div>
             </div>
 
             <!-- Quick Actions -->
-            <div class="card quick-actions-card" data-stagger="5">
+            <div class="card quick-actions-card">
                 <div class="card-header">
-                    <h3 class="card-title">Quick Actions</h3>
+                    <h3 class="card-title">{{ $t('dashboard.quick_actions.title') }}</h3>
                 </div>
                 <div class="card-body">
                     <Link href="/apps/items/create" class="quick-action-item">
-                        <div class="qa-icon icon-blue">
-                            <i class="fa fa-plus"></i>
-                        </div>
+                        <div class="qa-icon icon-blue"><i class="fa fa-plus"></i></div>
                         <div class="qa-content">
-                            <div class="qa-label">Add Material</div>
-                            <div class="qa-desc">Create new inventory item</div>
+                            <div class="qa-label">{{ $t('dashboard.quick_actions.add_material') }}</div>
+                            <div class="qa-desc">{{ $t('dashboard.quick_actions.add_material_desc') }}</div>
                         </div>
                         <i class="fa fa-chevron-right qa-arrow"></i>
                     </Link>
-
                     <Link href="/apps/stock-ins/create" class="quick-action-item">
-                        <div class="qa-icon icon-green">
-                            <i class="fa fa-arrow-down"></i>
-                        </div>
+                        <div class="qa-icon icon-green"><i class="fa fa-arrow-down"></i></div>
                         <div class="qa-content">
-                            <div class="qa-label">Stock In</div>
-                            <div class="qa-desc">Record incoming materials</div>
+                            <div class="qa-label">{{ $t('dashboard.quick_actions.stock_in') }}</div>
+                            <div class="qa-desc">{{ $t('dashboard.quick_actions.stock_in_desc') }}</div>
                         </div>
                         <i class="fa fa-chevron-right qa-arrow"></i>
                     </Link>
-
                     <Link href="/apps/stock-outs/create" class="quick-action-item">
-                        <div class="qa-icon icon-orange">
-                            <i class="fa fa-arrow-up"></i>
-                        </div>
+                        <div class="qa-icon icon-orange"><i class="fa fa-arrow-up"></i></div>
                         <div class="qa-content">
-                            <div class="qa-label">Stock Out</div>
-                            <div class="qa-desc">Record outgoing materials</div>
+                            <div class="qa-label">{{ $t('dashboard.quick_actions.stock_out') }}</div>
+                            <div class="qa-desc">{{ $t('dashboard.quick_actions.stock_out_desc') }}</div>
                         </div>
                         <i class="fa fa-chevron-right qa-arrow"></i>
                     </Link>
-
                     <Link href="/apps/stock-movements" class="quick-action-item">
-                        <div class="qa-icon icon-purple">
-                            <i class="fa fa-file-lines"></i>
-                        </div>
+                        <div class="qa-icon icon-purple"><i class="fa fa-file-lines"></i></div>
                         <div class="qa-content">
-                            <div class="qa-label">Reports</div>
-                            <div class="qa-desc">View stock movements</div>
+                            <div class="qa-label">{{ $t('dashboard.quick_actions.reports') }}</div>
+                            <div class="qa-desc">{{ $t('dashboard.quick_actions.reports_desc') }}</div>
                         </div>
                         <i class="fa fa-chevron-right qa-arrow"></i>
                     </Link>
                 </div>
             </div>
-
         </div>
 
-        <!-- Charts Section -->
-        <div class="charts-grid fade-in-stagger">
-
-            <!-- Stock Movement Chart -->
-            <div class="card chart-card chart-wide" data-stagger="6">
+        <!-- Charts Row -->
+        <div class="row-charts">
+            <div class="card chart-card">
                 <div class="card-header">
-                    <h3 class="card-title">Stock Movement (7 Days)</h3>
-                    <div class="chart-legend">
-                        <span class="legend-item">
-                            <span class="legend-dot dot-blue"></span>
-                            Stock Out
-                        </span>
-                    </div>
+                    <h3 class="card-title">{{ $t('dashboard.charts.stock_movement') }}</h3>
                 </div>
                 <div class="card-body">
-                    <apexchart type="area" height="280" :options="chartMovementOptions" :series="chartMovementSeries" />
+                    <apexchart type="area" height="260" :options="chartMovementOptions" :series="chartMovementSeries" />
                 </div>
             </div>
-
-            <!-- Material Category Distribution -->
-            <div class="card chart-card" data-stagger="7">
+            <div class="card chart-card">
                 <div class="card-header">
-                    <h3 class="card-title">Stock Status Distribution</h3>
+                    <h3 class="card-title">{{ $t('dashboard.charts.stock_status') }}</h3>
                 </div>
                 <div class="card-body">
-                    <apexchart v-if="hasStockData" type="donut" height="280" :options="chartStatusOptions" :series="stock_status.data" />
+                    <apexchart v-if="hasStockData" type="donut" height="260" :options="chartStatusOptions" :series="stock_status.data" />
                     <div v-else class="empty-state">
                         <i class="fa fa-inbox"></i>
-                        <p>No stock data available</p>
+                        <p>{{ $t('dashboard.tables.no_data') }}</p>
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- Tables Section -->
-        <div class="tables-grid fade-in-stagger">
-
-            <!-- Low Stock Alert Table -->
-            <div class="card table-card" data-stagger="8">
+        <!-- Tables Row -->
+        <div class="row-equal">
+            <!-- Low Stock -->
+            <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Low Stock Alert</h3>
+                    <h3 class="card-title">{{ $t('dashboard.tables.low_stock_alert') }}</h3>
                     <Link href="/apps/items" class="view-all-link">
-                        View All
-                        <i class="fa fa-arrow-right"></i>
+                        {{ $t('dashboard.tables.view_all') }} <i class="fa fa-arrow-right"></i>
                     </Link>
                 </div>
                 <div class="card-body">
@@ -235,14 +336,14 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Material</th>
-                                    <th>Code</th>
-                                    <th>Stock Level</th>
-                                    <th>Status</th>
+                                    <th>{{ $t('dashboard.tables.material') }}</th>
+                                    <th>{{ $t('dashboard.tables.code') }}</th>
+                                    <th>{{ $t('dashboard.tables.stock_level') }}</th>
+                                    <th>{{ $t('dashboard.tables.status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="item in low_stock_items.slice(0, 5)" :key="item.id" class="table-row-fade">
+                                <tr v-for="item in low_stock_items.slice(0, 5)" :key="item.id">
                                     <td>
                                         <div class="material-info">
                                             <div class="material-icon" :class="item.current_stock <= 0 ? 'icon-red' : 'icon-orange'">
@@ -263,7 +364,7 @@
                                     </td>
                                     <td>
                                         <span class="status-badge" :class="item.current_stock <= 0 ? 'badge-red' : 'badge-orange'">
-                                            {{ item.current_stock <= 0 ? 'Out of Stock' : 'Low Stock' }}
+                                            {{ item.current_stock <= 0 ? $t('dashboard.tables.out_of_stock') : $t('dashboard.tables.low_stock') }}
                                         </span>
                                     </td>
                                 </tr>
@@ -272,16 +373,16 @@
                     </div>
                     <div v-else class="empty-state">
                         <i class="fa fa-check-circle"></i>
-                        <p>All stock levels are healthy</p>
+                        <p>{{ $t('dashboard.tables.all_healthy') }}</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Transactions -->
-            <div class="card table-card" data-stagger="9">
+            <!-- Top Materials -->
+            <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Top Materials Usage</h3>
-                    <span class="card-badge">Last 7 Days</span>
+                    <h3 class="card-title">{{ $t('dashboard.tables.top_materials') }}</h3>
+                    <span class="card-badge">{{ $t('dashboard.tables.last_7_days') }}</span>
                 </div>
                 <div class="card-body">
                     <div v-if="hasTopData" class="usage-list">
@@ -293,65 +394,53 @@
                                     <div class="usage-fill" :style="{ width: (total[idx] / Math.max(...total) * 100) + '%' }"></div>
                                 </div>
                             </div>
-                            <div class="usage-value">{{ total[idx] }} units</div>
+                            <div class="usage-value">{{ total[idx] }} {{ $t('dashboard.tables.units') }}</div>
                         </div>
                     </div>
                     <div v-else class="empty-state">
                         <i class="fa fa-chart-bar"></i>
-                        <p>No usage data available</p>
+                        <p>{{ $t('dashboard.tables.no_usage') }}</p>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- Warehouse Overview -->
-        <div class="warehouse-section fade-in-stagger">
-            <div class="card warehouse-card" data-stagger="10">
-                <div class="card-header">
-                    <h3 class="card-title">Warehouse Overview</h3>
-                    <Link href="/apps/locations" class="view-all-link">
-                        Manage Locations
-                        <i class="fa fa-arrow-right"></i>
-                    </Link>
-                </div>
-                <div class="card-body">
-                    <div class="warehouse-stats">
-                        <div class="warehouse-stat">
-                            <div class="stat-icon icon-blue">
-                                <i class="fa fa-warehouse"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">Total Locations</div>
-                                <div class="stat-value">{{ animatedLocations }}</div>
-                            </div>
+        <div class="card warehouse-card">
+            <div class="card-header">
+                <h3 class="card-title">{{ $t('dashboard.warehouse.title') }}</h3>
+                <Link href="/apps/locations" class="view-all-link">
+                    {{ $t('dashboard.warehouse.manage_locations') }} <i class="fa fa-arrow-right"></i>
+                </Link>
+            </div>
+            <div class="card-body">
+                <div class="warehouse-stats">
+                    <div class="warehouse-stat">
+                        <div class="stat-icon icon-blue"><i class="fa fa-warehouse"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-label">{{ $t('dashboard.warehouse.total_locations') }}</div>
+                            <div class="stat-value">{{ animatedLocations }}</div>
                         </div>
-                        <div class="warehouse-stat">
-                            <div class="stat-icon icon-green">
-                                <i class="fa fa-boxes-stacked"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">Active Storage</div>
-                                <div class="stat-value">{{ stock_status.data[0] || 0 }}</div>
-                            </div>
+                    </div>
+                    <div class="warehouse-stat">
+                        <div class="stat-icon icon-green"><i class="fa fa-boxes-stacked"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-label">{{ $t('dashboard.warehouse.active_storage') }}</div>
+                            <div class="stat-value">{{ stock_status.data[0] || 0 }}</div>
                         </div>
-                        <div class="warehouse-stat">
-                            <div class="stat-icon icon-purple">
-                                <i class="fa fa-layer-group"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">Categories</div>
-                                <div class="stat-value">{{ animatedCategories }}</div>
-                            </div>
+                    </div>
+                    <div class="warehouse-stat">
+                        <div class="stat-icon icon-purple"><i class="fa fa-layer-group"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-label">{{ $t('dashboard.warehouse.categories') }}</div>
+                            <div class="stat-value">{{ animatedCategories }}</div>
                         </div>
-                        <div class="warehouse-stat">
-                            <div class="stat-icon icon-orange">
-                                <i class="fa fa-gauge-high"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-label">Utilization</div>
-                                <div class="stat-value">{{ utilizationPercent }}%</div>
-                            </div>
+                    </div>
+                    <div class="warehouse-stat">
+                        <div class="stat-icon icon-orange"><i class="fa fa-gauge-high"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-label">{{ $t('dashboard.warehouse.utilization') }}</div>
+                            <div class="stat-value">{{ utilizationPercent }}%</div>
                         </div>
                     </div>
                 </div>
@@ -379,6 +468,17 @@ export default {
         stock_status:       Object,
         low_stock_items:    Array,
         low_stock_count:    Number,
+        expiring_items:     Array,
+        restock_suggestions: Array,
+        period_comparison:  Object,
+        departments:        Array,
+        current_department_id: [Number, null],
+        is_admin:           Boolean,
+        total_inventory_value: { type: Number, default: 0 },
+        recent_movements:       { type: Array, default: () => [] },
+        my_pending_approvals:   { type: Number, default: 0 },
+        date_from:            String,
+        date_to:              String,
     },
 
     data() {
@@ -391,6 +491,9 @@ export default {
             animatedCategories: 0,
             liveClock: '',
             clockInterval: null,
+            selectedDepartment: this.current_department_id,
+            filterDateFrom: this.date_from,
+            filterDateTo: this.date_to,
         };
     },
 
@@ -401,10 +504,10 @@ export default {
         },
         greeting() {
             const hour = new Date().getHours();
-            if (hour < 11) return 'Good Morning';
-            if (hour < 15) return 'Good Afternoon';
-            if (hour < 18) return 'Good Evening';
-            return 'Good Night';
+            if (hour < 11) return this.$t('dashboard.greeting.morning');
+            if (hour < 15) return this.$t('dashboard.greeting.afternoon');
+            if (hour < 18) return this.$t('dashboard.greeting.evening');
+            return this.$t('dashboard.greeting.night');
         },
         todayFormatted() {
             return new Date().toLocaleDateString('en-US', {
@@ -426,8 +529,52 @@ export default {
         utilizationPercent() {
             const total = this.totalMaterials;
             if (total === 0) return 0;
-            const active = this.availableStock;
-            return Math.round((active / total) * 100);
+            return Math.round((this.availableStock / total) * 100);
+        },
+        kpiCards() {
+            return [
+                {
+                    label: this.$t('dashboard.kpi.total_materials'),
+                    value: this.animatedTotalMaterials,
+                    icon: 'fa fa-box',
+                    iconClass: 'icon-blue',
+                    dotClass: 'dot-blue',
+                    footer: this.$t('dashboard.kpi.active_items'),
+                },
+                {
+                    label: this.$t('dashboard.kpi.available_stock'),
+                    value: this.animatedAvailableStock,
+                    icon: 'fa fa-check-circle',
+                    iconClass: 'icon-green',
+                    dotClass: 'dot-green',
+                    footer: this.$t('dashboard.kpi.safe_level'),
+                },
+                {
+                    label: this.$t('dashboard.kpi.low_stock_alert'),
+                    value: this.animatedLowStock,
+                    icon: this.low_stock_count > 0 ? 'fa fa-exclamation-triangle' : 'fa fa-check-circle',
+                    iconClass: this.low_stock_count > 0 ? 'icon-orange' : 'icon-green',
+                    dotClass: this.low_stock_count > 0 ? 'dot-orange' : 'dot-green',
+                    footer: this.low_stock_count > 0 ? this.$t('dashboard.kpi.requires_attention') : this.$t('dashboard.kpi.all_healthy'),
+                    alert: this.low_stock_count > 0,
+                },
+                {
+                    label: this.$t('dashboard.kpi.monthly_stock_out'),
+                    value: this.animatedMonthlyOut,
+                    icon: 'fa fa-arrow-trend-up',
+                    iconClass: 'icon-purple',
+                    dotClass: 'dot-purple',
+                    footer: this.material_out_today.total_transaction + ' ' + this.$t('dashboard.kpi.transactions_today'),
+                },
+                {
+                    label: this.$t('dashboard.kpi.inventory_value'),
+                    value: 'Rp ' + this.formatPrice(this.total_inventory_value),
+                    icon: 'fa fa-coins',
+                    iconClass: 'icon-indigo',
+                    dotClass: 'dot-indigo',
+                    footer: this.$t('dashboard.kpi.total_stock_value'),
+                },
+            ];
         },
         chartMovementSeries() {
             return [{ name: 'Stock Out', data: this.grand_total ?? [] }];
@@ -437,102 +584,46 @@ export default {
                 chart: {
                     toolbar: { show: false },
                     zoom: { enabled: false },
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800,
-                        animateGradually: {
-                            enabled: true,
-                            delay: 150
-                        }
-                    }
+                    animations: { enabled: true, easing: 'easeinout', speed: 800 }
                 },
                 colors: ['#6366f1'],
                 fill: {
                     type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.25,
-                        opacityTo: 0.05,
-                        stops: [0, 100]
-                    }
+                    gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0.05, stops: [0, 100] }
                 },
                 stroke: { curve: 'smooth', width: 2.5 },
                 dataLabels: { enabled: false },
                 xaxis: {
                     categories: this.sales_date ?? [],
-                    labels: {
-                        style: {
-                            fontSize: '11px',
-                            fontFamily: 'Inter, sans-serif',
-                            colors: '#64748b'
-                        }
-                    },
+                    labels: { style: { fontSize: '11px', colors: '#64748b' } },
                     axisBorder: { show: false },
                     axisTicks: { show: false }
                 },
                 yaxis: {
-                    labels: {
-                        style: {
-                            fontSize: '11px',
-                            fontFamily: 'Inter, sans-serif',
-                            colors: '#64748b'
-                        }
-                    }
+                    labels: { style: { fontSize: '11px', colors: '#64748b' } }
                 },
-                grid: {
-                    strokeDashArray: 3,
-                    borderColor: '#e5e7eb',
-                    padding: { top: 0, right: 0, bottom: 0, left: 0 }
-                },
-                tooltip: {
-                    theme: 'light',
-                    y: {
-                        formatter: (v) => v + ' units'
-                    }
-                }
+                grid: { strokeDashArray: 3, borderColor: '#e5e7eb', padding: 0 },
+                tooltip: { theme: 'light', y: { formatter: (v) => v + ' units' } }
             };
         },
         chartStatusOptions() {
             return {
-                chart: {
-                    toolbar: { show: false },
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800
-                    }
-                },
+                chart: { toolbar: { show: false }, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
                 labels: this.stock_status?.labels ?? [],
                 colors: ['#10b981', '#f59e0b', '#ef4444'],
                 legend: {
-                    position: 'bottom',
-                    fontSize: '12px',
-                    fontFamily: 'Inter, sans-serif',
+                    position: 'bottom', fontSize: '12px',
                     markers: { width: 8, height: 8, radius: 2 },
                     itemMargin: { horizontal: 12, vertical: 8 }
                 },
-                dataLabels: {
-                    enabled: true,
-                    style: {
-                        fontSize: '12px',
-                        fontFamily: 'Inter, sans-serif',
-                        fontWeight: 600
-                    }
-                },
+                dataLabels: { enabled: true, style: { fontSize: '12px', fontWeight: 600 } },
                 plotOptions: {
                     pie: {
                         donut: {
                             size: '70%',
                             labels: {
                                 show: true,
-                                total: {
-                                    show: true,
-                                    label: 'Total Items',
-                                    fontSize: '14px',
-                                    fontFamily: 'Inter, sans-serif',
-                                    color: '#1e293b'
-                                }
+                                total: { show: true, label: 'Total Items', fontSize: '14px', color: '#1e293b' }
                             }
                         }
                     }
@@ -545,37 +636,51 @@ export default {
     methods: {
         stockPercent(item) {
             if (!item.min_stock || item.min_stock === 0) return item.current_stock > 0 ? 100 : 0;
-            const pct = (item.current_stock / item.min_stock) * 100;
-            return Math.min(Math.max(pct, 4), 100);
+            return Math.min(Math.max((item.current_stock / item.min_stock) * 100, 4), 100);
+        },
+        formatPrice(value) {
+            if (!value) return '0';
+            return new Intl.NumberFormat('id-ID').format(Math.round(value));
         },
         animateCounter(target, key, duration = 1200) {
             const startTime = performance.now();
             const step = (now) => {
                 const progress = Math.min((now - startTime) / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                this[key] = Math.round(target * eased);
+                this[key] = Math.round(target * (1 - Math.pow(1 - progress, 3)));
                 if (progress < 1) requestAnimationFrame(step);
             };
             requestAnimationFrame(step);
         },
         updateClock() {
-            this.liveClock = new Date().toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
+            this.liveClock = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         },
         initStaggerAnimation() {
             const elements = document.querySelectorAll('[data-stagger]');
             elements.forEach((el, idx) => {
                 el.style.opacity = '0';
-                el.style.transform = 'translateY(20px)';
+                el.style.transform = 'translateY(16px)';
                 setTimeout(() => {
-                    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                     el.style.opacity = '1';
                     el.style.transform = 'translateY(0)';
-                }, idx * 80);
+                }, idx * 70);
             });
+        },
+        onDepartmentChange() {
+            this.$inertia.get('/apps/dashboard', {
+                department_id: this.selectedDepartment || undefined,
+            }, { preserveState: true });
+        },
+        applyDateFilter() {
+            const params = new URLSearchParams();
+            if (this.filterDateFrom) params.set('date_from', this.filterDateFrom);
+            if (this.filterDateTo) params.set('date_to', this.filterDateTo);
+            this.$inertia.get('/apps/dashboard?' + params.toString(), {}, { preserveState: true });
+        },
+        resetDateFilter() {
+            this.filterDateFrom = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-01';
+            this.filterDateTo = new Date().toISOString().split('T')[0];
+            this.applyDateFilter();
         }
     },
 
@@ -584,15 +689,12 @@ export default {
         this.animateCounter(this.availableStock, 'animatedAvailableStock');
         this.animateCounter(this.low_stock_count ?? 0, 'animatedLowStock');
         this.animateCounter(this.grand_total?.reduce((a, b) => a + b, 0) || 0, 'animatedMonthlyOut');
-        this.animateCounter(8, 'animatedLocations', 1000);
+        this.animateCounter(this.stock_status?.data?.length || 0, 'animatedLocations', 1000);
         this.animateCounter(12, 'animatedCategories', 1000);
 
         this.updateClock();
         this.clockInterval = setInterval(this.updateClock, 1000);
-
-        this.$nextTick(() => {
-            this.initStaggerAnimation();
-        });
+        this.$nextTick(() => { this.initStaggerAnimation(); });
     },
 
     beforeUnmount() {
@@ -602,773 +704,403 @@ export default {
 </script>
 
 <style scoped>
-/* Minimal & Airy Design System */
+/* ============================================
+   DESIGN SYSTEM — consistent tokens
+   ============================================ */
 .dashboard-page {
-    background: #fafafa;
+    background: #f8fafc;
     min-height: 100vh;
     padding: 24px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Header Section */
-.dash-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 32px;
-    gap: 24px;
-    flex-wrap: wrap;
-}
-
-.header-left {
-    flex: 1;
-    min-width: 300px;
-}
-
-.dash-title {
-    font-size: 28px;
-    font-weight: 600;
-    color: #0f172a;
-    margin: 0 0 6px;
-    letter-spacing: -0.02em;
-    font-family: 'Inter', sans-serif;
-}
-
-.dash-subtitle {
-    font-size: 14px;
-    color: #64748b;
-    margin: 0;
-    font-weight: 400;
-}
-
-.live-time {
-    font-variant-numeric: tabular-nums;
-    color: #475569;
-    font-weight: 500;
-}
-
-.header-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    border: 1px solid #e5e7eb;
-    background: white;
-    color: #1e293b;
-    transition: all 0.2s ease;
-    font-family: 'Inter', sans-serif;
-}
-
-.action-btn:hover {
-    border-color: #cbd5e1;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    text-decoration: none;
-}
-
-.btn-primary {
-    background: #6366f1;
-    border-color: #6366f1;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #4f46e5;
-    border-color: #4f46e5;
-    color: white;
-}
-
-.btn-secondary {
-    background: white;
-    border-color: #e5e7eb;
-    color: #475569;
-}
-
-/* KPI Grid */
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-    margin-bottom: 32px;
-}
-
-.kpi-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 20px;
-    transition: all 0.3s ease;
-}
-
-.kpi-card:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-}
-
-.kpi-card.kpi-alert {
-    background: linear-gradient(to bottom, #fffbeb, white);
-}
-
-.kpi-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.kpi-label {
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.kpi-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.icon-blue {
-    background: #eff6ff;
-    color: #3b82f6;
-}
-
-.icon-green {
-    background: #f0fdf4;
-    color: #10b981;
-}
-
-.icon-orange {
-    background: #fff7ed;
-    color: #f97316;
-}
-
-.icon-purple {
-    background: #faf5ff;
-    color: #a855f7;
-}
-
-.icon-red {
-    background: #fef2f2;
-    color: #ef4444;
-}
-
-.kpi-value {
-    font-size: 36px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 12px;
-    line-height: 1;
-    letter-spacing: -0.02em;
-}
-
-.kpi-footer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #64748b;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.dot-blue {
-    background: #3b82f6;
-}
-
-.dot-green {
-    background: #10b981;
-}
-
-.dot-orange {
-    background: #f97316;
-}
-
-.dot-purple {
-    background: #a855f7;
-}
-
-/* Content Grid */
-.content-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 20px;
-    margin-bottom: 32px;
-}
-
-/* Card Base */
+/* ---- Shared Card ---- */
 .card {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: box-shadow 0.2s ease;
 }
-
-.card:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-}
-
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
 .card-header {
-    padding: 20px;
+    padding: 18px 22px;
     border-bottom: 1px solid #f1f5f9;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.card-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #0f172a;
-    margin: 0;
-}
-
-.card-subtitle {
-    font-size: 12px;
-    color: #94a3b8;
-    margin: 2px 0 0;
-}
-
+.card-title { font-size: 15px; font-weight: 600; color: #0f172a; margin: 0; }
+.card-subtitle { font-size: 12px; color: #94a3b8; margin: 2px 0 0; }
+.card-body { padding: 18px 22px; }
+.card-footer { padding: 14px 22px; border-top: 1px solid #f1f5f9; }
 .card-badge {
-    font-size: 12px;
-    padding: 4px 10px;
-    background: #f1f5f9;
-    color: #475569;
-    border-radius: 6px;
-    font-weight: 500;
+    font-size: 11px; padding: 3px 10px; background: #f1f5f9;
+    color: #475569; border-radius: 6px; font-weight: 500;
 }
+.header-content { display: flex; align-items: center; gap: 12px; }
 
-.card-body {
-    padding: 20px;
+/* ============================================
+   HEADER
+   ============================================ */
+.dash-header {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
 }
-
-.card-footer {
-    padding: 16px 20px;
-    border-top: 1px solid #f1f5f9;
-}
-
-/* AI Insight Card */
-.ai-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+.header-top {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-}
-
-.insight-item {
-    display: flex;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.insight-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.insight-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: #f8fafc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6366f1;
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-.insight-content {
-    flex: 1;
-}
-
-.insight-label {
-    font-size: 12px;
-    color: #64748b;
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-.insight-value {
-    font-size: 14px;
-    color: #0f172a;
-    font-weight: 500;
-}
-
-.ai-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
-    color: white;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.ai-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(168,85,247,0.3);
-    text-decoration: none;
-    color: white;
-}
-
-.ai-disabled {
-    display: block;
-    text-align: center;
-    font-size: 13px;
-    color: #94a3b8;
-    padding: 12px;
-}
-
-/* Quick Actions */
-.quick-action-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    margin-bottom: 8px;
-}
-
-.quick-action-item:last-child {
-    margin-bottom: 0;
-}
-
-.quick-action-item:hover {
-    background: #f8fafc;
-    text-decoration: none;
-}
-
-.qa-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-.qa-content {
-    flex: 1;
-}
-
-.qa-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #0f172a;
-    margin-bottom: 2px;
-}
-
-.qa-desc {
-    font-size: 12px;
-    color: #64748b;
-}
-
-.qa-arrow {
-    color: #cbd5e1;
-    font-size: 14px;
-}
-
-/* Charts Grid */
-.charts-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
-    margin-bottom: 32px;
-}
-
-.chart-wide {
-    grid-column: span 1;
-}
-
-.chart-legend {
-    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 16px;
+    margin-bottom: 16px;
 }
+.header-left { flex: 1; min-width: 260px; }
+.dash-title { font-size: 26px; font-weight: 700; color: #0f172a; margin: 0 0 4px; letter-spacing: -0.02em; }
+.dash-subtitle { font-size: 13px; color: #64748b; margin: 0; }
+.live-time { font-variant-numeric: tabular-nums; color: #475569; font-weight: 500; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #64748b;
+.action-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    text-decoration: none; border: 1px solid #e2e8f0; background: white;
+    color: #334155; transition: all 0.15s ease;
 }
+.action-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-decoration: none; }
+.btn-primary { background: #6366f1; border-color: #6366f1; color: white; }
+.btn-primary:hover { background: #4f46e5; color: white; }
+.btn-secondary { background: white; color: #475569; }
+.btn-outline-red { background: white; border-color: #fecaca; color: #dc2626; }
+.btn-outline-red:hover { background: #fef2f2; border-color: #fca5a5; }
 
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-}
-
-/* Tables Grid */
-.tables-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 20px;
-    margin-bottom: 32px;
-}
-
-.view-all-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #6366f1;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.view-all-link:hover {
-    color: #4f46e5;
-    text-decoration: none;
-}
-
-/* Data Table */
-.table-wrapper {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table thead th {
-    text-align: left;
-    padding: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.data-table tbody td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 13px;
-    color: #475569;
-}
-
-.data-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.material-info {
+/* Filters row */
+.header-filters {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
 }
-
-.material-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
+.filter-group {
+    display: flex; align-items: center; gap: 6px;
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 0 10px; height: 36px;
 }
-
-.material-name {
-    font-weight: 500;
-    color: #0f172a;
+.filter-icon { color: #94a3b8; font-size: 12px; }
+.filter-select {
+    border: none; background: transparent; font-size: 13px; font-weight: 500;
+    color: #334155; outline: none; padding: 6px 0; font-family: inherit;
 }
-
-.item-code {
-    font-size: 12px;
-    padding: 2px 8px;
-    background: #f1f5f9;
-    color: #64748b;
-    border-radius: 4px;
+.filter-date {
+    border: none; background: transparent; font-size: 13px; font-weight: 500;
+    color: #334155; outline: none; width: 120px; font-family: inherit;
 }
-
-.stock-progress {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+.filter-dash { color: #cbd5e1; margin: 0 2px; }
+.filter-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em; }
+.filter-separator { display: flex; align-items: center; }
+.filter-reset {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0;
+    background: white; color: #64748b; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; transition: all 0.15s ease; font-size: 12px;
 }
+.filter-reset:hover { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
 
-.progress-bar {
-    width: 100%;
-    height: 6px;
-    background: #f1f5f9;
-    border-radius: 3px;
-    overflow: hidden;
+/* ============================================
+   PENDING BANNER
+   ============================================ */
+.pending-banner {
+    display: flex; align-items: center; gap: 12px;
+    background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px;
+    padding: 12px 18px; margin-bottom: 20px;
 }
-
-.progress-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.6s ease;
+.pending-icon { color: #f59e0b; font-size: 16px; flex-shrink: 0; }
+.pending-text { flex: 1; font-size: 13px; color: #92400e; }
+.pending-link {
+    font-size: 13px; font-weight: 600; color: #d97706;
+    text-decoration: none; display: flex; align-items: center; gap: 4px;
 }
+.pending-link:hover { color: #b45309; text-decoration: underline; }
 
-.fill-red {
-    background: linear-gradient(90deg, #f87171, #ef4444);
-}
-
-.fill-orange {
-    background: linear-gradient(90deg, #fbbf24, #f97316);
-}
-
-.stock-text {
-    font-size: 11px;
-    color: #94a3b8;
-    font-variant-numeric: tabular-nums;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.badge-red {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.badge-orange {
-    background: #fff7ed;
-    color: #ea580c;
-}
-
-/* Usage List */
-.usage-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.usage-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.usage-rank {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    background: #f8fafc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: #475569;
-    flex-shrink: 0;
-}
-
-.usage-info {
-    flex: 1;
-}
-
-.usage-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: #0f172a;
-    margin-bottom: 6px;
-}
-
-.usage-bar {
-    height: 6px;
-    background: #f1f5f9;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.usage-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    border-radius: 3px;
-    transition: width 0.6s ease;
-}
-
-.usage-value {
-    font-size: 13px;
-    font-weight: 600;
-    color: #475569;
-    font-variant-numeric: tabular-nums;
-}
-
-/* Warehouse Section */
-.warehouse-section {
-    margin-bottom: 32px;
-}
-
-.warehouse-stats {
+/* ============================================
+   KPI GRID
+   ============================================ */
+.kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.kpi-card {
+    background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+    padding: 18px 20px; transition: all 0.2s ease;
+}
+.kpi-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+.kpi-card.kpi-alert { background: linear-gradient(to bottom, #fffbeb, white); border-color: #fde68a; }
+.kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.kpi-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.kpi-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.kpi-value { font-size: 30px; font-weight: 700; color: #0f172a; margin-bottom: 10px; line-height: 1; letter-spacing: -0.02em; }
+.kpi-footer { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* ============================================
+   LAYOUT ROWS
+   ============================================ */
+.row-2-1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
+    margin-bottom: 20px;
+}
+.row-equal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.row-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
+/* ============================================
+   PERIOD COMPARISON
+   ============================================ */
+.period-comparison {
+    display: flex; flex-direction: column; gap: 12px;
+}
+.period-card {
+    background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+    padding: 16px 18px; transition: all 0.2s ease;
+}
+.period-card:hover { border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.period-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.period-icon {
+    width: 38px; height: 38px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+}
+.period-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.period-value { font-size: 26px; font-weight: 700; color: #0f172a; line-height: 1; margin-top: 2px; }
+.period-footer {
+    display: flex; align-items: center; gap: 8px;
+    padding-top: 10px; border-top: 1px solid #f1f5f9;
+}
+.change-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600;
+}
+.change-up { background: #fef2f2; color: #dc2626; }
+.change-down { background: #f0fdf4; color: #16a34a; }
+.change-flat { background: #f1f5f9; color: #64748b; }
+.change-label { font-size: 11px; color: #94a3b8; }
+
+/* ============================================
+   COLOR ICONS
+   ============================================ */
+.icon-blue { background: #eff6ff; color: #3b82f6; }
+.icon-green { background: #f0fdf4; color: #10b981; }
+.icon-orange { background: #fff7ed; color: #f97316; }
+.icon-purple { background: #faf5ff; color: #a855f7; }
+.icon-indigo { background: #eef2ff; color: #6366f1; }
+.icon-red { background: #fef2f2; color: #ef4444; }
+.icon-amber { background: #fffbeb; color: #f59e0b; }
+.dot-blue { background: #3b82f6; }
+.dot-green { background: #10b981; }
+.dot-orange { background: #f97316; }
+.dot-purple { background: #a855f7; }
+.dot-indigo { background: #6366f1; }
+
+/* ============================================
+   SECTION ICON (small colored square)
+   ============================================ */
+.section-icon {
+    width: 38px; height: 38px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+
+/* ============================================
+   EXPIRY CARD
+   ============================================ */
+.expiry-card { border-color: #fde68a; background: linear-gradient(to bottom, #fffbeb, white); }
+.expiry-card:hover { box-shadow: 0 4px 16px rgba(245,158,11,0.08); }
+
+/* ============================================
+   DATA TABLE
+   ============================================ */
+.table-wrapper { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table thead th {
+    text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600;
+    color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid #e2e8f0;
+}
+.data-table tbody td {
+    padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #475569;
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+.material-info { display: flex; align-items: center; gap: 8px; }
+.material-icon {
+    width: 30px; height: 30px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;
+}
+.material-name { font-weight: 500; color: #0f172a; }
+.item-code {
+    font-size: 11px; padding: 2px 7px; background: #f1f5f9;
+    color: #64748b; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.status-badge { display: inline-block; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; }
+.badge-red { background: #fef2f2; color: #dc2626; }
+.badge-orange { background: #fff7ed; color: #ea580c; }
+.badge-green { background: #f0fdf4; color: #16a34a; }
+.stock-progress { display: flex; flex-direction: column; gap: 3px; }
+.progress-bar { width: 100%; height: 5px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.fill-red { background: linear-gradient(90deg, #f87171, #ef4444); }
+.fill-orange { background: linear-gradient(90deg, #fbbf24, #f97316); }
+.stock-text { font-size: 11px; color: #94a3b8; font-variant-numeric: tabular-nums; }
+
+/* ============================================
+   AI INSIGHT
+   ============================================ */
+.ai-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px; flex-shrink: 0;
+}
+.restock-label {
+    font-size: 11px; font-weight: 600; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px;
+}
+.restock-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid #f1f5f9;
+}
+.restock-item:last-child { border-bottom: none; }
+.restock-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+.restock-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
+.restock-qty {
+    padding: 3px 9px; background: #fef2f2; color: #dc2626;
+    border-radius: 5px; font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.restock-empty {
+    display: flex; gap: 10px; align-items: flex-start; padding: 4px 0;
+}
+.restock-empty i { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+.restock-empty-title { font-size: 13px; font-weight: 600; color: #0f172a; }
+.restock-empty-text { font-size: 12px; color: #64748b; margin-top: 2px; }
+.ai-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 11px; background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: white; border-radius: 8px; text-decoration: none;
+    font-size: 13px; font-weight: 600; transition: all 0.2s ease;
+}
+.ai-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(168,85,247,0.3); text-decoration: none; color: white; }
+.ai-disabled { display: block; text-align: center; font-size: 12px; color: #94a3b8; padding: 10px; }
+
+/* ============================================
+   QUICK ACTIONS
+   ============================================ */
+.quick-action-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; border-radius: 8px; text-decoration: none;
+    transition: background 0.15s ease; margin-bottom: 4px;
+}
+.quick-action-item:last-child { margin-bottom: 0; }
+.quick-action-item:hover { background: #f8fafc; text-decoration: none; }
+.qa-icon {
+    width: 38px; height: 38px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+}
+.qa-content { flex: 1; }
+.qa-label { font-size: 13px; font-weight: 600; color: #0f172a; }
+.qa-desc { font-size: 11px; color: #64748b; margin-top: 1px; }
+.qa-arrow { color: #cbd5e1; font-size: 12px; }
+
+/* ============================================
+   USAGE LIST (Top Materials)
+   ============================================ */
+.usage-list { display: flex; flex-direction: column; gap: 10px; }
+.usage-item { display: flex; align-items: center; gap: 10px; }
+.usage-rank {
+    width: 26px; height: 26px; border-radius: 6px; background: #f8fafc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #475569; flex-shrink: 0;
+}
+.usage-info { flex: 1; }
+.usage-name { font-size: 13px; font-weight: 500; color: #0f172a; margin-bottom: 5px; }
+.usage-bar { height: 5px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+.usage-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); border-radius: 3px; }
+.usage-value { font-size: 12px; font-weight: 600; color: #475569; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ============================================
+   VIEW ALL LINK
+   ============================================ */
+.view-all-link {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px; color: #6366f1; text-decoration: none; font-weight: 500;
+}
+.view-all-link:hover { color: #4f46e5; text-decoration: none; }
+
+/* ============================================
+   WAREHOUSE
+   ============================================ */
+.warehouse-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .warehouse-stat {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px;
-    background: #f8fafc;
-    border-radius: 8px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px; background: #f8fafc; border-radius: 10px;
 }
-
 .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
 }
+.stat-content { flex: 1; }
+.stat-label { font-size: 11px; color: #64748b; font-weight: 500; margin-bottom: 3px; }
+.stat-value { font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1; }
 
-.stat-content {
-    flex: 1;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: #64748b;
-    margin-bottom: 4px;
-    font-weight: 500;
-}
-
-.stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: #0f172a;
-    line-height: 1;
-}
-
-/* Empty State */
+/* ============================================
+   EMPTY STATE
+   ============================================ */
 .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 20px;
-    color: #94a3b8;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 40px 16px; color: #94a3b8;
 }
+.empty-state i { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
+.empty-state p { margin: 0; font-size: 13px; }
+.empty-alert-card { display: flex; align-items: center; justify-content: center; min-height: 200px; }
 
-.empty-state i {
-    font-size: 40px;
-    margin-bottom: 12px;
-    opacity: 0.5;
-}
-
-.empty-state p {
-    margin: 0;
-    font-size: 14px;
-}
-
-/* Animations */
-.fade-in-stagger [data-stagger] {
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-.table-row-fade {
-    animation: fadeInUp 0.5s ease forwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive */
+/* ============================================
+   RESPONSIVE
+   ============================================ */
 @media (max-width: 1200px) {
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .row-charts { grid-template-columns: 1fr; }
 }
-
+@media (max-width: 992px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .row-2-1, .row-equal { grid-template-columns: 1fr; }
+    .warehouse-stats { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 768px) {
-    .dashboard-page {
-        padding: 16px;
-    }
-
-    .dash-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .header-actions {
-        width: 100%;
-    }
-
-    .action-btn {
-        flex: 1;
-        justify-content: center;
-    }
-
-    .kpi-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .content-grid,
-    .tables-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .warehouse-stats {
-        grid-template-columns: 1fr;
-    }
+    .dashboard-page { padding: 16px; }
+    .header-top { flex-direction: column; }
+    .header-actions { width: 100%; }
+    .action-btn { flex: 1; justify-content: center; }
+    .header-filters { flex-direction: column; align-items: stretch; }
+    .filter-group { width: 100%; }
+    .filter-select, .filter-date { flex: 1; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .warehouse-stats { grid-template-columns: 1fr; }
 }
 </style>

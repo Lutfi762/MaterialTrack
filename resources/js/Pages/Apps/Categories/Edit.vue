@@ -1,24 +1,24 @@
 <template>
-    <Head><title>Edit Kategori - MaterialTrack</title></Head>
+    <Head><title>{{ $t('categories.edit') }} - MaterialTrack</title></Head>
     <main>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card border-0 rounded-3 shadow border-top-purple">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-folder me-1"></i> EDIT KATEGORI</span>
-                            <Link href="/apps/categories" class="btn btn-sm btn-secondary"><i class="fa fa-arrow-left me-1"></i> Kembali</Link>
+                            <span class="font-weight-bold"><i class="fa fa-folder me-1"></i> {{ $t('categories.edit') }}</span>
+                            <Link href="/apps/categories" class="btn btn-sm btn-secondary"><i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}</Link>
                         </div>
                         <div class="card-body">
                             <form @submit.prevent="submit">
                                 <div class="mb-3">
-                                    <label class="fw-bold">Nama Kategori</label>
+                                    <label class="fw-bold">{{ $t('categories.name') }}</label>
                                     <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.name }" type="text">
                                     <div v-if="form.errors.name" class="invalid-feedback d-block">{{ form.errors.name }}</div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="fw-bold">Kode Prefix</label>
+                                    <label class="fw-bold">{{ $t('categories.code_prefix') }}</label>
                                     <input
                                         class="form-control"
                                         v-model="form.code_prefix"
@@ -27,19 +27,19 @@
                                         type="text"
                                         maxlength="10"
                                     >
-                                    <small class="text-muted">Mengubah prefix tidak akan mengubah kode material yang sudah ada.</small>
+                                    <small class="text-muted">{{ $t('categories.code_prefix_desc') }}</small>
                                     <div v-if="form.errors.code_prefix" class="invalid-feedback d-block">{{ form.errors.code_prefix }}</div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="fw-bold">Deskripsi</label>
+                                    <label class="fw-bold">{{ $t('categories.description') }}</label>
                                     <textarea class="form-control" v-model="form.description" rows="3"></textarea>
                                 </div>
 
                                 <hr>
 
                                 <div class="mb-3">
-                                    <label class="fw-bold">Department yang Bisa Akses</label>
+                                    <label class="fw-bold">{{ $t('categories.departments_access') }}</label>
                                     <br>
                                     <div class="form-check form-check-inline" v-for="dept in departments" :key="dept.id">
                                         <input
@@ -52,13 +52,13 @@
                                         <label class="form-check-label" :for="`dept-${dept.id}`">{{ dept.name }}</label>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        Kosongkan jika kategori ini hanya boleh diakses Admin/Gudang (tidak tampil ke departemen manapun).
+                                        {{ $t('categories.departments_access_desc') }}
                                     </small>
                                 </div>
 
                                 <button class="btn btn-primary shadow-sm rounded-sm" type="submit" :disabled="form.processing">
-                                    <span v-if="form.processing">Menyimpan...</span>
-                                    <span v-else>UPDATE</span>
+                                    <span v-if="form.processing">{{ $t('common.saving') }}</span>
+                                    <span v-else>{{ $t('common.update') }}</span>
                                 </button>
                             </form>
                         </div>
@@ -73,12 +73,15 @@
 import LayoutApp from '../../../Layouts/App.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
+import { useI18n } from 'vue-i18n';
 
 export default {
     layout: LayoutApp,
     components: { Head, Link },
     props: { category: Object, departments: Array },
     setup(props) {
+        const { t } = useI18n();
+
         const form = useForm({
             name: props.category.name,
             code_prefix: props.category.code_prefix ?? '',
@@ -88,7 +91,7 @@ export default {
 
         const submit = () => {
             form.put(`/apps/categories/${props.category.id}`, {
-                onSuccess: () => Swal.fire({ title: 'Berhasil!', text: 'Kategori diperbarui.', icon: 'success', showConfirmButton: false, timer: 2000 }),
+                onSuccess: () => Swal.fire({ title: t('common.success'), text: t('categories.updated_success'), icon: 'success', showConfirmButton: false, timer: 2000 }),
             });
         };
 

@@ -21,7 +21,17 @@ class StockOut extends Model
         'purpose',
         'notes',
         'date',
+        'status',
+        'approved_by',
+        'approved_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'approved_at' => 'datetime',
+        ];
+    }
 
     protected function createdAt(): Attribute
     {
@@ -48,5 +58,10 @@ class StockOut extends Model
     public function pic()
     {
         return $this->belongsTo(Pic::class);
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }
