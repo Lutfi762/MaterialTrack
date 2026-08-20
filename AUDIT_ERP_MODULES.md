@@ -60,6 +60,26 @@ telah dijalankan (efek DDL sudah terpasang manual sebelumnya; direkam di tabel `
 state di frontend), MEDIUM #1 (wire ApprovalWorkflow ke approve PR/PO/SO/Leave), MEDIUM #5 (index
 non-unique kolom filter), MEDIUM #6 (loading state umum).
 
+## RE-AUDIT MENYELURUH (20 Agustus 2026, sweep otomatis)
+
+Script audit `/_sweep.php` (gitignored): lint semua PHP, `route:list` action→controller method,
+`Inertia::render`→file Vue, model fillable vs kolom DB, migration→tabel, permission route vs DB,
+`route()` Vue vs rute terdaftar, kolom mencurigakan, FK yatim, props controller vs `defineProps`.
+
+| Temuan | Aksi | Status |
+|---|---|---|
+| `stock_ins.po_number/supplier_id`, `stock_movements.hash`, `stock_opnames.status/verified_by/verified_at`, `departments.status` **tidak ada di DB** walau migration `2026_08_18_100010`/`2026_08_19_100001`/`100003` tercatat Ran (DDL tak pernah terpasang — file diedit setelah running) → StockIn `with('supplier')` & `StockMovement::create` (isi `hash`) **SQL error** | Migration baru `2026_08_20_000013_add_missing_legacy_inventory_columns` (guarded `hasColumn`), backfill rantai hash & status opname lama, trigger append-only deny UPDATE/DELETE; dijalankan | ✅ |
+| Trigger `stock_movements_deny_update/delete` belum ada | Dibuat di 000013; verifikasi: INSERT dummy ber-hash → UPDATE & DELETE **ditolak** (SQLSTATE 45000), rollback bersih | ✅ |
+| Permission route baru belum ada di DB (`notifications.index`, `financial_reports.index`, `cash_bank.index/create`, `sales_returns.index/create/approve`) | `PermissionsTableSeeder` (sudah memuatnya) dijalankan → 95 permission | ✅ |
+| Migration `2026_08_21_000001/000002` (cash_bank_transactions, sales_returns, sales_return_items) pending | `php artisan migrate` → Ran; model/controller fillable ↔ kolom cocok | ✅ |
+| `FinancialReports/Index.vue` v-model di prop `from/to` → **build gagal** | ganti `:value` + `@change` | ✅ |
+| `route:list` gagal-semu utk controller Fortify (short name tanpa namespace) | sweep resolve via `Laravel\Fortify\Http\Controllers\` | tooling |
+| Verifikasi akhir | Sweep **SEMUA OK** (sisa 1 WIP: `SalesReturns/Show.vue` belum ditulis); `phpunit` **5/5 (11 assertions)**; `npm run build` **EXIT 0** | ✅ |
+
+**Catatan**: Modul Cash Bank / Sales Returns / Financial Reports / Notifications = WIP belum commit
+(controller+model+migration+seeder sudah ada; halaman Vue sedang dilengkapi). Tabel & permission
+sudah siap di DB; tidak ada rute yang menunjuk page kosong selain `Apps/SalesReturns/Show.vue`.
+
 ---
 
 ## BAGIAN 1: CRITICAL
