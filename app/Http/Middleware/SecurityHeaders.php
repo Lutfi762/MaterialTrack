@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Vite;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -45,12 +46,21 @@ class SecurityHeaders
             "form-action 'self'",
         ];
 
-        // Dev (Vite dev-server): izinkan origin-nya + websocket HMR.
-        // Hanya di-nonaktifkan produksi — prod tetap strict.
-        if (! $isProduction) {
-            $viteDev = 'http://127.0.0.1:5173 http://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5173';
-            $csp[1] .= " $viteDev"; // script-src
-            $csp[5] .= " $viteDev"; // connect-src
+        // Vite dev-server sedang jalan (ada file public/hot saat `npm run dev`):
+        // izinkan origin + websocket HMR — terlepas dari APP_ENV (bisa production di lokal).
+        // Origin diambil dari isi public/hot supaya port custom ikut.
+        if (Vite::isRunningHot()) {
+            $hotUrl = trim((string) (file_get_contents(public_path('hot')) ?: ''));
+            $viteDev = filter_var($hotUrl, FILTER_VALIDATE_URL)
+                ? $hotUrl . ' ' . preg_replace('#^http#', 'ws', $hotUrl)
+                : '';
+            // Fallback port default 5173 (host mana pun)
+            $viteDev .= ' http://127.0.0.1:5173 http://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5173';
+            $viteDev = trim($viteDev);
+            if ($viteDev !== '') {
+                $csp[1] .= ' ' . $viteDev; // script-src
+                $csp[5] .= ' ' . $viteDev; // connect-src
+            }
         }
 
         $response->headers->set('Content-Security-Policy', implode('; ', $csp));
