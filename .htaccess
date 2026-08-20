@@ -1,0 +1,11 @@
+# MaterialTrack — pertahanan ekstra bila vhost menunjuk ke root proyek.
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(env|example|log|sql|bak|md|lock)$">
+        Require all denied
+    </FilesMatch>
+    <FilesMatch "^\.">
+        Require all denied
+    </FilesMatch>
+</IfModule>

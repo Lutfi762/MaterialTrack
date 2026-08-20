@@ -22,4 +22,18 @@ export default defineConfig({
             },
         }),
     ],
+    build: {
+        // Pisah vendor besar → chunk stabil ter-cache browser (hash tidak berubah
+        // saat source sendiri berubah). Rolldown: output.advancedChunks.
+        rolldownOptions: {
+            output: {
+                advancedChunks: {
+                    groups: [
+                        { name: 'vue-vendor', test: /node_modules\/(vue|@vue|vue-i18n|@intlify|@inertiajs|ziggy)/ },
+                        { name: 'charts-vendor', test: /node_modules\/(apexcharts|vue3-apexcharts|sweetalert2|html5-qrcode|qrcode)/ },
+                    ],
+                },
+            },
+        },
+    },
 });

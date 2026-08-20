@@ -2,6 +2,8 @@
 
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\UserLocaleController;
+use App\Http\Controllers\Apps\WelcomeController;
 use App\Http\Controllers\Apps\DashboardController;
 use App\Http\Controllers\Apps\PermissionController;
 use App\Http\Controllers\Apps\RoleController;
@@ -39,6 +41,9 @@ use App\Http\Controllers\Apps\QuotationController;
 use App\Http\Controllers\Apps\SalesOrderController;
 use App\Http\Controllers\Apps\DeliveryController;
 use App\Http\Controllers\Apps\SalesInvoiceController;
+use App\Http\Controllers\Apps\FinancialReportController;
+use App\Http\Controllers\Apps\CashBankController;
+use App\Http\Controllers\Apps\SalesReturnController;
 use App\Http\Controllers\Apps\ChartOfAccountController;
 use App\Http\Controllers\Apps\JournalEntryController;
 use App\Http\Controllers\Apps\EmployeeController;
@@ -47,21 +52,11 @@ use App\Http\Controllers\Apps\LeaveController;
 use App\Http\Controllers\Apps\PayrollController;
 use App\Http\Controllers\Apps\ApprovalWorkflowController;
 
-// Halaman Utama → Login
-Route::get('/', function () {
-    return Inertia::render('Auth/Login');
-})->middleware('guest');
+// Halaman Utama → Login (controller, bukan closure — supaya route:cache jalan)
+Route::get('/', WelcomeController::class)->middleware('guest');
 
 // API route for updating user locale
-Route::post('/api/user/locale', function () {
-    $validated = request()->validate([
-        'locale' => 'required|in:en,id',
-    ]);
-
-    auth()->user()->update(['locale' => $validated['locale']]);
-
-    return response()->json(['success' => true]);
-})->middleware('auth');
+Route::post('/api/user/locale', [UserLocaleController::class, 'update'])->middleware('auth');
 
 // Group Route "apps"
 Route::prefix('apps')->middleware(['auth'])->group(function () {
@@ -250,6 +245,9 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
     Route::post('/notifications/refresh', [NotificationController::class, 'refresh'])
         ->name('apps.notifications.refresh')
         ->middleware('auth');
+    Route::get('/notifications/all', [NotificationController::class, 'page'])
+        ->name('apps.notifications.all')
+        ->middleware('permission:notifications.index');
 
     // Stock Transfers
     Route::resource('/stock-transfers', StockTransferController::class, ['as' => 'apps'])
@@ -405,6 +403,30 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
     Route::resource('/journal-entries', JournalEntryController::class, ['as' => 'apps'])
         ->except(['edit', 'update', 'destroy'])
         ->middleware('permission:journal_entries.index|journal_entries.create');
+
+    // Laporan Keuangan
+    Route::get('/financial-reports', [FinancialReportController::class, 'index'])
+        ->name('apps.financial-reports.index')
+        ->middleware('permission:financial_reports.index');
+    Route::get('/financial-reports/pdf', [FinancialReportController::class, 'downloadPdf'])
+        ->name('apps.financial-reports.pdf')
+        ->middleware(['permission:financial_reports.index', 'throttle:10,1']);
+
+    // Kas & Bank
+    Route::resource('/cash-bank', CashBankController::class, ['as' => 'apps'])
+        ->except(['show', 'edit', 'update', 'destroy'])
+        ->middleware('permission:cash_bank.index|cash_bank.create');
+
+    // Sales Returns (Retur Penjualan)
+    Route::resource('/sales-returns', SalesReturnController::class, ['as' => 'apps'])
+        ->except(['edit', 'update', 'destroy'])
+        ->middleware('permission:sales_returns.index|sales_returns.create');
+    Route::post('/sales-returns/{salesReturn}/approve', [SalesReturnController::class, 'approve'])
+        ->name('apps.sales-returns.approve')
+        ->middleware('permission:sales_returns.approve');
+    Route::post('/sales-returns/{salesReturn}/reject', [SalesReturnController::class, 'reject'])
+        ->name('apps.sales-returns.reject')
+        ->middleware('permission:sales_returns.approve');
 
     // HRM & Payroll
     Route::resource('/employees', EmployeeController::class, ['as' => 'apps'])

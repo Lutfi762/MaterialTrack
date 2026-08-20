@@ -23,3 +23,42 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# ==========================================================
+# Optimasi & keamanan tambahan (MaterialTrack)
+# ==========================================================
+
+# Kompresi gzip/deflate untuk respons HTML & aset
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json image/svg+xml application/xml
+</IfModule>
+
+# Cache aset static lama (file build Vite ber-hash = immutable)
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    ExpiresDefault "access plus 1 hour"
+</IfModule>
+
+# Header cache + sembunyikan versi server
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js|css|png|jpe?g|gif|svg|woff2?|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    Header unset Server
+</IfModule>
+
+# Blokir file sensitif di dalam public/ (berlapis dgn aturan app)
+<IfModule mod_authz_core.c>
+    <FilesMatch "^\.|\.(env|log|sql|bak)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+

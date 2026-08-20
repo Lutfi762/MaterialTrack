@@ -214,6 +214,54 @@ Juga tidak ada `onError` di semua `form.post` → error validasi tampil mentah.
 4. **Leaves**: `rejection_reason` tidak ada di schema/fillable → alasan ditolak silent drop.
    Juga total_days > jatah `leave_types.default_days` tidak dicek.
 5. **Index**: tidak ada index non-unique pada kolom filter umum (`status`); `number` kolom sudah
+
+---
+
+## BAGIAN 5: LAPISAN KECEPATAN & KEAMANAN (ditambahkan 2026-08-20)
+
+### Kecepatan
+1. **OPcache** — belum aktif di php.ini Laragon (`;zend_extension=opcache` dikomentari).
+   Blok siap-pakai: `deploy/opcache-php.ini` (tempel ke php.ini). Verifikasi `php --ri opcache`.
+2. **Config/route/view/event cache** — `deploy/optimize.ps1` (ditolak bila `APP_ENV=local`).
+   Closure route `/` dan `/api/user/locale` sudah dikonversi ke `WelcomeController` &
+   `UserLocaleController` supaya `route:cache` bisa jalan.
+3. **Browser cache** — `public/.htaccess`: gzip (mod_deflate) + `Expires 1 tahun, immutable`
+   untuk aset build Vite (ber-hash). `deploy/nginx-materialtrack.conf` versi nginx (gzip,
+   http2, caching, blokir file sensitif).
+4. **Vendor chunk split** — `vite.config.js` `build.rolldownOptions.output.advancedChunks`:
+   `vue-vendor` + `charts-vendor` dipisah dari bundle app → tidak ke-download ulang saat
+   source berubah.
+5. **Indeks DB baru** — migration `2026_08_20_000014_add_performance_indexes`:
+   `stock_movements(item_id,type,created_at)`, `stock_ins(supplier_id,date)`,
+   `activity_logs(user_id,created_at)`, `journal_entries(status,entry_date)`,
+   `journal_entry_lines(chart_of_account_id)`, `cash_bank_transactions(transaction_date,type)`.
+6. **Dashboard & item list sudah di-cache** (`CacheService`).
+
+### Keamanan
+1. **Security headers** (`app/Http/Middleware/SecurityHeaders.php`, global):
+   CSP (self + CDN allowlist), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
+   `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`,
+   `Strict-Transport-Security` (prod), dan `X-Powered-By` dihapus.
+2. **HTTPS paksa** (`app/Http/Middleware/HttpsRedirect.php`) — aktif bila `APP_ENV=production`
+   DAN `APP_URL=https://…` (skipped di unit test / CLI). `TRUSTED_PROXIES` di `.env` dipakai
+   untuk proxy (nginx/Cloudflare).
+3. **Ziggy eksternal** — `@routes` inline script dihapus dari `app.blade.php`; routes di-generate
+   ke `resources/js/ziggy.js` (`php artisan ziggy:generate`) + `ziggy-js` npm dep. **Wajib
+   regenerate ziggy.js setiap tambah/ubah route** (diperiksa otomatis oleh `_sweep.php` section C2).
+4. **Password policy** — `Password::defaults(min 8 + huruf + angka)` di `AppServiceProvider`
+   (register/reset/update password via Fortify).
+5. **Rate limit login** sudah ada (Fortify 5/menit per email+IP); PDF/export sudah
+   `throttle:10,1`.
+6. **`.htaccess` lapisan ganda** — `public/.htaccess`: gzip + cache + blokir `.env/log/sql`;
+   `.htaccess` root: `Options -Indexes` + deny file sensitif.
+7. **.env produksi** — blok di `.env.example`: `APP_DEBUG=false`, `LOG_LEVEL=warning`,
+   `SESSION_ENCRYPT=true`, `SESSION_SECURE_COOKIE=true`, `TRUSTED_PROXIES`.
+
+### Catatan deployment
+- Set `APP_URL=https://domain`, `APP_ENV=production`, `TRUSTED_PROXIES`, aktifkan OPcache.
+- Jalankan `deploy/optimize.ps1` setelah setiap rilis.
+- Arahkan vhost ke folder `public` (bukan root) — `.htaccess` root hanya pertahanan ekstra.
+
    unique (bagus). `pr_number/po_number/...` LIKE search `%..%` → full scan (konsisten dgn pola lama).
 6. **Frontend**: tidak ada loading state `form.processing` di mayoritas halaman, tidak ada
    `v-html` (XSS aman), tidak ada client-side file validation.

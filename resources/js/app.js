@@ -5,8 +5,14 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import VueApexCharts from 'vue3-apexcharts';
 import { createI18n } from 'vue-i18n';
+import { route as ziggyRoute, ZiggyVue } from 'ziggy-js';
+import { Ziggy } from './ziggy.js';
 import en from './locales/en.json';
 import id from './locales/id.json';
+
+// Ziggy routes eksternal (resources/js/ziggy.js, hasil `php artisan ziggy:generate`)
+// — tanpa inline <script> di blade, jadi CSP script-src tidak butuh 'unsafe-inline'.
+window.route = (name, params, absolute) => ziggyRoute(name, params, absolute, Ziggy);
 
 // Get saved locale from localStorage or default to 'id'
 const savedLocale = localStorage.getItem('locale') || 'id';
@@ -36,6 +42,7 @@ createInertiaApp({
             .use(plugin)
             .use(i18n)
             .use(VueApexCharts)
+            .use(ZiggyVue, Ziggy)
             .mixin({
                 methods: {
                     // Cek apakah user memiliki salah satu dari permission yang diberikan

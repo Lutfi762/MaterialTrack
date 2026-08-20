@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -47,6 +48,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Kebijakan password: minimal 8 karakter, wajib huruf & angka
+        // (berlaku untuk register / reset / update password via Fortify).
+        Password::defaults(fn () => Password::min(8)->letters()->numbers());
+
         // Register observers untuk stock movement audit trail
         StockIn::observe(StockInObserver::class);
         StockOut::observe(StockOutObserver::class);
