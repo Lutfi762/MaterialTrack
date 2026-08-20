@@ -46,6 +46,8 @@ class DepartmentController extends Controller
 
     public function edit(Department $department)
     {
+        $this->authorize('update', $department);
+
         return Inertia::render('Apps/Departments/Edit', [
             'department' => $department,
         ]);
@@ -53,6 +55,7 @@ class DepartmentController extends Controller
 
     public function update(Request $request, Department $department)
     {
+        $this->authorize('update', $department);
         $request->validate([
             'name'        => 'required|string|max:255',
             'code'        => 'nullable|string|max:50|unique:departments,code,' . $department->id,
@@ -72,6 +75,8 @@ class DepartmentController extends Controller
 
     public function destroy(Department $department)
     {
+        $this->authorize('delete', $department);
+
         try {
             if ($department->pics()->exists() || $department->users()->exists() || $department->stockOuts()->exists()) {
                 return back()->withErrors(['error' => 'Department tidak bisa dihapus karena masih memiliki data terkait (PIC, User, atau Transaksi).']);

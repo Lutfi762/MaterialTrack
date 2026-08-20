@@ -13,7 +13,7 @@ class StockInPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasAnyPermission(['stock_ins.index']);
     }
 
     /**
@@ -26,12 +26,17 @@ class StockInPolicy
             return true;
         }
 
+        // Must have view permission
+        if (! $user->hasAnyPermission(['stock_ins.index'])) {
+            return false;
+        }
+
         // Department user can only view their own transactions
         if ($user->hasRole('department_user')) {
             return $stockIn->user_id === $user->id;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -39,7 +44,7 @@ class StockInPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasAnyPermission(['stock_ins.create']);
     }
 
     /**
@@ -47,6 +52,11 @@ class StockInPolicy
      */
     public function update(User $user, StockIn $stockIn): bool
     {
+        // Must have update permission
+        if (! $user->hasAnyPermission(['stock_ins.edit'])) {
+            return false;
+        }
+
         // Super admin can update all
         if ($user->hasRole('super_admin')) {
             return true;
@@ -57,7 +67,7 @@ class StockInPolicy
             return $stockIn->user_id === $user->id;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -65,6 +75,11 @@ class StockInPolicy
      */
     public function delete(User $user, StockIn $stockIn): bool
     {
+        // Must have delete permission
+        if (! $user->hasAnyPermission(['stock_ins.delete'])) {
+            return false;
+        }
+
         // Super admin can delete all
         if ($user->hasRole('super_admin')) {
             return true;
@@ -75,7 +90,7 @@ class StockInPolicy
             return $stockIn->user_id === $user->id;
         }
 
-        return false;
+        return true;
     }
 
     /**

@@ -13,7 +13,7 @@ class StockOutPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasAnyPermission(['stock_outs.index']);
     }
 
     /**
@@ -26,12 +26,17 @@ class StockOutPolicy
             return true;
         }
 
+        // Must have view permission
+        if (! $user->hasAnyPermission(['stock_outs.index'])) {
+            return false;
+        }
+
         // Department user can only view transactions from their department
         if ($user->hasRole('department_user')) {
             return $stockOut->department_id === $user->department_id;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -39,7 +44,7 @@ class StockOutPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasAnyPermission(['stock_outs.create']);
     }
 
     /**
@@ -47,6 +52,11 @@ class StockOutPolicy
      */
     public function update(User $user, StockOut $stockOut): bool
     {
+        // Must have update permission
+        if (! $user->hasAnyPermission(['stock_outs.edit'])) {
+            return false;
+        }
+
         // Super admin can update all
         if ($user->hasRole('super_admin')) {
             return true;
@@ -57,7 +67,7 @@ class StockOutPolicy
             return $stockOut->department_id === $user->department_id;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -65,6 +75,11 @@ class StockOutPolicy
      */
     public function delete(User $user, StockOut $stockOut): bool
     {
+        // Must have delete permission
+        if (! $user->hasAnyPermission(['stock_outs.delete'])) {
+            return false;
+        }
+
         // Super admin can delete all
         if ($user->hasRole('super_admin')) {
             return true;
@@ -75,7 +90,7 @@ class StockOutPolicy
             return $stockOut->department_id === $user->department_id;
         }
 
-        return false;
+        return true;
     }
 
     /**

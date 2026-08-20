@@ -53,6 +53,8 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
+        $this->authorize('update', $category);
+
         return inertia('Apps/Categories/Edit', [
             'category'    => $category->load('departments:id'),
             'departments' => Department::orderBy('name')->get(['id', 'name']),
@@ -61,6 +63,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
+        $this->authorize('update', $category);
         $request->validate([
             'name'              => 'required|string|max:255',
             'code_prefix'       => 'required|string|max:10|unique:categories,code_prefix,' . $category->id . '|alpha',
@@ -82,6 +85,8 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        $this->authorize('delete', $category);
+
         try {
             if ($category->items()->exists()) {
                 return back()->withErrors(['error' => 'Kategori tidak bisa dihapus karena masih memiliki material.']);

@@ -39,6 +39,8 @@ class LocationController extends Controller
 
     public function edit(Location $location)
     {
+        $this->authorize('update', $location);
+
         return Inertia::render('Apps/Locations/Edit', [
             'location' => $location,
         ]);
@@ -46,6 +48,7 @@ class LocationController extends Controller
 
     public function update(Request $request, Location $location)
     {
+        $this->authorize('update', $location);
         $request->validate([
             'name'    => 'required|string|max:255',
             'code'    => 'nullable|string|max:50|unique:locations,code,' . $location->id,
@@ -59,6 +62,8 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
+        $this->authorize('delete', $location);
+
         try {
             if ($location->items()->exists()) {
                 return back()->withErrors(['error' => 'Lokasi tidak bisa dihapus karena masih memiliki material.']);

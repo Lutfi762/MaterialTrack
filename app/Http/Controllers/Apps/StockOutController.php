@@ -195,7 +195,7 @@ class StockOutController extends Controller
 
     public function edit(StockOut $stockOut)
     {
-        $this->authorizeStockOutAccess($stockOut);
+        $this->authorize('update', $stockOut);
 
         return inertia('Apps/StockOuts/Edit', [
             'stockOut' => $stockOut,
@@ -207,7 +207,7 @@ class StockOutController extends Controller
 
     public function update(Request $request, StockOut $stockOut)
     {
-        $this->authorizeStockOutAccess($stockOut);
+        $this->authorize('update', $stockOut);
 
         $validated = $request->validate([
             'purpose' => 'required|string|max:255',
@@ -227,7 +227,7 @@ class StockOutController extends Controller
 
     public function destroy(StockOut $stockOut)
     {
-        $this->authorizeStockOutAccess($stockOut);
+        $this->authorize('delete', $stockOut);
 
         try {
             DB::transaction(function () use ($stockOut) {

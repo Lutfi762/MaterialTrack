@@ -223,6 +223,99 @@
                 </Link>
             </template>
 
+            <template v-if="!isDepartmentUser">
+                <div class="nav-section-label">ERP - PENGADAAN & PENJUALAN</div>
+
+                <Link href="/apps/customers" class="nav-item" :class="{ active: $page.url.startsWith('/apps/customers') }">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label">Pelanggan (Customers)</span>
+                </Link>
+
+                <Link href="/apps/purchase-requests" class="nav-item" :class="{ active: $page.url.startsWith('/apps/purchase-requests') }">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-label">Purchase Requests</span>
+                </Link>
+
+                <Link href="/apps/purchase-orders" class="nav-item" :class="{ active: $page.url.startsWith('/apps/purchase-orders') }">
+                    <span class="nav-icon">🛍️</span>
+                    <span class="nav-label">Purchase Orders</span>
+                </Link>
+
+                <Link href="/apps/goods-receipts" class="nav-item" :class="{ active: $page.url.startsWith('/apps/goods-receipts') }">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-label">Goods Receipts</span>
+                </Link>
+
+                <Link href="/apps/purchase-invoices" class="nav-item" :class="{ active: $page.url.startsWith('/apps/purchase-invoices') }">
+                    <span class="nav-icon">🧾</span>
+                    <span class="nav-label">Purchase Invoices</span>
+                </Link>
+
+                <Link href="/apps/quotations" class="nav-item" :class="{ active: $page.url.startsWith('/apps/quotations') }">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-label">Quotations</span>
+                </Link>
+
+                <Link href="/apps/sales-orders" class="nav-item" :class="{ active: $page.url.startsWith('/apps/sales-orders') }">
+                    <span class="nav-icon">🛒</span>
+                    <span class="nav-label">Sales Orders</span>
+                </Link>
+
+                <Link href="/apps/deliveries" class="nav-item" :class="{ active: $page.url.startsWith('/apps/deliveries') }">
+                    <span class="nav-icon">🚚</span>
+                    <span class="nav-label">Surat Jalan (Deliveries)</span>
+                </Link>
+
+                <Link href="/apps/sales-invoices" class="nav-item" :class="{ active: $page.url.startsWith('/apps/sales-invoices') }">
+                    <span class="nav-icon">💳</span>
+                    <span class="nav-label">Sales Invoices</span>
+                </Link>
+
+                <div class="nav-section-label">ERP - KEUANGAN & HRM</div>
+
+                <Link href="/apps/chart-of-accounts" class="nav-item" :class="{ active: $page.url.startsWith('/apps/chart-of-accounts') }">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Chart of Accounts</span>
+                </Link>
+
+                <Link href="/apps/journal-entries" class="nav-item" :class="{ active: $page.url.startsWith('/apps/journal-entries') }">
+                    <span class="nav-icon">📖</span>
+                    <span class="nav-label">Jurnal Umum</span>
+                </Link>
+
+                <Link href="/apps/employees" class="nav-item" :class="{ active: $page.url.startsWith('/apps/employees') }">
+                    <span class="nav-icon">👨‍💼</span>
+                    <span class="nav-label">Karyawan (Employees)</span>
+                </Link>
+
+                <Link href="/apps/attendances" class="nav-item" :class="{ active: $page.url.startsWith('/apps/attendances') }">
+                    <span class="nav-icon">⏰</span>
+                    <span class="nav-label">Presensi (Attendances)</span>
+                </Link>
+
+                <Link href="/apps/leaves" class="nav-item" :class="{ active: $page.url.startsWith('/apps/leaves') }">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-label">Pengajuan Cuti</span>
+                </Link>
+
+                <Link href="/apps/payroll" class="nav-item" :class="{ active: $page.url.startsWith('/apps/payroll') }">
+                    <span class="nav-icon">💵</span>
+                    <span class="nav-label">Penggajian (Payroll)</span>
+                </Link>
+
+                <div class="nav-section-label">ERP - SISTEM & ALUR</div>
+
+                <Link href="/apps/approval-workflows" class="nav-item" :class="{ active: $page.url.startsWith('/apps/approval-workflows') }">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-label">Approval Workflows</span>
+                </Link>
+
+                <Link href="/apps/company-profile" class="nav-item" :class="{ active: $page.url.startsWith('/apps/company-profile') }">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-label">Profil Perusahaan</span>
+                </Link>
+            </template>
+
             <template v-if="hasAnyPermission(['activity_logs.index'])">
                 <div class="nav-section-label">AUDIT</div>
 

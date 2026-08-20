@@ -25,3 +25,15 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# scratch audit tooling
+/_*.php
+/route*.txt
+/_routes_full.json
+/*.out
+/migrate*.out
+/emp_test.*
+/pages_list.txt
+/cdp_test*.mjs
+/seed.out
+

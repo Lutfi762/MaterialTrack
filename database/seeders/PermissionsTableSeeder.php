@@ -52,6 +52,26 @@ class PermissionsTableSeeder extends Seeder
             'stock_adjustments.index', 'stock_adjustments.create', 'stock_adjustments.approve',
             // 17. Audit Trail
             'activity_logs.index', 'activity_logs.export',
+
+            // 18. ERP Extensions
+            'company_profile.index', 'company_profile.edit',
+            'customers.index', 'customers.create', 'customers.edit', 'customers.delete',
+            'purchase_requests.index', 'purchase_requests.create', 'purchase_requests.approve',
+            'purchase_orders.index', 'purchase_orders.create', 'purchase_orders.approve',
+            'goods_receipts.index', 'goods_receipts.create',
+            'purchase_invoices.index', 'purchase_invoices.create',
+            'quotations.index', 'quotations.create',
+            'sales_orders.index', 'sales_orders.create', 'sales_orders.approve',
+            'deliveries.index', 'deliveries.create',
+            'sales_invoices.index', 'sales_invoices.create',
+            'chart_of_accounts.index', 'chart_of_accounts.create', 'chart_of_accounts.edit', 'chart_of_accounts.delete',
+            'journal_entries.index', 'journal_entries.create',
+            'employees.index', 'employees.create', 'employees.edit', 'employees.delete',
+            'attendances.index', 'attendances.create',
+            'leaves.index', 'leaves.create', 'leaves.approve',
+            'payroll.index', 'payroll.create', 'payroll.approve',
+            'approval_workflows.index', 'approval_workflows.create',
+            'stock_alerts.index', 'stock_alerts.edit',
         ];
 
         foreach ($permissions as $permission) {
@@ -59,10 +79,10 @@ class PermissionsTableSeeder extends Seeder
         }
 
         // Assign ke Role
-        $adminRole = Role::findByName('admin');
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $adminRole->syncPermissions(Permission::all());
 
-        $deptRole = Role::findByName('department_user');
+        $deptRole = Role::firstOrCreate(['name' => 'department_user', 'guard_name' => 'web']);
         $deptRole->syncPermissions([
             'dashboard.index',
             'items.index',

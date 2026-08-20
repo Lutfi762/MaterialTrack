@@ -51,6 +51,12 @@ createInertiaApp({
                         let val = (value / 1).toFixed(0).replace('.', ',');
                         return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
                     },
+
+                    // Ziggy route helper (disediakan @routes di app.blade.php)
+                    // Bungkus agar tersedia sebagai method komponen (dipakai halaman ERP).
+                    route: function (...args) {
+                        return window.route(...args);
+                    },
                 }
             })
             .mount(el);

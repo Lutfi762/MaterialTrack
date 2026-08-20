@@ -5,6 +5,10 @@
         <div class="main-area" :class="{ 'main-collapsed': collapsed }">
             <Header />
 
+            <div class="page-header" v-if="$slots.header">
+                <slot name="header" />
+            </div>
+
             <div class="main-content">
                 <slot />
             </div>
@@ -75,6 +79,12 @@ body {
 .main-content {
     flex: 1;
     padding: 24px;
+}
+
+.page-header {
+    padding: 24px 24px 0;
+    display: flex;
+    align-items: center;
 }
 
 .main-footer {
