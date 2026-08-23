@@ -1,40 +1,40 @@
 <template>
   <Head><title>{{ $t('stock_transfer.title') }} - MaterialTrack</title></Head>
 
-  <main class="p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-        <i class="fa fa-exchange-alt text-indigo-600"></i>
+  <main class="min-h-full bg-bg p-4 text-on-surface sm:p-6">
+    <div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <h2 class="flex items-center gap-2 text-2xl font-bold tracking-tight text-on-surface">
+        <i class="fa fa-exchange-alt text-primary"></i>
         {{ $t('stock_transfer.heading') }}
       </h2>
       <Link
         v-if="hasAnyPermission(['stock_ins.create'])"
         href="/apps/stock-transfers/create"
-        class="btn-modern btn-modern-primary"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm dark:text-[#1000a9]"
       >
         <i class="fa fa-plus me-1"></i> {{ $t('stock_transfer.add') }}
       </Link>
     </div>
 
-    <div class="filter-bar mb-4">
-      <div class="filter-item">
-        <i class="fa fa-layer-group text-muted"></i>
-        <select v-model="filters.status" class="filter-select" @change="applyFilter">
+    <div class="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-outline/20 bg-surface p-4 shadow-sm">
+      <div class="min-w-48">
+        <select v-model="filters.status" class="w-full rounded-lg border border-outline/30 bg-surface px-3 py-2.5 text-sm text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" @change="applyFilter">
           <option value="">{{ $t('stock_transfer.filter_all_status') }}</option>
           <option value="pending">{{ $t('stock_transfer.status_pending') }}</option>
           <option value="approved">{{ $t('stock_transfer.status_approved') }}</option>
           <option value="rejected">{{ $t('stock_transfer.status_rejected') }}</option>
         </select>
       </div>
-      <div class="filter-item">
-        <i class="fa fa-building text-muted"></i>
-        <select v-model="filters.department_id" class="filter-select" @change="applyFilter">
+      <div class="min-w-48">
+        <select v-model="filters.department_id" class="w-full rounded-lg border border-outline/30 bg-surface px-3 py-2.5 text-sm text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" @change="applyFilter">
           <option value="">{{ $t('stock_transfer.filter_all_dept') }}</option>
           <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
         </select>
       </div>
     </div>
 
+    <div class="overflow-hidden rounded-xl border border-outline/20 bg-surface shadow-sm">
     <DataTable
       :columns="columns"
       :rows="transfers.data"
@@ -60,7 +60,7 @@
         <strong>{{ row.qty }} {{ row.unit }}</strong>
       </template>
       <template #cell-status="{ row }">
-        <span class="badge" :class="statusClass(row.status)">{{ row.status }}</span>
+        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" :class="statusClass(row.status)">{{ row.status }}</span>
       </template>
       <template #cell-created_at="{ row }">
         {{ row.created_at }}
@@ -69,7 +69,7 @@
         <div class="flex justify-center">
           <Link
             :href="`/apps/stock-transfers/${row.id}`"
-            class="act-btn act-btn-neutral"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-primary hover:bg-primary/10"
             :aria-label="$t('common.view')"
           >
             <i class="fa fa-eye"></i>
@@ -77,6 +77,8 @@
         </div>
       </template>
     </DataTable>
+    </div>
+    </div>
   </main>
 </template>
 
@@ -119,10 +121,10 @@ export default {
     };
     const statusClass = (status) => {
       return {
-        pending: 'bg-warning text-dark',
-        approved: 'bg-success',
-        rejected: 'bg-danger',
-      }[status] || 'bg-secondary';
+        pending: 'bg-warning/15 text-warning',
+        approved: 'bg-success/15 text-success',
+        rejected: 'bg-danger/15 text-danger',
+      }[status] || 'bg-bg text-on-surface-variant';
     };
     return { transfers: props.transfers, departments: props.departments, filters, columns, applyFilter, statusClass };
   },

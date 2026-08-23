@@ -70,7 +70,7 @@
                 <svg v-if="emptyIcon" :class="emptyIcon" class="h-12 w-12 text-on-surface-variant/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <svg v-else class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="w-12 h-12 text-on-surface-variant/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span class="text-sm">{{ emptyText || $t('common.no_data') }}</span>
@@ -83,9 +83,9 @@
               v-for="(row, rowIndex) in rows"
               :key="getRowKey(row, rowIndex)"
               :class="[
-                'hover:bg-gray-50 transition-colors duration-100',
+                'hover:bg-primary/5 transition-colors duration-100',
                 rowClass ? (typeof rowClass === 'function' ? rowClass(row, rowIndex) : rowClass) : '',
-                striped && rowIndex % 2 === 1 ? 'bg-gray-50' : ''
+                striped && rowIndex % 2 === 1 ? 'bg-bg' : ''
               ]"
               @click="rowClick && $emit('row-click', row, rowIndex)"
             >
@@ -107,7 +107,7 @@
                     :value="getCellValue(row, col, rowIndex)"
                   >
                     <template v-if="!col.render">
-                      <span v-if="isBoolean(getCellValue(row, col, rowIndex))" :class="getCellValue(row, col, rowIndex) ? 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800' : 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800'">
+                      <span v-if="isBoolean(getCellValue(row, col, rowIndex))" :class="getCellValue(row, col, rowIndex) ? 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success/15 text-success' : 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-bg text-on-surface-variant'">
                         {{ getCellValue(row, col, rowIndex) ? $t('common.yes') : $t('common.no') }}
                       </span>
                       <span v-else-if="isDate(getCellValue(row, col, rowIndex))" class="font-mono">
