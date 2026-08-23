@@ -22,7 +22,6 @@
         {{ $t('warehouses.add') }}
       </Link>
       </div>
-    </div>
 
     <div class="mb-4 flex flex-wrap gap-3">
       <div class="relative min-w-[250px] flex-1 sm:max-w-md">
