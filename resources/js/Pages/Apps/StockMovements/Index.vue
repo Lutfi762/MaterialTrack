@@ -1,193 +1,111 @@
 <template>
-    <Head><title>Riwayat Pergerakan Stok - MaterialTrack</title></Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 rounded-3 shadow">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold"><i class="fa fa-clock-rotate-left me-1"></i> {{ $t('stock_movements.heading') }}</span>
-                                <div class="d-flex gap-2">
-                                    <a v-if="hasAnyPermission(['stock_movements.export', 'stock_movements.index'])" :href="exportExcelUrl" class="btn btn-sm btn-outline-success">
-                                        <i class="fa fa-file-excel me-1"></i> Export Excel
-                                    </a>
-                                    <a v-if="hasAnyPermission(['stock_movements.export', 'stock_movements.index'])" :href="downloadAllUrl" class="btn btn-sm btn-outline-danger">
-                                        <i class="fa fa-file-pdf me-1"></i> {{ $t('common.download_all_pdf') }}
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-2">
-                                        <select v-model="filterForm.department_id" class="form-select form-select-sm" @change="onDepartmentChange">
-                                            <option value="">{{ $t('stock_movements.filter_all_dept') }}</option>
-                                            <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select v-model="filterForm.item_id" class="form-select form-select-sm">
-                                            <option value="">{{ $t('stock_movements.filter_all_material') }}</option>
-                                            <option v-for="item in filteredItems" :key="item.id" :value="item.id">
-                                                [{{ item.code }}] {{ item.name }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select v-model="filterForm.type" class="form-select form-select-sm">
-                                            <option value="">{{ $t('stock_movements.filter_all_type') }}</option>
-                                            <option value="in">{{ $t('stock_movements.type_in') }}</option>
-                                            <option value="out">{{ $t('stock_movements.type_out') }}</option>
-                                            <option value="opname">{{ $t('stock_movements.type_opname') }}</option>
-                                            <option value="adjustment">{{ $t('stock_movements.type_adjustment') }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select v-model="filterForm.user_id" class="form-select form-select-sm">
-                                            <option value="">{{ $t('stock_movements.filter_all_user') }}</option>
-                                            <option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <input v-model="filterForm.date_from" type="date" class="form-control form-control-sm" :placeholder="$t('stock_movements.date_from_placeholder')">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <input v-model="filterForm.date_to" type="date" class="form-control form-control-sm" :placeholder="$t('stock_movements.date_to_placeholder')">
-                                    </div>
-                                </div>
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-1">
-                                        <button @click="applyFilter" class="btn btn-sm btn-primary w-100">{{ $t('common.filter') }}</button>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <button @click="resetFilter" class="btn btn-sm btn-secondary w-100">{{ $t('common.reset') }}</button>
-                                    </div>
-                                </div>
+  <Head><title>{{ $t('stock_movements.heading') }} - MaterialTrack</title></Head>
 
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>{{ $t('stock_movements.col_date') }}</th>
-                                                <th>{{ $t('stock_movements.col_material') }}</th>
-                                                <th>{{ $t('stock_movements.col_type') }}</th>
-                                                <th>{{ $t('stock_movements.col_qty') }}</th>
-                                                <th>{{ $t('stock_movements.col_before') }}</th>
-                                                <th>{{ $t('stock_movements.col_after') }}</th>
-                                                <th>{{ $t('stock_movements.col_notes') }}</th>
-                                                <th>{{ $t('stock_movements.col_by') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-if="movements.data.length === 0">
-                                                <td colspan="8" class="text-center text-muted py-4">{{ $t('stock_movements.empty') }}</td>
-                                            </tr>
-                                            <tr v-for="mov in movements.data" :key="mov.id">
-                                                <td class="text-nowrap">{{ mov.created_at }}</td>
-                                                <td>
-                                                    <div class="fw-semibold">{{ mov.item?.name }}</div>
-                                                    <div class="text-muted small">{{ mov.item?.code }}</div>
-                                                </td>
-                                                <td>
-                                                    <span v-if="mov.type === 'in'" class="badge bg-success">⬇ {{ $t('stock_movements.type_in') }}</span>
-                                                    <span v-else-if="mov.type === 'out'" class="badge bg-danger">⬆ {{ $t('stock_movements.type_out') }}</span>
-                                                    <span v-else-if="mov.type === 'opname'" class="badge bg-primary">📋 {{ $t('stock_movements.type_opname') }}</span>
-                                                    <span v-else class="badge bg-warning text-dark">🔧 {{ $t('stock_movements.type_adjustment') }}</span>
-                                                </td>
-                                                <td class="fw-bold">{{ mov.qty }}</td>
-                                                <td>{{ mov.stock_before ?? '-' }}</td>
-                                                <td>{{ mov.balance_after ?? '-' }}</td>
-                                                <td>{{ mov.notes ?? '-' }}</td>
-                                               <td>{{ mov.pic?.name ?? mov.user?.name ?? '-' }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-clock-rotate-left text-indigo-600"></i>
+        {{ $t('stock_movements.heading') }}
+      </h2>
+      <div class="d-flex gap-2">
+        <a v-if="hasAnyPermission(['stock_movements.export', 'stock_movements.index'])" :href="exportExcelUrl" class="btn-modern btn-modern-outline"><i class="fa fa-file-excel me-2"></i> Export Excel</a>
+        <a v-if="hasAnyPermission(['stock_movements.export', 'stock_movements.index'])" :href="downloadAllUrl" class="btn-modern btn-modern-outline"><i class="fa fa-file-pdf me-2"></i> {{ $t('common.download_all_pdf') }}</a>
+      </div>
+    </div>
 
-                                <div class="d-flex justify-content-end mt-2">
-                                    <nav v-if="movements.last_page > 1">
-                                        <ul class="pagination pagination-sm mb-0">
-                                            <li v-for="link in movements.links" :key="link.label"
-                                                class="page-item" :class="{ active: link.active, disabled: !link.url }">
-                                                <Link class="page-link" :href="link.url ?? '#'" v-html="link.label" />
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+    <div class="filter-bar mb-4">
+      <div class="filter-item"><i class="fa fa-building text-muted"></i><select v-model="filterForm.department_id" class="filter-select" @change="applyFilter"><option value="">{{ $t('stock_movements.filter_all_dept') }}</option><option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option></select></div>
+      <div class="filter-item"><i class="fa fa-box text-muted"></i><select v-model="filterForm.item_id" class="filter-select" @change="applyFilter"><option value="">{{ $t('stock_movements.filter_all_material') }}</option><option v-for="item in filteredItems" :key="item.id" :value="item.id">[{{ item.code }}] {{ item.name }}</option></select></div>
+      <div class="filter-item"><i class="fa fa-filter text-muted"></i><select v-model="filterForm.type" class="filter-select" @change="applyFilter"><option value="">{{ $t('stock_movements.filter_all_type') }}</option><option value="in">{{ $t('stock_movements.type_in') }}</option><option value="out">{{ $t('stock_movements.type_out') }}</option><option value="opname">{{ $t('stock_movements.type_opname') }}</option><option value="adjustment">{{ $t('stock_movements.type_adjustment') }}</option></select></div>
+      <div class="filter-item"><i class="fa fa-user text-muted"></i><select v-model="filterForm.user_id" class="filter-select" @change="applyFilter"><option value="">{{ $t('stock_movements.filter_all_user') }}</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option></select></div>
+      <div class="filter-item"><i class="fa fa-calendar text-muted"></i><input type="date" v-model="filterForm.date_from" class="filter-select" @change="applyFilter"></div>
+      <div class="filter-item"><span class="text-muted small">{{ $t('stock_movements.date_to_placeholder') }}</span><input type="date" v-model="filterForm.date_to" class="filter-select" @change="applyFilter"></div>
+    </div>
+
+    <DataTable :columns="columns" :rows="movements.data" :pagination="movements" row-key="id" :striped="true" :loading="false" :empty-text="$t('stock_movements.empty')" :searchable="false">
+      <template #cell-created_at="{ row }">{{ row.created_at }}</template>
+      <template #cell-item="{ row }"><div><div class="fw-semibold">{{ row.item?.name }}</div><div class="text-muted small">{{ row.item?.code }}</div></div></template>
+      <template #cell-type="{ row }">
+        <span v-if="row.type === 'in'" class="badge bg-success">⬇ {{ $t('stock_movements.type_in') }}</span>
+        <span v-else-if="row.type === 'out'" class="badge bg-danger">⬆ {{ $t('stock_movements.type_out') }}</span>
+        <span v-else-if="row.type === 'opname'" class="badge bg-primary">📋 {{ $t('stock_movements.type_opname') }}</span>
+        <span v-else class="badge bg-warning text-dark">🔧 {{ $t('stock_movements.type_adjustment') }}</span>
+      </template>
+      <template #cell-qty="{ row }"><strong>{{ row.qty }}</strong></template>
+      <template #cell-stock_before="{ row }">{{ row.stock_before ?? '-' }}</template>
+      <template #cell-balance_after="{ row }">{{ row.balance_after ?? '-' }}</template>
+      <template #cell-notes="{ row }">{{ row.notes ?? '-' }}</template>
+      <template #cell-pic="{ row }">{{ row.pic?.name ?? row.user?.name ?? '-' }}</template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '@/Layouts/App.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-    layout: LayoutApp,
-    components: { Head, Link },
-    props: {
-        movements: Object,
-        departments: Array,
-        items: Array,
-        categories: Array,
-        users: Array,
-        filters: Object,
-    },
-    computed: {
-        filteredItems() {
-            if (!this.filterForm.department_id) return this.items;
-            const deptId = Number(this.filterForm.department_id);
-            return this.items.filter(item =>
-                (item.department_ids ?? []).includes(deptId)
-            );
-        },
-        downloadAllUrl() {
-            const params = new URLSearchParams();
-            Object.entries(this.filterForm).forEach(([key, val]) => {
-                if (val) params.append(key, val);
-            });
-            const qs = params.toString();
-            return `/apps/stock-movements/download-all/pdf${qs ? '?' + qs : ''}`;
-        },
-        exportExcelUrl() {
-            const params = new URLSearchParams();
-            Object.entries(this.filterForm).forEach(([key, val]) => {
-                if (val) params.append(key, val);
-            });
-            const qs = params.toString();
-            return `/apps/stock-movements/export/excel${qs ? '?' + qs : ''}`;
-        },
-    },
-    data() {
-        return {
-            filterForm: {
-                department_id: this.filters?.department_id ?? '',
-                item_id: this.filters?.item_id ?? '',
-                type: this.filters?.type ?? '',
-                user_id: this.filters?.user_id ?? '',
-                date_from: this.filters?.date_from ?? '',
-                date_to: this.filters?.date_to ?? '',
-            }
-        };
-    },
-    methods: {
-        onDepartmentChange() {
-            // Reset material setiap kali department berubah,
-            // karena daftar yang tersedia berubah total.
-            this.filterForm.item_id = '';
-        },
-        applyFilter() {
-            router.get('/apps/stock-movements', this.filterForm, { preserveState: true });
-        },
-        resetFilter() {
-            this.filterForm = { department_id: '', item_id: '', type: '', user_id: '', date_from: '', date_to: '' };
-            router.get('/apps/stock-movements');
-        },
-    }
-}
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: {
+    movements: Object,
+    departments: Array,
+    items: Array,
+    users: Array,
+    filters: Object,
+  },
+  setup(props) {
+    const { t } = useI18n();
+    const filterForm = ref({
+      department_id: props.filters?.department_id ?? '',
+      item_id: props.filters?.item_id ?? '',
+      type: props.filters?.type ?? '',
+      user_id: props.filters?.user_id ?? '',
+      date_from: props.filters?.date_from ?? '',
+      date_to: props.filters?.date_to ?? '',
+    });
+    const filteredItems = computed(() => {
+      if (!filterForm.value.department_id) return props.items;
+      const deptId = Number(filterForm.value.department_id);
+      return props.items.filter(item => (item.department_ids ?? []).includes(deptId));
+    });
+    const downloadAllUrl = computed(() => {
+      const params = new URLSearchParams();
+      Object.entries(filterForm.value).forEach(([k, v]) => { if (v) params.append(k, v); });
+      const qs = params.toString();
+      return `/apps/stock-movements/download-all/pdf${qs ? '?' + qs : ''}`;
+    });
+    const exportExcelUrl = computed(() => {
+      const params = new URLSearchParams();
+      Object.entries(filterForm.value).forEach(([k, v]) => { if (v) params.append(k, v); });
+      const qs = params.toString();
+      return `/apps/stock-movements/export/excel${qs ? '?' + qs : ''}`;
+    });
+    const columns = ref([
+      { key: "created_at", label: t("stock_movements.col_date") },
+      { key: "item", label: t("stock_movements.col_material") },
+      { key: "type", label: t("stock_movements.col_type") },
+      { key: "qty", label: t("stock_movements.col_qty"), align: "center" },
+      { key: "stock_before", label: t("stock_movements.col_before"), align: "center" },
+      { key: "balance_after", label: t("stock_movements.col_after"), align: "center" },
+      { key: "notes", label: t("stock_movements.col_notes") },
+      { key: "pic", label: t("stock_movements.col_by") },
+    ]);
+    const applyFilter = () => {
+      router.get('/apps/stock-movements', filterForm.value, { preserveState: true });
+    };
+    const resetFilter = () => {
+      filterForm.value = { department_id: '', item_id: '', type: '', user_id: '', date_from: '', date_to: '' };
+      router.get('/apps/stock-movements');
+    };
+    return {
+      movements: props.movements, departments: props.departments, users: props.users,
+      filterForm, filteredItems, downloadAllUrl, exportExcelUrl, columns, applyFilter, resetFilter,
+    };
+  },
+};
 </script>

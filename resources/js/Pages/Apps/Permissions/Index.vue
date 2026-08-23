@@ -1,89 +1,66 @@
 <template>
-    <Head>
-        <title>Permissions - MaterialTrack</title>
-    </Head>
+  <Head><title>{{ $t('permissions.heading') }} - MaterialTrack</title></Head>
 
-    <div class="dashboard-page">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="chart-card">
-                    <div class="chart-card-header">
-                        <span class="chart-icon">🔑</span> {{ $t('permissions.heading') }}
-                    </div>
-                    <div class="chart-card-body">
-
-                        <!-- Search -->
-                        <form @submit.prevent="handleSearch" class="mb-3">
-                            <div class="input-group">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    v-model="search"
-                                    :placeholder="$t('permissions.search_placeholder')"
-                                >
-                                <button class="btn btn-primary" type="submit">
-                                    <i class="fa fa-search me-1"></i> {{ $t('common.search') }}
-                                </button>
-                            </div>
-                        </form>
-
-                        <!-- Table -->
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Permission Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-if="permissions.data.length === 0">
-                                        <td colspan="2" class="text-center text-muted">{{ $t('permissions.empty') }}</td>
-                                    </tr>
-                                    <tr v-for="(permission, index) in permissions.data" :key="permission.id">
-                                        <td>{{ permissions.from + index }}</td>
-                                        <td>{{ permission.name }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div class="d-flex justify-content-end mt-3">
-                            <Pagination :links="permissions.links" align="end" />
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-key text-indigo-600"></i>
+        {{ $t('permissions.heading') }}
+      </h2>
+      <div class="search-box">
+        <input
+          type="text"
+          v-model="search"
+          :placeholder="$t('permissions.search_placeholder')"
+          class="search-input"
+          @input="handleSearch"
+        />
+        <i class="fa fa-search search-icon"></i>
+      </div>
     </div>
+
+    <DataTable
+      :columns="columns"
+      :rows="permissions.data"
+      :pagination="permissions"
+      row-key="name"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('permissions.empty')"
+    >
+      <template #cell-no="{ rowIndex }">
+        {{ permissions.from + rowIndex }}
+      </template>
+      <template #cell-name="{ row }">
+        {{ row.name }}
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '@/Layouts/App.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import Pagination from '@/Components/Pagination.vue';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-    layout: LayoutApp,
-    components: { Head, Link, Pagination },
-
-    props: {
-        permissions: Object,
-    },
-
-    setup() {
-        const search = ref('' || (new URL(document.location)).searchParams.get('q'));
-
-        const handleSearch = () => {
-            router.get('/apps/permissions', {
-                q: search.value,
-            });
-        };
-
-        return { search, handleSearch };
-    }
-}
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { permissions: Object },
+  setup() {
+    const { t } = useI18n();
+    const search = ref("");
+    const columns = ref([
+      { key: "no", label: t("permissions.col_no"), align: "center" },
+      { key: "name", label: t("permissions.col_name"), sortable: true },
+    ]);
+    const handleSearch = () => {
+      router.get("/apps/permissions", { q: search.value });
+    };
+    return { search, handleSearch, columns };
+  },
+};
 </script>

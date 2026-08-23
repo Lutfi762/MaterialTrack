@@ -86,8 +86,8 @@ class AppServiceProvider extends ServiceProvider
             NotificationService::generateAll();
         })->dailyAt('08:00');
 
-        // Kirim email alert stok menipis setiap hari Senin jam 9 pagi
-        Schedule::command('report:low-stock')->weekly()->mondays()->at('09:00');
+        // Kirim email alert stok menipis setiap hari jam 7 pagi
+        Schedule::command('report:low-stock')->dailyAt('07:00');
 
         RateLimiter::for('login', function ($request) {
             $throttleKey = strtolower($request->input('email')).'|'.$request->ip();

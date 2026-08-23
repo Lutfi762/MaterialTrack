@@ -1,0 +1,60 @@
+<template>
+  <Head><title>{{ $t('financial_reports.heading') }} - MaterialTrack</title></Head>
+
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-chart-bar text-indigo-600"></i>
+        {{ $t('financial_reports.heading') }}
+      </h2>
+    </div>
+
+    <DataTable
+      :columns="columns"
+      :rows="entries.data"
+      :pagination="entries"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('financial_reports.empty')"
+    >
+      <template #cell-account="{ row }">
+        <code>{{ row.account?.code }}</code> {{ row.account?.name }}
+      </template>
+      <template #cell-debit="{ row }">
+        Rp {{ Number(row.debit || 0).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-credit="{ row }">
+        Rp {{ Number(row.credit || 0).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-balance="{ row }">
+        Rp {{ Number(row.balance || 0).toLocaleString('id-ID') }}
+      </template>
+    </DataTable>
+  </main>
+</template>
+
+<script>
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+export default {
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { entries: Object },
+  setup() {
+    const { t } = useI18n();
+    const columns = ref([
+      { key: "account", label: t("financial_reports.col_account") },
+      { key: "debit", label: t("financial_reports.col_debit"), align: "right" },
+      { key: "credit", label: t("financial_reports.col_credit"), align: "right" },
+      { key: "balance", label: t("financial_reports.col_balance"), align: "right" },
+    ]);
+    return { columns };
+  },
+};
+</script>

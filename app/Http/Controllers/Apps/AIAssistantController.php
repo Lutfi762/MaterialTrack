@@ -54,9 +54,17 @@ class AIAssistantController extends Controller
         // Load or create conversation
         $conversationId = $request->input('conversation_id');
         if ($conversationId) {
+            // IDOR guard: conversation milik user lain tidak boleh diakses
             $conversation = ChatConversation::where('id', $conversationId)
                 ->where('user_id', $user->id)
                 ->first();
+
+            if (! $conversation) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Percakapan tidak ditemukan.',
+                ], 404);
+            }
         } else {
             $conversation = ChatConversation::create([
                 'user_id' => $user->id,

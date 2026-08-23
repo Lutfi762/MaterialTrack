@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MaterialTrack - Transaksi Stok Keluar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#400071",
+                      "on-tertiary-fixed-variant": "#6900b3",
+                      "error-container": "#93000a",
+                      "primary": "#c0c1ff",
+                      "tertiary-fixed": "#f0dbff",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "surface-container-highest": "#33343b",
+                      "primary-fixed": "#e1e0ff",
+                      "on-secondary": "#3f008e",
+                      "secondary-fixed-dim": "#d2bbff",
+                      "on-primary-container": "#0d0096",
+                      "tertiary-fixed-dim": "#ddb7ff",
+                      "on-primary-fixed": "#07006c",
+                      "surface": "#111319",
+                      "on-tertiary": "#490080",
+                      "secondary-fixed": "#eaddff",
+                      "surface-container-high": "#282a30",
+                      "outline": "#908fa0",
+                      "on-error": "#690005",
+                      "outline-variant": "#464554",
+                      "surface-bright": "#373940",
+                      "error": "#ffb4ab",
+                      "surface-tint": "#c0c1ff",
+                      "on-primary": "#1000a9",
+                      "surface-dim": "#111319",
+                      "inverse-primary": "#494bd6",
+                      "on-surface-variant": "#c7c4d7",
+                      "on-tertiary-fixed": "#2c0051",
+                      "background": "#111319",
+                      "secondary": "#d2bbff",
+                      "surface-container-low": "#191b22",
+                      "on-error-container": "#ffdad6",
+                      "surface-container": "#1e1f26",
+                      "on-secondary-fixed": "#25005a",
+                      "on-secondary-container": "#c9aeff",
+                      "primary-container": "#8083ff",
+                      "tertiary-container": "#b76dff",
+                      "secondary-container": "#6001d1",
+                      "on-secondary-fixed-variant": "#5a00c6",
+                      "tertiary": "#ddb7ff",
+                      "inverse-surface": "#e2e2eb",
+                      "surface-container-lowest": "#0c0e14",
+                      "on-background": "#e2e2eb",
+                      "surface-variant": "#33343b",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "inverse-on-surface": "#2e3037",
+                      "on-surface": "#e2e2eb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "lg": "24px",
+                      "header-height": "64px",
+                      "xl": "32px",
+                      "sidebar-width": "260px",
+                      "sm": "8px",
+                      "sidebar-collapsed": "72px",
+                      "md": "16px",
+                      "unit": "8px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Geist", "sans-serif"
+                      ],
+                      "body-md": [
+                              "Geist", "sans-serif"
+                      ],
+                      "wordmark-track": [
+                              "Geist", "sans-serif"
+                      ],
+                      "wordmark-material": [
+                              "Geist", "sans-serif"
+                      ],
+                      "headline-lg": [
+                              "Geist", "sans-serif"
+                      ],
+                      "body-lg": [
+                              "Geist", "sans-serif"
+                      ],
+                      "headline-md": [
+                              "Geist", "sans-serif"
+                      ],
+                      "display-lg": [
+                              "Geist", "sans-serif"
+                      ],
+                      "title-lg": [
+                              "Geist", "sans-serif"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "wordmark-track": [
+                              "20px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "wordmark-material": [
+                              "20px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body { background-color: #0F1117; color: #e2e2eb; }
+        .glass-panel { background: rgba(26, 29, 39, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-card { background: #1A1D27; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15); background: rgba(26, 29, 39, 0.9); }
+        .btn-gradient { background: linear-gradient(135deg, #6001d1 0%, #494bd6 100%); border-top: 1px solid rgba(255,255,255,0.3); }
+        .btn-gradient:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .glow-active { background: rgba(96, 1, 209, 0.1); border-left: 4px solid #d2bbff; }
+        .table-row-hover:hover { background-color: rgba(255,255,255,0.05); }
+      </style>
+</head>
+<body class="flex h-screen overflow-hidden font-body-md text-body-md selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col w-sidebar-width h-screen sticky top-0 left-0 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant/10 py-lg z-50">
+<div class="px-lg mb-xl flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center font-bold text-on-primary">M</div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed">MaterialTrack</h1>
+<p class="text-xs text-on-surface-variant">ERP Unified</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-sm space-y-1">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">dashboard</span>
+<span>Main</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">database</span>
+<span>Master Data</span>
+</a>
+<a class="flex items-center gap-md bg-secondary-container/10 text-secondary border-l-4 border-secondary px-md py-sm transition-all duration-200 rounded-lg group glow-active" href="#">
+<span class="material-symbols-outlined text-secondary transition-colors" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span>Transaksi Stok</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">shopping_cart</span>
+<span>Pengadaan &amp; Penjualan</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">account_balance_wallet</span>
+<span>Keuangan &amp; HRM</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">smart_toy</span>
+<span>AI Assistant</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">analytics</span>
+<span>Laporan &amp; Analisis</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">account_tree</span>
+<span>Sistem &amp; Alur</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">business</span>
+<span>Departemen</span>
+</a>
+</nav>
+<div class="mt-auto px-sm pt-md border-t border-outline-variant/10 space-y-1">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-error transition-colors">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col relative overflow-hidden bg-background">
+<!-- TopNavBar -->
+<header class="h-header-height sticky top-0 z-40 w-full flex justify-between items-center px-lg bg-surface/80 dark:bg-surface/80 backdrop-blur-md shadow-sm border-b border-outline-variant/10">
+<div class="flex items-center gap-md md:hidden">
+<button class="text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-wordmark-material text-wordmark-material text-primary font-bold">MaterialTrack</span>
+</div>
+<!-- Search Bar on Left (Desktop) -->
+<div class="hidden md:flex items-center flex-1 max-w-md relative">
+<span class="material-symbols-outlined absolute left-3 text-outline">search</span>
+<input class="w-full bg-[#12141C] border border-outline-variant/20 rounded-full pl-10 pr-4 py-2 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all bg-surface-container" placeholder="Search transactions..." type="text"/>
+</div>
+<div class="flex items-center gap-sm ml-auto">
+<button class="text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200" title="language">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200 relative" title="notifications">
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200 flex items-center gap-2" title="account_circle">
+<img alt="Administrator Gudang" class="w-8 h-8 rounded-full border border-outline-variant/20 object-cover" data-alt="A small, circular avatar portrait of a warehouse administrator, professional lighting, corporate modern style, dark background, highly detailed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUDmPB1mVO32hSiocif9ZZVVNEwDzORhifqiBnKA9i3sSj-vcLXz9s7LFymecshZ34_AUWRRHiRVMUBNvg1fa-cbfxfCx97IJTab0eaNVew5oeym3XsF_2c655A7FwTBYv7kYTDek1lEy-qsAVcIF4t7vM0-iext8gN1pOkZm9GQ0CbncjBg8QpeLfr_p_rLyWGdoEzv48bBbjTD358PohPe6cnzNWAI_YSeRn1_j9VMkmwRXe7kb5"/>
+<span class="material-symbols-outlined hidden md:block">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto p-4 md:p-lg">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-lg gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Stock Keluar</h2>
+<span class="px-2 py-1 rounded-full bg-error/10 text-error text-xs font-bold border border-error/20 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                            OUT
+                        </span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md">Pencatatan pengeluaran barang dari gudang</p>
+</div>
+<button class="btn-gradient text-white px-6 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2 transition-all duration-200 w-full md:w-auto justify-center">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Baru
+                </button>
+</div>
+<!-- Bento Grid Stats (Optional but requested "high-end UI patterns") -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-lg">
+<div class="glass-card p-lg rounded-xl flex flex-col">
+<span class="text-on-surface-variant text-sm mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-outline text-[18px]">outbox</span> Total Keluar (Bulan Ini)</span>
+<span class="font-display-lg text-display-lg text-on-surface">1,248</span>
+<div class="mt-auto pt-4 flex items-center gap-2 text-error text-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+12% vs last month</span>
+</div>
+</div>
+<div class="glass-card p-lg rounded-xl flex flex-col">
+<span class="text-on-surface-variant text-sm mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-outline text-[18px]">pending_actions</span> Pending Approval</span>
+<span class="font-display-lg text-display-lg text-primary">24</span>
+<div class="mt-auto pt-4">
+<div class="w-full bg-surface-container-high rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+</div>
+<div class="glass-card p-lg rounded-xl relative overflow-hidden flex flex-col justify-center items-center text-center">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/5 z-0"></div>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary mb-2 text-[32px]">support_agent</span>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-1">Butuh Bantuan?</h3>
+<p class="text-sm text-on-surface-variant">Tanya AI Assistant untuk rekonsiliasi data.</p>
+</div>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col">
+<!-- Table Header Actions -->
+<div class="p-md border-b border-outline-variant/10 flex flex-col sm:flex-row justify-between items-center gap-4 bg-surface-container-low/50">
+<div class="flex items-center gap-2 w-full sm:w-auto">
+<div class="relative flex-1 sm:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">filter_list</span>
+<input class="w-full bg-[#12141C] border border-outline-variant/20 rounded-md pl-9 pr-3 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50" placeholder="Filter transaksi..." type="text"/>
+</div>
+</div>
+<div class="flex gap-2 w-full sm:w-auto">
+<button class="px-3 py-1.5 rounded-md border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-highest transition-colors text-sm flex items-center gap-2 flex-1 justify-center">
+<span class="material-symbols-outlined text-[18px]">download</span> Export
+                        </button>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest/50 border-b border-outline-variant/10 text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
+<th class="p-sm pl-md font-medium">No. Transaksi</th>
+<th class="p-sm font-medium">Tanggal</th>
+<th class="p-sm font-medium">Item</th>
+<th class="p-sm font-medium">Tujuan</th>
+<th class="p-sm text-right font-medium">Qty</th>
+<th class="p-sm pr-md font-medium text-center">Status</th>
+<th class="p-sm w-10"></th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant/5 table-row-hover transition-colors">
+<td class="p-sm pl-md py-3 font-medium text-primary">TRX-OUT-2023-1001</td>
+<td class="p-sm text-on-surface-variant">24 Oct 2023, 10:30</td>
+<td class="p-sm">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-outline text-[16px]">precision_manufacturing</span>
+</div>
+<div>
+<p class="text-on-surface font-medium">Baja Ringan C75</p>
+<p class="text-xs text-on-surface-variant">SKU: BRC-75-001</p>
+</div>
+</div>
+</td>
+<td class="p-sm text-on-surface">Proyek Alpha - JKT</td>
+<td class="p-sm text-right font-medium text-on-surface">500 pcs</td>
+<td class="p-sm pr-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Completed
+                                    </span>
+</td>
+<td class="p-sm pr-md text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-outline-variant/5 table-row-hover transition-colors bg-[#141720]/30">
+<td class="p-sm pl-md py-3 font-medium text-primary">TRX-OUT-2023-1002</td>
+<td class="p-sm text-on-surface-variant">24 Oct 2023, 11:15</td>
+<td class="p-sm">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-outline text-[16px]">format_paint</span>
+</div>
+<div>
+<p class="text-on-surface font-medium">Cat Dinding Putih 25kg</p>
+<p class="text-xs text-on-surface-variant">SKU: PT-W-25</p>
+</div>
+</div>
+</td>
+<td class="p-sm text-on-surface">Cabang Surabaya</td>
+<td class="p-sm text-right font-medium text-on-surface">50 pl</td>
+<td class="p-sm pr-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Pending
+                                    </span>
+</td>
+<td class="p-sm pr-md text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-outline-variant/5 table-row-hover transition-colors">
+<td class="p-sm pl-md py-3 font-medium text-primary">TRX-OUT-2023-1003</td>
+<td class="p-sm text-on-surface-variant">23 Oct 2023, 14:00</td>
+<td class="p-sm">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-outline text-[16px]">cable</span>
+</div>
+<div>
+<p class="text-on-surface font-medium">Kabel NYM 3x2.5mm</p>
+<p class="text-xs text-on-surface-variant">SKU: CBL-NYM-325</p>
+</div>
+</div>
+</td>
+<td class="p-sm text-on-surface">Vendor Instalasi B</td>
+<td class="p-sm text-right font-medium text-on-surface">200 rol</td>
+<td class="p-sm pr-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Completed
+                                    </span>
+</td>
+<td class="p-sm pr-md text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="border-b border-outline-variant/5 table-row-hover transition-colors bg-[#141720]/30">
+<td class="p-sm pl-md py-3 font-medium text-primary">TRX-OUT-2023-1004</td>
+<td class="p-sm text-on-surface-variant">23 Oct 2023, 16:45</td>
+<td class="p-sm">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-outline text-[16px]">handyman</span>
+</div>
+<div>
+<p class="text-on-surface font-medium">Semen Portland 50kg</p>
+<p class="text-xs text-on-surface-variant">SKU: SMN-P-50</p>
+</div>
+</div>
+</td>
+<td class="p-sm text-on-surface">Proyek Beta - BDG</td>
+<td class="p-sm text-right font-medium text-on-surface">1000 sak</td>
+<td class="p-sm pr-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Pending
+                                    </span>
+</td>
+<td class="p-sm pr-md text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="p-sm px-md border-t border-outline-variant/10 flex justify-between items-center text-sm text-on-surface-variant bg-surface-container-low/30">
+<span>Showing 1 to 4 of 248 entries</span>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-highest disabled:opacity-50"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+<button class="w-8 h-8 rounded bg-primary/10 text-primary font-medium flex items-center justify-center border border-primary/20">1</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-highest flex items-center justify-center transition-colors">2</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-highest flex items-center justify-center transition-colors">3</button>
+<span class="px-1">...</span>
+<button class="p-1 rounded hover:bg-surface-container-highest"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+</div>
+</div>
+</div>
+<div class="h-24"></div> <!-- Spacer for scrolling -->
+</div>
+<!-- Floating AI Assistant -->
+<button class="absolute bottom-lg right-lg w-14 h-14 rounded-full btn-gradient flex items-center justify-center shadow-lg group z-50">
+<span class="material-symbols-outlined text-white text-2xl group-hover:scale-110 transition-transform duration-300">smart_toy</span>
+<span class="absolute -top-1 -right-1 w-3 h-3 bg-error rounded-full border-2 border-background"></span>
+</button>
+</main>
+</body></html>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apps;
 use App\Http\Controllers\Controller;
 use App\Models\ChartOfAccount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ChartOfAccountController extends Controller
@@ -84,7 +85,19 @@ class ChartOfAccountController extends Controller
 
     public function destroy(ChartOfAccount $chartOfAccount)
     {
+        $inUse = DB::table('journal_entry_lines')->where('chart_of_account_id', $chartOfAccount->id)->exists()
+            || DB::table('cash_bank_transactions')->where('account_id', $chartOfAccount->id)->exists()
+            || DB::table('cash_bank_transactions')->where('counter_account_id', $chartOfAccount->id)->exists()
+            || ChartOfAccount::where('parent_id', $chartOfAccount->id)->exists();
+
+        if ($inUse) {
+            return back()->withErrors([
+                'error' => 'Akun tidak bisa dihapus karena masih dipakai jurnal/transaksi kas-bank atau menjadi akun induk. Nonaktifkan saja.',
+            ]);
+        }
+
         $chartOfAccount->delete();
+
         return to_route('apps.chart-of-accounts.index')->with('success', 'Akun Akuntansi berhasil dihapus.');
     }
 }

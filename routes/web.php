@@ -51,6 +51,7 @@ use App\Http\Controllers\Apps\AttendanceController;
 use App\Http\Controllers\Apps\LeaveController;
 use App\Http\Controllers\Apps\PayrollController;
 use App\Http\Controllers\Apps\ApprovalWorkflowController;
+use App\Http\Controllers\Apps\ErpSectionController;
 
 // Halaman Utama → Login (controller, bukan closure — supaya route:cache jalan)
 Route::get('/', WelcomeController::class)->middleware('guest');
@@ -66,6 +67,11 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
     Route::get('/dashboard/pdf', [DashboardController::class, 'downloadPdf'])
         ->name('apps.dashboard.pdf')
         ->middleware('throttle:10,1');
+
+    // ERP Section Landing Pages (landing per grup: Pengadaan & Penjualan, Keuangan & HRM, Sistem & Alur)
+    Route::get('/erp/{section}', [ErpSectionController::class, 'show'])
+        ->whereIn('section', ['pengadaan-penjualan', 'keuangan-hrm', 'sistem-alur'])
+        ->name('apps.erp.section');
 
     // Permissions
     Route::get('/permissions', PermissionController::class)
@@ -287,18 +293,18 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
     // Suppliers
     Route::resource('/suppliers', SupplierController::class, ['as' => 'apps'])
         ->except(['show'])
-        ->middleware('permission:items.index|items.create|items.edit|items.delete');
+        ->middleware('permission:suppliers.index|suppliers.create|suppliers.edit|suppliers.delete');
 
     // Stock Reservations
     Route::resource('/stock-reservations', StockReservationController::class, ['as' => 'apps'])
         ->except(['edit', 'update'])
-        ->middleware('permission:stock_ins.index');
+        ->middleware('permission:stock_reservations.index|stock_reservations.create');
     Route::post('/stock-reservations/{stockReservation}/fulfill', [StockReservationController::class, 'fulfill'])
         ->name('apps.stock-reservations.fulfill')
-        ->middleware('permission:stock_ins.index');
+        ->middleware('permission:stock_reservations.index|stock_reservations.create');
     Route::post('/stock-reservations/{stockReservation}/cancel', [StockReservationController::class, 'cancel'])
         ->name('apps.stock-reservations.cancel')
-        ->middleware('permission:stock_ins.index');
+        ->middleware('permission:stock_reservations.index|stock_reservations.create');
 
     // Stock Returns
     Route::get('/stock-returns', [StockReturnController::class, 'index'])
@@ -341,7 +347,7 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
     // Warehouses
     Route::resource('/warehouses', WarehouseController::class, ['as' => 'apps'])
         ->except(['show'])
-        ->middleware('permission:items.index|items.create|items.edit|items.delete');
+        ->middleware('permission:warehouses.index|warehouses.create|warehouses.edit|warehouses.delete');
 
     // --- ERP MODULE ROUTES ---
 
@@ -358,43 +364,35 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
 
     // Procurement
     Route::resource('/purchase-requests', PurchaseRequestController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:purchase_requests.index|purchase_requests.create');
+        ->middleware('permission:purchase_requests.index|purchase_requests.create|purchase_requests.edit|purchase_requests.delete');
     Route::post('/purchase-requests/{purchaseRequest}/approve', [PurchaseRequestController::class, 'approve'])->name('apps.purchase-requests.approve')
         ->middleware('permission:purchase_requests.approve');
     Route::post('/purchase-requests/{purchaseRequest}/reject', [PurchaseRequestController::class, 'reject'])->name('apps.purchase-requests.reject')
         ->middleware('permission:purchase_requests.approve');
 
     Route::resource('/purchase-orders', PurchaseOrderController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:purchase_orders.index|purchase_orders.create');
+        ->middleware('permission:purchase_orders.index|purchase_orders.create|purchase_orders.edit|purchase_orders.delete');
     Route::post('/purchase-orders/{purchaseOrder}/approve', [PurchaseOrderController::class, 'approve'])->name('apps.purchase-orders.approve')
         ->middleware('permission:purchase_orders.approve');
 
     Route::resource('/goods-receipts', GoodsReceiptController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:goods_receipts.index|goods_receipts.create');
+        ->middleware('permission:goods_receipts.index|goods_receipts.create|goods_receipts.edit|goods_receipts.delete');
     Route::resource('/purchase-invoices', PurchaseInvoiceController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:purchase_invoices.index|purchase_invoices.create');
+        ->middleware('permission:purchase_invoices.index|purchase_invoices.create|purchase_invoices.edit|purchase_invoices.delete');
 
     // Sales & Distribution
     Route::resource('/quotations', QuotationController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:quotations.index|quotations.create');
+        ->middleware('permission:quotations.index|quotations.create|quotations.edit|quotations.delete');
 
     Route::resource('/sales-orders', SalesOrderController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:sales_orders.index|sales_orders.create');
+        ->middleware('permission:sales_orders.index|sales_orders.create|sales_orders.edit|sales_orders.delete');
     Route::post('/sales-orders/{salesOrder}/approve', [SalesOrderController::class, 'approve'])->name('apps.sales-orders.approve')
         ->middleware('permission:sales_orders.approve');
 
     Route::resource('/deliveries', DeliveryController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:deliveries.index|deliveries.create');
+        ->middleware('permission:deliveries.index|deliveries.create|deliveries.edit|deliveries.delete');
     Route::resource('/sales-invoices', SalesInvoiceController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:sales_invoices.index|sales_invoices.create');
+        ->middleware('permission:sales_invoices.index|sales_invoices.create|sales_invoices.edit|sales_invoices.delete');
 
     // Finance & Accounting
     Route::resource('/chart-of-accounts', ChartOfAccountController::class, ['as' => 'apps'])
@@ -419,8 +417,7 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
 
     // Sales Returns (Retur Penjualan)
     Route::resource('/sales-returns', SalesReturnController::class, ['as' => 'apps'])
-        ->except(['edit', 'update', 'destroy'])
-        ->middleware('permission:sales_returns.index|sales_returns.create');
+        ->middleware('permission:sales_returns.index|sales_returns.create|sales_returns.edit|sales_returns.delete');
     Route::post('/sales-returns/{salesReturn}/approve', [SalesReturnController::class, 'approve'])
         ->name('apps.sales-returns.approve')
         ->middleware('permission:sales_returns.approve');

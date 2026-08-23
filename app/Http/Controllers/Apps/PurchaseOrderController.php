@@ -100,6 +100,84 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
+    public function edit(PurchaseOrder $purchaseOrder)
+    {
+        return Inertia::render('Apps/PurchaseOrders/Edit', [
+            'purchaseOrder' => $purchaseOrder->load(['items']),
+            'suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code']),
+            'items' => Item::orderBy('name')->get(['id', 'name', 'code', 'unit', 'price']),
+            'purchaseRequests' => PurchaseRequest::where('status', 'approved')->orderBy('pr_number')->get(['id', 'pr_number']),
+        ]);
+    }
+
+    public function update(Request $request, PurchaseOrder $purchaseOrder)
+    {
+        if (! in_array($purchaseOrder->status, ['draft', 'pending'])) {
+            return back()->withErrors(['status' => 'Hanya PO berstatus draft/pending yang dapat diedit.']);
+        }
+
+        $validated = $request->validate([
+            'supplier_id' => 'required|exists:suppliers,id',
+            'purchase_request_id' => 'nullable|exists:purchase_requests,id',
+            'expected_delivery_date' => 'nullable|date',
+            'payment_term' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.qty' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+        ]);
+
+        DB::transaction(function () use ($validated, $purchaseOrder) {
+            $subtotal = 0;
+            foreach ($validated['items'] as $item) {
+                $subtotal += $item['qty'] * $item['unit_price'];
+            }
+            $taxAmount = $subtotal * 0.11; // PPN 11%
+            $total = $subtotal + $taxAmount;
+
+            $purchaseOrder->update([
+                'supplier_id' => $validated['supplier_id'],
+                'purchase_request_id' => $validated['purchase_request_id'] ?? null,
+                'expected_delivery_date' => $validated['expected_delivery_date'] ?? null,
+                'payment_term' => $validated['payment_term'] ?? 'Net 30',
+                'subtotal' => $subtotal,
+                'tax_amount' => $taxAmount,
+                'total' => $total,
+                'notes' => $validated['notes'] ?? null,
+                'approved_by' => null,
+                'approved_at' => null,
+            ]);
+
+            $purchaseOrder->items()->delete();
+            foreach ($validated['items'] as $item) {
+                $itemSubtotal = $item['qty'] * $item['unit_price'];
+                $purchaseOrder->items()->create([
+                    'item_id' => $item['item_id'],
+                    'qty' => $item['qty'],
+                    'unit_price' => $item['unit_price'],
+                    'subtotal' => $itemSubtotal,
+                ]);
+            }
+        });
+
+        return to_route('apps.purchase-orders.index')->with('success', 'Pesanan Pembelian (PO) berhasil diperbarui.');
+    }
+
+    public function destroy(PurchaseOrder $purchaseOrder)
+    {
+        if (! in_array($purchaseOrder->status, ['draft', 'pending'])) {
+            return back()->withErrors(['status' => 'Hanya PO berstatus draft/pending yang dapat dihapus.']);
+        }
+        if ($purchaseOrder->goodsReceipts()->exists() || $purchaseOrder->invoices()->exists()) {
+            return back()->withErrors(['status' => 'PO sudah memiliki penerimaan barang / faktur, tidak dapat dihapus.']);
+        }
+
+        $purchaseOrder->delete();
+
+        return to_route('apps.purchase-orders.index')->with('success', 'Pesanan Pembelian (PO) berhasil dihapus.');
+    }
+
     public function approve(PurchaseOrder $purchaseOrder)
     {
         if (! in_array($purchaseOrder->status, ['pending', 'draft'])) {

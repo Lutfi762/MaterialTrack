@@ -1,64 +1,130 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Data Karyawan (Employees)</h2>
-        <Link :href="route('apps.employees.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Tambah Karyawan
+  <Head><title>{{ $t('employees.heading') }} - MaterialTrack</title></Head>
+
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-users text-indigo-600"></i>
+        {{ $t('employees.heading') }}
+      </h2>
+      <div class="flex items-center gap-4">
+        <div class="search-box">
+          <input
+            type="text"
+            v-model="search"
+            :placeholder="$t('employees.search_placeholder')"
+            class="search-input"
+            @input="handleSearch"
+          />
+          <i class="fa fa-search search-icon"></i>
+        </div>
+        <Link
+          v-if="hasAnyPermission(['employees.create'])"
+          href="/apps/employees/create"
+          class="btn-modern btn-modern-primary"
+        >
+          <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
         </Link>
       </div>
-    </template>
-
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIK / Kode</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Lengkap</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departemen & Jabatan</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status Kerja</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gaji Pokok</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="e in employees.data" :key="e.id">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-semibold">{{ e.employee_id }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">{{ e.first_name }} {{ e.last_name || '' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ e.department?.name || '-' }} <br><span class="text-xs text-gray-400">{{ e.position || '-' }}</span></td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize">{{ e.employment_status }}</td>
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">Rp {{ Number(e.basic_salary || 0).toLocaleString('id-ID') }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.employees.edit', e.id)" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</Link>
-                  <button @click="destroy(e.id)" class="text-red-600 hover:text-red-900">Hapus</button>
-                </td>
-              </tr>
-              <tr v-if="employees.data.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada data karyawan.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="employees.data"
+      :pagination="employees"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('employees.empty')"
+    >
+      <template #cell-no="{ rowIndex }">
+        {{ employees.from + rowIndex }}
+      </template>
+      <template #cell-employee_id="{ row }">
+        <code>{{ row.employee_id }}</code>
+      </template>
+      <template #cell-name="{ row }">
+        {{ row.first_name }} {{ row.last_name || '' }}
+      </template>
+      <template #cell-department="{ row }">
+        <div>
+          <span>{{ row.department?.name || '-' }}</span>
+          <br />
+          <span class="text-xs text-gray-400">{{ row.position || '-' }}</span>
+        </div>
+      </template>
+      <template #cell-employment_status="{ row }">
+        {{ row.employment_status }}
+      </template>
+      <template #cell-basic_salary="{ row }">
+        Rp {{ Number(row.basic_salary || 0).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link
+            v-if="hasAnyPermission(['employees.edit'])"
+            :href="`/apps/employees/${row.id}/edit`"
+            class="act-btn act-btn-success"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            v-if="hasAnyPermission(['employees.delete'])"
+            class="act-btn act-btn-danger"
+            :aria-label="$t('common.delete')"
+            @click="handleDelete(row.id)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
 export default {
-  components: { AppLayout, Link },
-  props: { employees: Object },
-  methods: {
-    destroy(id) {
-      if (confirm('Hapus data karyawan ini?')) {
-        this.$inertia.delete(route('apps.employees.destroy', id));
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { employees: Object, filters: Object },
+  setup(props) {
+    const { t } = useI18n();
+    const search = ref(props.filters?.q ?? "");
+
+    const columns = ref([
+      { key: "no", label: t("employees.col_no"), align: "center", width: "60px" },
+      { key: "employee_id", label: t("employees.col_employee_id") },
+      { key: "name", label: t("employees.col_name"), sortable: true },
+      { key: "department", label: t("employees.col_department") },
+      { key: "employment_status", label: t("employees.col_status") },
+      { key: "basic_salary", label: t("employees.col_salary") },
+      { key: "actions", label: t("common.action"), align: "center", width: "120px" },
+    ]);
+
+    const handleSearch = () => {
+      router.get(
+        "/apps/employees",
+        { q: search.value },
+        { preserveState: true, replace: true }
+      );
+    };
+
+    const handleDelete = async (id) => {
+      if (await confirmDelete(t("employees.delete_confirm"))) {
+        router.delete(`/apps/employees/${id}`);
       }
-    },
+    };
+
+    return { search, handleSearch, handleDelete, columns };
   },
 };
 </script>

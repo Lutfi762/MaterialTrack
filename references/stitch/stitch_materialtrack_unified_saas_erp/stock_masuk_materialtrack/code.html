@@ -1,0 +1,454 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>MaterialTrack - Stock Masuk</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#f0dbff",
+                    "surface-tint": "#c0c1ff",
+                    "on-tertiary-fixed-variant": "#6900b3",
+                    "surface": "#111319",
+                    "on-primary-fixed-variant": "#2f2ebe",
+                    "tertiary": "#ddb7ff",
+                    "surface-dim": "#111319",
+                    "primary-fixed": "#e1e0ff",
+                    "inverse-on-surface": "#2e3037",
+                    "error": "#ffb4ab",
+                    "on-secondary": "#3f008e",
+                    "on-tertiary-fixed": "#2c0051",
+                    "background": "#111319",
+                    "outline": "#908fa0",
+                    "surface-container-high": "#282a30",
+                    "on-error": "#690005",
+                    "surface-container-low": "#191b22",
+                    "on-error-container": "#ffdad6",
+                    "surface-container": "#1e1f26",
+                    "tertiary-container": "#b76dff",
+                    "on-surface-variant": "#c7c4d7",
+                    "primary": "#c0c1ff",
+                    "on-primary": "#1000a9",
+                    "on-tertiary": "#490080",
+                    "on-surface": "#e2e2eb",
+                    "secondary": "#d2bbff",
+                    "inverse-primary": "#494bd6",
+                    "secondary-container": "#6001d1",
+                    "on-secondary-fixed": "#25005a",
+                    "surface-container-lowest": "#0c0e14",
+                    "error-container": "#93000a",
+                    "inverse-surface": "#e2e2eb",
+                    "primary-container": "#8083ff",
+                    "on-background": "#e2e2eb",
+                    "tertiary-fixed-dim": "#ddb7ff",
+                    "primary-fixed-dim": "#c0c1ff",
+                    "on-primary-fixed": "#07006c",
+                    "on-secondary-container": "#c9aeff",
+                    "on-primary-container": "#0d0096",
+                    "surface-container-highest": "#33343b",
+                    "outline-variant": "#464554",
+                    "secondary-fixed": "#eaddff",
+                    "secondary-fixed-dim": "#d2bbff",
+                    "surface-variant": "#33343b",
+                    "surface-bright": "#373940",
+                    "on-secondary-fixed-variant": "#5a00c6",
+                    "on-tertiary-container": "#400071"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-width": "260px",
+                    "sidebar-collapsed": "72px",
+                    "unit": "8px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "header-height": "64px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "title-lg": ["Geist"],
+                    "wordmark-track": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "body-lg": ["Geist"],
+                    "wordmark-material": ["Geist"],
+                    "label-md": ["Geist"],
+                    "body-md": ["Geist"]
+            },
+            "fontSize": {
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "wordmark-track": ["20px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "wordmark-material": ["20px", {"lineHeight": "24px", "fontWeight": "800"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom scrollbar for ERP density */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #111319; }
+        ::-webkit-scrollbar-thumb { background: #33343b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #464554; }
+    </style>
+</head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden selection:bg-primary/30 selection:text-primary-fixed">
+<!-- SideNavBar -->
+<aside class="w-sidebar-width h-screen sticky top-0 left-0 bg-surface-container-low border-r border-outline-variant/10 flex flex-col h-full py-lg z-50 hidden md:flex">
+<!-- Header -->
+<div class="px-lg mb-xl flex items-center gap-sm">
+<div class="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-[0_0_15px_rgba(192,193,255,0.2)]"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5f-5nt2M3k7j9BL8lyEfj9iTOO7XDLroshD2zHhsbqYjODuza67bDGeIpw6khIUXcPoSxCh4RkApZdaeXZCp00LBid1d_DyWazf5D_Z2W68qMCfdZrKpvBSo_eB5G_y9ja_goBUYaaQ5GrpiwNAeAWF-sjdSX-LzOuDTIXT6L-cOIfTw-n63_sWystpSVQe2Y77DbQUmdo2JQa9TJzxX6fsvwlv0ODArVDBWJ8yKgQO6l6o1vWmauGEBSWxDmFLjAMg" alt="MaterialTrack Logo" class="w-full h-full object-cover"></div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed">MaterialTrack</h1>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">ERP Unified</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto font-body-md text-body-md">
+<ul class="space-y-sm px-sm">
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                        Main
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">database</span>
+                        Master Data
+                    </a>
+</li>
+<!-- ACTIVE STATE -->
+<li class="relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary rounded-r-full"></div>
+<a class="flex items-center gap-md bg-secondary-container/10 text-secondary px-md py-sm transition-all duration-200 rounded-lg ml-1 hover:scale-[1.02]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+                        Transaksi Stok
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+                        Pengadaan &amp; Penjualan
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+                        Keuangan &amp; HRM
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+                        AI Assistant
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                        Laporan &amp; Analisis
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+                        Sistem &amp; Alur
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">business</span>
+                        Departemen
+                    </a>
+</li>
+</ul>
+</nav>
+<!-- Footer Actions -->
+<div class="px-sm mt-auto font-body-md text-body-md">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-transform duration-200 rounded-lg text-error" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0 h-screen relative">
+<!-- TopNavBar -->
+<header class="h-header-height sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 flex justify-between items-center px-lg w-full transition-all">
+<!-- Mobile Menu Trigger -->
+<button class="md:hidden text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Search Bar (on_left) -->
+<div class="flex-1 max-w-md hidden md:block">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/20 rounded-full py-1.5 pl-10 pr-4 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-surface-dim transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" placeholder="Search transactions, items..." type="text">
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-sm ml-auto">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200 relative">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full animate-pulse shadow-[0_0_8px_rgba(255,180,171,0.6)]"></span>
+</button>
+<button class="flex items-center gap-2 ml-sm pl-sm border-l border-outline-variant/20 hover:opacity-80 transition-opacity">
+<img alt="Administrator Gudang" class="w-8 h-8 rounded-full border border-outline-variant/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7QVCGWBTpzAKCqTOLyM0KXkeH0wTUJoDnoiFERfbshHbtQObTJbQ8X0PYRI35YGHEMfxUuUDVi4LR6i7KNfur8xjgks0pW3yjPMvbFmNig1qaQVrpPmyzBe2exAtS6tMyiJktub_ejSXsQR8E79SnEgj6sNRqiZ-edlJxb5unxg4ExTJ5ObsORWAYHwwikmNXHC-3J6viAbCNHCwMndHjJBcka7-Os26LR7mKKxfKX0y1NVwllUtq">
+</button>
+</div>
+</header>
+<!-- Page Canvas -->
+<main class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-lg relative">
+<!-- Page Header Area -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-xl">
+<div class="flex items-center gap-md">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Stock Masuk</h2>
+<!-- IN Badge (Using Primary token for positive indication as per strict token rules) -->
+<span class="bg-primary/10 text-primary-fixed border border-primary/20 px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1 shadow-[0_0_10px_rgba(192,193,255,0.1)]">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                        IN
+                    </span>
+</div>
+<!-- Action Button -->
+<button class="group flex items-center gap-2 bg-gradient-to-r from-primary-container to-secondary-container text-on-primary-container font-label-md text-label-md px-md py-2 rounded-lg border-t border-white/20 shadow-[0_4px_15px_rgba(96,1,209,0.3)] hover:shadow-[0_6px_20px_rgba(96,1,209,0.4)] hover:-translate-y-0.5 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Baru
+                </button>
+</div>
+<!-- Bento/Glassmorphism Data Container -->
+<div class="bg-surface-container border border-outline-variant/10 rounded-xl overflow-hidden shadow-lg relative group transition-all duration-200">
+<!-- Inner glow effect -->
+<div class="absolute inset-0 border border-white/5 rounded-xl pointer-events-none group-hover:border-primary/20 transition-colors"></div>
+<!-- Table Header/Controls -->
+<div class="flex justify-between items-center p-md border-b border-outline-variant/10 bg-surface-container-low/50">
+<div class="font-title-lg text-title-lg text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                        Recent Incoming Data
+                    </div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<!-- High-Density Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low font-label-md text-label-md text-on-surface-variant uppercase tracking-wider border-b border-outline-variant/10">
+<tr>
+<th class="py-sm px-md font-medium">Item Name</th>
+<th class="py-sm px-md font-medium">Supplier</th>
+<th class="py-sm px-md font-medium text-right">Qty</th>
+<th class="py-sm px-md font-medium">Date</th>
+<th class="py-sm px-md font-medium">Warehouse</th>
+<th class="py-sm px-md font-medium">Status</th>
+<th class="py-sm px-md font-medium text-center">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-dim">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Besi Beton 12mm</td>
+<td class="py-sm px-md text-on-surface-variant">PT Krakatau Steel</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">500 Ton</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-25</td>
+<td class="py-sm px-md">Gudang Utama</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-primary/10 text-primary border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Completed
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-container-low">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Semen Merah Putih 50kg</td>
+<td class="py-sm px-md text-on-surface-variant">PT Cemindo Gemilang</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">1,000 Sak</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-26</td>
+<td class="py-sm px-md">Gudang Transit</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-primary/10 text-primary border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Completed
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-dim">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Cat Tembok Dulux 25kg</td>
+<td class="py-sm px-md text-on-surface-variant">PT ICI Paints</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">200 Pail</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-26</td>
+<td class="py-sm px-md">Gudang Kimia</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-tertiary-container/20 text-tertiary border border-tertiary/30">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> In Transit
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-container-low">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Pipa PVC 4" AW</td>
+<td class="py-sm px-md text-on-surface-variant">PT Wavin Duta Jaya</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">150 Btg</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-27</td>
+<td class="py-sm px-md">Gudang Utama</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-surface-variant/50 text-on-surface-variant border border-outline-variant/50">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Pending
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-dim">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Kabel NYY 4x16mm</td>
+<td class="py-sm px-md text-on-surface-variant">PT Supreme Cable</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">3,000 M</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-27</td>
+<td class="py-sm px-md">Gudang Elektro</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-primary/10 text-primary border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Completed
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-container-low">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Bata Ringan Hebel</td>
+<td class="py-sm px-md text-on-surface-variant">PT Hebel Indonesia</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">50 Palet</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-28</td>
+<td class="py-sm px-md">Gudang Luar</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-primary/10 text-primary border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Completed
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-dim">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Keramik Granit 60x60</td>
+<td class="py-sm px-md text-on-surface-variant">PT Roman Ceramic</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">400 Dus</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-28</td>
+<td class="py-sm px-md">Gudang Utama</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-tertiary-container/20 text-tertiary border border-tertiary/30">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> In Transit
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 8 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-container-low">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Baja Ringan C75</td>
+<td class="py-sm px-md text-on-surface-variant">PT Taso</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">800 Btg</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-29</td>
+<td class="py-sm px-md">Gudang Logam</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-primary/10 text-primary border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Completed
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 9 -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-dim">
+<td class="py-sm px-md font-medium text-primary-fixed-dim">Gypsum Board 9mm</td>
+<td class="py-sm px-md text-on-surface-variant">PT Knauf</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">600 Lbr</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-29</td>
+<td class="py-sm px-md">Gudang Utama</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-surface-variant/50 text-on-surface-variant border border-outline-variant/50">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Pending
+                                    </span>
+</td>
+<td class="py-sm px-md text-center">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 10 -->
+<tr class="hover:bg-surface-container-highest/30 transition-colors group/row bg-surface-container-low">
+<td class="py-sm px-md font-medium text-primary-fixed-dim rounded-bl-xl">Paku Kayu 2"</td>
+<td class="py-sm px-md text-on-surface-variant">PT Wire Nail</td>
+<td class="py-sm px-md text-right font-mono text-[13px]">50 Dus</td>
+<td class="py-sm px-md text-on-surface-variant">2023-10-30</td>
+<td class="py-sm px-md">Gudang Kecil</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-primary/10 text-primary border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Completed
+                                    </span>
+</td>
+<td class="py-sm px-md text-center rounded-br-xl">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Floating AI Assistant -->
+<button class="fixed bottom-lg right-lg w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary text-on-primary flex items-center justify-center shadow-[0_4px_25px_rgba(99,102,241,0.4)] hover:scale-110 hover:shadow-[0_8px_30px_rgba(99,102,241,0.6)] transition-all duration-300 z-50 group border-t border-white/30">
+<span class="material-symbols-outlined text-[28px] group-hover:animate-pulse">smart_toy</span>
+<!-- Breathing Glow Base -->
+<span class="absolute inset-0 rounded-full bg-primary blur-md opacity-40 animate-pulse pointer-events-none -z-10"></span>
+</button>
+</div>
+
+
+</body></html>

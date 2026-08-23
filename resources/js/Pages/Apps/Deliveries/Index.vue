@@ -30,8 +30,14 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ d.sales_order?.customer?.name }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">{{ d.delivery_date }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ d.driver_name || '-' }} ({{ d.vehicle_number || '-' }})</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link :href="route('apps.deliveries.show', d.id)" class="text-indigo-600 hover:text-indigo-900">Detail</Link>
+                  <template v-if="hasAnyPermission(['deliveries.edit'])">
+                    <Link :href="route('apps.deliveries.edit', d.id)" class="text-amber-600 hover:text-amber-900 ml-2">Edit</Link>
+                  </template>
+                  <template v-if="hasAnyPermission(['deliveries.delete'])">
+                    <button @click="remove(d)" type="button" class="text-red-600 hover:text-red-900 ml-2 font-medium">Hapus</button>
+                  </template>
                 </td>
               </tr>
               <tr v-if="deliveries.data.length === 0">
@@ -48,9 +54,17 @@
 <script>
 import AppLayout from '@/Layouts/App.vue';
 import { Link } from '@inertiajs/vue3';
+import { confirmDelete } from '@/Utils/confirmDialog';
 
 export default {
   components: { AppLayout, Link },
   props: { deliveries: Object },
+  methods: {
+    async remove(row) {
+      if (await confirmDelete()) {
+        this.$inertia.delete(route('apps.deliveries.destroy', row.id));
+      }
+    },
+  },
 };
 </script>

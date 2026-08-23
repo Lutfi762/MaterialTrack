@@ -1,79 +1,124 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Data Pelanggan (Customers)</h2>
-        <Link :href="route('apps.customers.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Tambah Pelanggan
+  <Head><title>{{ $t('customers.heading') }} - MaterialTrack</title></Head>
+
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-users text-indigo-600"></i>
+        {{ $t('customers.heading') }}
+      </h2>
+      <div class="flex items-center gap-4">
+        <div class="search-box">
+          <input
+            type="text"
+            v-model="search"
+            :placeholder="$t('customers.search_placeholder')"
+            class="search-input"
+            @input="handleSearch"
+          />
+          <i class="fa fa-search search-icon"></i>
+        </div>
+        <Link
+          v-if="hasAnyPermission(['customers.create'])"
+          href="/apps/customers/create"
+          class="btn-modern btn-modern-primary"
+        >
+          <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
         </Link>
       </div>
-    </template>
-
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <div class="mb-4 flex justify-between items-center">
-            <input v-model="search" @input="doSearch" type="text" placeholder="Cari pelanggan..." class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 w-64" />
-          </div>
-
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kontak / Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipe</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Batas Kredit</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="c in customers.data" :key="c.id">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">{{ c.code || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">{{ c.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ c.contact_person || '-' }} <br><span class="text-xs text-gray-400">{{ c.email }}</span></td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize">{{ c.type }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono">Rp {{ Number(c.credit_limit || 0).toLocaleString('id-ID') }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.customers.edit', c.id)" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</Link>
-                  <button @click="destroy(c.id)" class="text-red-600 hover:text-red-900">Hapus</button>
-                </td>
-              </tr>
-              <tr v-if="customers.data.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada data pelanggan.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="customers.data"
+      :pagination="customers"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('customers.empty')"
+    >
+      <template #cell-code="{ row }">
+        <code>{{ row.code || '-' }}</code>
+      </template>
+      <template #cell-name="{ row }">
+        {{ row.name }}
+      </template>
+      <template #cell-contact="{ row }">
+        {{ row.contact_person || '-' }}
+        <br />
+        <span class="text-xs text-gray-400">{{ row.email }}</span>
+      </template>
+      <template #cell-type="{ row }">
+        {{ row.type }}
+      </template>
+      <template #cell-credit_limit="{ row }">
+        Rp {{ Number(row.credit_limit || 0).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link
+            v-if="hasAnyPermission(['customers.edit'])"
+            :href="`/apps/customers/${row.id}/edit`"
+            class="act-btn act-btn-success"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            v-if="hasAnyPermission(['customers.delete'])"
+            class="act-btn act-btn-danger"
+            :aria-label="$t('common.delete')"
+            @click="handleDelete(row.id)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
 export default {
-  components: { AppLayout, Link },
-  props: {
-    customers: Object,
-    filters: Object,
-  },
-  data() {
-    return {
-      search: this.filters.search || '',
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { customers: Object, filters: Object },
+  setup(props) {
+    const { t } = useI18n();
+    const search = ref(props.filters?.search || "");
+
+    const columns = ref([
+      { key: "code", label: t("customers.col_code"), width: "120px" },
+      { key: "name", label: t("customers.col_name"), sortable: true },
+      { key: "contact", label: t("customers.col_contact") },
+      { key: "type", label: t("customers.col_type") },
+      { key: "credit_limit", label: t("customers.col_credit_limit") },
+      { key: "actions", label: t("common.action"), align: "center", width: "120px" },
+    ]);
+
+    const handleSearch = () => {
+      router.get(
+        "/apps/customers",
+        { search: search.value },
+        { preserveState: true, replace: true }
+      );
     };
-  },
-  methods: {
-    doSearch() {
-      this.$inertia.get(route('apps.customers.index'), { search: this.search }, { preserveState: true, replace: true });
-    },
-    destroy(id) {
-      if (confirm('Apakah Anda yakin ingin menghapus pelanggan ini?')) {
-        this.$inertia.delete(route('apps.customers.destroy', id));
+
+    const handleDelete = async (id) => {
+      if (await confirmDelete(t("customers.delete_confirm"))) {
+        router.delete(`/apps/customers/${id}`);
       }
-    },
+    };
+
+    return { search, handleSearch, handleDelete, columns };
   },
 };
 </script>

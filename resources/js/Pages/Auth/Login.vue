@@ -1,5 +1,5 @@
 <template>
-    <Head><title>Login - MaterialTrack</title></Head>
+    <Head><title>Masuk - MaterialTrack</title></Head>
 
     <div class="login-page">
         <section class="login-story" aria-label="MaterialTrack overview">
@@ -105,7 +105,7 @@
                             <button
                                 type="button"
                                 class="password-toggle"
-                                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
                                 @click="showPassword = !showPassword"
                             >
                                 <i class="fa" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
@@ -163,14 +163,13 @@
 
 <script>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import logoUrl from '@/assets/logo-materialtrack.png';
 
 export default {
     components: { Head, Link },
 
     data() {
         return {
-            logoUrl,
+            logoUrl: '/images/logo.png',
             showPassword: false,
             features: [
                 {

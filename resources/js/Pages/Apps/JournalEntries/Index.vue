@@ -1,54 +1,81 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Jurnal Umum (Journal Entries)</h2>
-        <Link :href="route('apps.journal-entries.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Buat Jurnal Baru
-        </Link>
-      </div>
-    </template>
+  <Head><title>{{ $t('journal_entries.heading') }} - MaterialTrack</title></Head>
 
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. Jurnal</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Keterangan / Narasi</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="j in journalEntries.data" :key="j.id">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-semibold">{{ j.entry_number }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ j.entry_date }}</td>
-                <td class="px-6 py-4 text-sm">{{ j.narration || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize"><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">{{ j.status }}</span></td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.journal-entries.show', j.id)" class="text-indigo-600 hover:text-indigo-900">Detail</Link>
-                </td>
-              </tr>
-              <tr v-if="journalEntries.data.length === 0">
-                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada transaksi jurnal.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-book text-indigo-600"></i>
+        {{ $t('journal_entries.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['journal_entries.create'])"
+        href="/apps/journal-entries/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+      </Link>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="journalEntries.data"
+      :pagination="journalEntries"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('journal_entries.empty')"
+    >
+      <template #cell-entry_number="{ row }">
+        <code>{{ row.entry_number }}</code>
+      </template>
+      <template #cell-entry_date="{ row }">
+        {{ row.entry_date }}
+      </template>
+      <template #cell-narration="{ row }">
+        {{ row.narration || '-' }}
+      </template>
+      <template #cell-status="{ row }">
+        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
+          {{ row.status }}
+        </span>
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex justify-center">
+          <Link
+            :href="`/apps/journal-entries/${row.id}`"
+            class="act-btn act-btn-neutral"
+            :aria-label="$t('common.view')"
+          >
+            <i class="fa fa-eye"></i>
+          </Link>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-  components: { AppLayout, Link },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
   props: { journalEntries: Object },
+  setup() {
+    const { t } = useI18n();
+    const columns = ref([
+      { key: "entry_number", label: t("journal_entries.col_reference") },
+      { key: "entry_date", label: t("journal_entries.col_date") },
+      { key: "narration", label: t("journal_entries.col_description") },
+      { key: "status", label: t("journal_entries.col_status") },
+      { key: "actions", label: t("common.action"), align: "center", width: "100px" },
+    ]);
+    return { columns };
+  },
 };
 </script>

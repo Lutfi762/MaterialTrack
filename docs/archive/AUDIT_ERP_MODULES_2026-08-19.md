@@ -78,7 +78,14 @@ Script audit `/_sweep.php` (gitignored): lint semua PHP, `route:list` action→c
 
 **Catatan**: Modul Cash Bank / Sales Returns / Financial Reports / Notifications = WIP belum commit
 (controller+model+migration+seeder sudah ada; halaman Vue sedang dilengkapi). Tabel & permission
-sudah siap di DB; tidak ada rute yang menunjuk page kosong selain `Apps/SalesReturns/Show.vue`.
+sudah siap di DB; `Apps/SalesReturns/Show.vue` sudah dibuat.
+
+## FIX 22 Agustus 2026
+- Bug test `test_cash_bank_crud_dan_jurnal_otomatis`: payload `description` 500 char > kolom DB
+  `string()` (255) & rule `max:255` → validasi gagal, redirect-back (masih lolos `assertRedirect()`),
+  insert tidak jalan → assertion "table is empty". Bug di test, bukan app (controller/migration
+  sudah benar). Fix: kurangi payload test jadi 200 char. Verifikasi: `vendor\bin\phpunit`
+  **23/23 tests, 142 assertions, OK**.
 
 ---
 

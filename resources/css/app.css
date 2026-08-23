@@ -2,8 +2,127 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../../resources/js/**/*.vue';
+@source '../../resources/js/**/*.js';
 
+/* Dark mode via .dark class on <html> (toggled in Header.vue, persisted in localStorage) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   MaterialTrack Design Tokens (light default / dark override)
+   Source of truth — mirrors "Design tokens" section in CLAUDE.md.
+   Never hardcode these hex values in components; use the
+   Tailwind utilities they generate (bg-primary, text-success, ...)
+   or var(--color-*) in scoped <style> blocks.
+   ============================================================ */
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-bg: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-sidebar: #0F172A;
+    --color-on-surface: #0F172A;
+    --color-on-surface-variant: #475569;
+    --color-outline: #64748B;
+    --color-on-sidebar: #F1F5F9;
+    --color-on-sidebar-variant: #CBD5E1;
+    --color-primary: #7C3AED;
+    --color-primary-2: #7C3AED;
+    --color-success: #16A34A;
+    --color-warning: #F59E0B;
+    --color-danger: #DC2626;
+}
+.dark {
+    --color-bg: #111319;
+    --color-surface: #1A1D27;
+    --color-sidebar: #0F172A;
+    --color-on-surface: #e2e2eb;
+    --color-on-surface-variant: #c7c4d7;
+    --color-outline: #908fa0;
+    --color-on-sidebar: #e2e2eb;
+    --color-on-sidebar-variant: #c7c4d7;
+    --color-primary: #c0c1ff;
+    --color-primary-2: #8083ff;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-danger: #F43F5E;
+    --color-on-primary: #1000a9;
+}
+
+.dark .mtx-btn-primary { color: var(--color-on-primary); }
+
+/* ============================================================
+   MaterialTrack Design System (mtx-*)
+   Dipakai di modul: Suppliers, Categories, Items, Locations,
+   Warehouses, WarehouseMap, StockIns, StockOuts, StockTransfers,
+   Notifications. Namespace "mtx-" sengaja dipisah dari class
+   Bootstrap-remnant lama (card/btn/form-control) supaya modul lain
+   & Dashboard yang belum diredesign tidak ikut berubah.
+   Brand color: indigo-600 (sama dengan Dashboard/Sidebar existing).
+   ============================================================ */
+@layer components {
+    /* Layout */
+    .mtx-page-header { @apply flex flex-wrap items-center justify-between gap-3 mb-6; }
+    .mtx-page-title { @apply text-xl font-semibold text-gray-900 tracking-tight flex items-center gap-2.5; }
+    .mtx-page-title .mtx-title-icon { @apply text-indigo-600 text-lg; }
+    .mtx-toolbar { @apply flex flex-wrap items-center gap-2 mb-4; }
+    .mtx-search-wrap { @apply relative flex-1 min-w-[240px] max-w-sm; }
+    .mtx-search-icon { @apply pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs; }
+
+    /* Card */
+    .mtx-card { @apply bg-white border border-gray-200 rounded-lg; }
+    .mtx-card-header { @apply px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3; }
+    .mtx-card-title { @apply text-sm font-semibold text-gray-900 flex items-center gap-2; }
+    .mtx-card-body { @apply p-5; }
+
+    /* Form */
+    .mtx-field { @apply mb-4; }
+    .mtx-label { @apply block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5; }
+    .mtx-required { @apply text-red-500; }
+    .mtx-input, .mtx-select, .mtx-textarea {
+        @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 transition-colors duration-150 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400;
+    }
+    .mtx-textarea { @apply resize-y; }
+    .mtx-input-error, .mtx-select-error, .mtx-textarea-error { @apply border-red-400 focus:border-red-500 focus:ring-red-500; }
+    .mtx-error-text { @apply mt-1.5 text-xs text-red-600; }
+    .mtx-hint { @apply mt-1.5 text-xs text-gray-400; }
+    .mtx-checkbox-row { @apply flex items-center gap-2; }
+    .mtx-checkbox { @apply h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0; }
+    .mtx-checkbox-label { @apply text-sm text-gray-700; }
+
+    /* Buttons */
+    .mtx-btn {
+        @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3.5 py-2 text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .mtx-btn-sm { @apply px-2.5 py-1.5 text-xs; }
+    .mtx-btn-primary { background-color: var(--color-primary); color: white; }
+    .mtx-btn-primary:hover { filter: brightness(0.92); }
+    .mtx-btn-primary:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+    .mtx-btn-secondary { @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-300; }
+    .mtx-btn-danger { @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500; }
+    .mtx-btn-ghost { @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-300; }
+
+    /* Icon-only row action buttons (table) */
+    .mtx-icon-btn { @apply inline-flex items-center justify-center h-8 w-8 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-300; }
+    .mtx-icon-btn-danger { @apply hover:bg-red-50 hover:text-red-600 focus:ring-red-300; }
+
+    /* Badge (status pill) */
+    .mtx-badge { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium; }
+    .mtx-badge-success { @apply bg-green-100 text-green-700; }
+    .mtx-badge-warning { @apply bg-amber-100 text-amber-700; }
+    .mtx-badge-danger { @apply bg-red-100 text-red-700; }
+    .mtx-badge-neutral { @apply bg-gray-100 text-gray-600; }
+    .mtx-badge-info { @apply bg-blue-100 text-blue-700; }
+
+    /* Modal */
+    .mtx-modal-overlay { @apply fixed inset-0 bg-gray-900/40 flex items-center justify-center z-50 p-4; }
+    .mtx-modal { @apply bg-white rounded-lg shadow-lg w-full max-w-md border border-gray-200; }
+    .mtx-modal-header { @apply px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3; }
+    .mtx-modal-title { @apply text-sm font-semibold text-gray-900; }
+    .mtx-modal-body { @apply p-5; }
+    .mtx-modal-footer { @apply px-5 py-4 border-t border-gray-100 flex justify-end gap-2; }
+
+    /* Empty / skeleton helpers */
+    .mtx-skeleton { @apply animate-pulse bg-gray-200 rounded; }
 }

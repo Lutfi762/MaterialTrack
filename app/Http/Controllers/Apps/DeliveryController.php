@@ -167,4 +167,168 @@ class DeliveryController extends Controller
             'delivery' => $delivery->load(['salesOrder.customer', 'dispatcher', 'warehouse', 'items.item']),
         ]);
     }
+
+    public function edit(Delivery $delivery)
+    {
+        return Inertia::render('Apps/Deliveries/Edit', [
+            'delivery' => $delivery->load(['salesOrder.customer', 'salesOrder.items.item', 'items']),
+            'warehouses' => Warehouse::where('is_active', true)->orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+
+    public function update(Request $request, Delivery $delivery)
+    {
+        $validated = $request->validate([
+            'warehouse_id' => 'nullable|exists:warehouses,id',
+            'delivery_date' => 'required|date',
+            'driver_name' => 'nullable|string|max:255',
+            'vehicle_number' => 'nullable|string|max:50',
+            'notes' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.sales_order_item_id' => 'required|exists:sales_order_items,id',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.qty_shipped' => 'required|integer|min:1',
+        ]);
+
+        DB::transaction(function () use ($validated, $delivery) {
+            // Kunci baris SO: serialisasi update delivery (anti race over-ship)
+            $so = SalesOrder::with('items.item')->lockForUpdate()->findOrFail($delivery->sales_order_id);
+
+            if (! in_array($so->status, ['approved', 'processing', 'partial_delivered', 'delivered'])) {
+                throw ValidationException::withMessages(['sales_order_id' => 'SO berstatus ' . $so->status . ' — tidak dapat mengubah pengiriman.']);
+            }
+
+            // 1. Balik efek lama (stok, qty_delivered SO, StockOut terkait)
+            $this->reverseDelivery($delivery);
+
+            // 2. Hapus line lama agar tidak terhitung pada perhitungan sisa SO
+            $delivery->items()->delete();
+
+            // 3. Agregasi qty per baris SO (dedup baris berulang)
+            $lines = [];
+            $lineItemIds = [];
+            foreach ($validated['items'] as $itemData) {
+                $soItemId = (int) $itemData['sales_order_item_id'];
+                $lines[$soItemId] = ($lines[$soItemId] ?? 0) + (int) $itemData['qty_shipped'];
+                $lineItemIds[$soItemId] = (int) $itemData['item_id'];
+            }
+
+            // 4. Validasi kepemilikan baris, konsistensi item, dan sisa qty SO (anti over-ship)
+            foreach ($lines as $soItemId => $qty) {
+                if ($qty <= 0) {
+                    continue;
+                }
+                $soItem = $so->items->firstWhere('id', $soItemId);
+                if (! $soItem) {
+                    throw ValidationException::withMessages(['items' => "Sales order item #{$soItemId} bukan milik SO {$so->so_number}."]);
+                }
+                if ($lineItemIds[$soItemId] !== (int) $soItem->item_id) {
+                    throw ValidationException::withMessages(['items' => "Item tidak cocok untuk item SO {$soItem->item->name}."]);
+                }
+
+                $shippedSoFar = (int) DB::table('delivery_items')
+                    ->join('deliveries', 'deliveries.id', '=', 'delivery_items.delivery_id')
+                    ->where('deliveries.sales_order_id', $so->id)
+                    ->where('delivery_items.sales_order_item_id', $soItemId)
+                    ->sum('delivery_items.qty_shipped');
+
+                $remaining = $soItem->qty - $shippedSoFar;
+                if ($qty > $remaining) {
+                    throw ValidationException::withMessages(['items' => "Qty kirim ({$qty}) melebihi sisa SO ({$remaining}) untuk item {$soItem->item->name}."]);
+                }
+            }
+
+            // 5. Kunci baris item yang stoknya akan dikurangi
+            $itemIds = $so->items->whereIn('id', array_keys($lines))->pluck('item_id')->unique()->values();
+            $lockedItems = Item::whereIn('id', $itemIds)->lockForUpdate()->get()->keyBy('id');
+
+            // 6. Update header & terapkan kembali
+            $delivery->update([
+                'warehouse_id' => $validated['warehouse_id'] ?? null,
+                'delivery_date' => $validated['delivery_date'],
+                'driver_name' => $validated['driver_name'] ?? null,
+                'vehicle_number' => $validated['vehicle_number'] ?? null,
+                'status' => 'delivered',
+                'delivered_at' => now(),
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            foreach ($lines as $soItemId => $qty) {
+                if ($qty <= 0) {
+                    continue;
+                }
+                $soItem = $so->items->firstWhere('id', $soItemId);
+                $item = $lockedItems->get($soItem->item_id);
+
+                if (! $item) {
+                    throw ValidationException::withMessages(['items' => "Item {$soItem->item->name} tidak ditemukan."]);
+                }
+                if ($item->current_stock < $qty) {
+                    throw ValidationException::withMessages(['items' => "Stok tidak mencukupi untuk barang {$item->name}. Stok saat ini: {$item->current_stock}, dibutuhkan: {$qty}"]);
+                }
+
+                $delivery->items()->create([
+                    'sales_order_item_id' => $soItemId,
+                    'item_id' => $soItem->item_id,
+                    'qty_shipped' => $qty,
+                ]);
+
+                $soItem->increment('qty_delivered', $qty);
+                $item->decrement('current_stock', $qty);
+
+                StockOut::create([
+                    'reference_no' => 'OUT-SJ-' . $delivery->delivery_number,
+                    'item_id' => $soItem->item_id,
+                    'qty' => $qty,
+                    'date' => $validated['delivery_date'],
+                    'user_id' => auth()->id(),
+                    'purpose' => 'Pengiriman Surat Jalan ' . $delivery->delivery_number,
+                    'status' => 'approved',
+                ]);
+            }
+
+            // 7. Update status SO (baris SO sudah terkunci sejak awal)
+            $so->refresh();
+            $allDelivered = $so->items->every(fn ($i) => $i->qty_delivered >= $i->qty);
+            $so->update(['status' => $allDelivered ? 'delivered' : 'partial_delivered']);
+        });
+
+        return to_route('apps.deliveries.index')->with('success', 'Surat Jalan (Delivery) berhasil diperbarui.');
+    }
+
+    public function destroy(Delivery $delivery)
+    {
+        DB::transaction(function () use ($delivery) {
+            $so = SalesOrder::with('items')->lockForUpdate()->findOrFail($delivery->sales_order_id);
+
+            // Balik efek stok & counter SO, lalu hapus dokumen
+            $this->reverseDelivery($delivery);
+            $delivery->delete();
+
+            // Status SO dihitung ulang berdasarkan sisa pengiriman
+            $so->refresh();
+            if ($so->items->sum('qty_delivered') <= 0) {
+                $so->update(['status' => 'approved']);
+            } else {
+                $allDelivered = $so->items->every(fn ($i) => $i->qty_delivered >= $i->qty);
+                $so->update(['status' => $allDelivered ? 'delivered' : 'partial_delivered']);
+            }
+        });
+
+        return to_route('apps.deliveries.index')->with('success', 'Surat Jalan (Delivery) dibatalkan dan stok dikembalikan.');
+    }
+
+    /**
+     * Balik efek stok & counter dari satu delivery (sebelum dihapus/diubah ulang).
+     */
+    private function reverseDelivery(Delivery $delivery): void
+    {
+        foreach ($delivery->items as $line) {
+            $item = Item::lockForUpdate()->findOrFail($line->item_id);
+            $item->increment('current_stock', $line->qty_shipped);
+            $line->salesOrderItem->decrement('qty_delivered', $line->qty_shipped);
+        }
+
+        StockOut::where('reference_no', 'OUT-SJ-' . $delivery->delivery_number)->delete();
+    }
 }

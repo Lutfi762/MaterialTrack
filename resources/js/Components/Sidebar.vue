@@ -24,6 +24,13 @@
                 <span class="nav-label">{{ $t('sidebar.dashboard') }}</span>
             </Link>
 
+<template v-if="hasAnyPermission(['notifications.index'])">
+                <Link href="/apps/notifications/all" class="nav-item" :class="{ active: $page.url.startsWith('/apps/notifications') }">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-label">Notifikasi</span>
+                </Link>
+            </template>
+
             <template v-if="!isDepartmentUser">
                 <div class="nav-section-label">MASTER DATA</div>
 
@@ -224,7 +231,7 @@
             </template>
 
             <template v-if="!isDepartmentUser">
-                <div class="nav-section-label">ERP - PENGADAAN & PENJUALAN</div>
+                <Link href="/apps/erp/pengadaan-penjualan" class="nav-section-link" :class="{ active: $page.url.startsWith('/apps/erp/pengadaan-penjualan') }">ERP - PENGADAAN & PENJUALAN</Link>
 
                 <Link href="/apps/customers" class="nav-item" :class="{ active: $page.url.startsWith('/apps/customers') }">
                     <span class="nav-icon">👤</span>
@@ -271,7 +278,12 @@
                     <span class="nav-label">Sales Invoices</span>
                 </Link>
 
-                <div class="nav-section-label">ERP - KEUANGAN & HRM</div>
+                <Link href="/apps/sales-returns" class="nav-item" :class="{ active: $page.url.startsWith('/apps/sales-returns') }">
+                    <span class="nav-icon">↩️</span>
+                    <span class="nav-label">Sales Returns</span>
+                </Link>
+
+                <Link href="/apps/erp/keuangan-hrm" class="nav-section-link" :class="{ active: $page.url.startsWith('/apps/erp/keuangan-hrm') }">ERP - KEUANGAN & HRM</Link>
 
                 <Link href="/apps/chart-of-accounts" class="nav-item" :class="{ active: $page.url.startsWith('/apps/chart-of-accounts') }">
                     <span class="nav-icon">📊</span>
@@ -281,6 +293,16 @@
                 <Link href="/apps/journal-entries" class="nav-item" :class="{ active: $page.url.startsWith('/apps/journal-entries') }">
                     <span class="nav-icon">📖</span>
                     <span class="nav-label">Jurnal Umum</span>
+                </Link>
+
+                <Link href="/apps/financial-reports" class="nav-item" :class="{ active: $page.url.startsWith('/apps/financial-reports') }">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Laporan Keuangan</span>
+                </Link>
+
+                <Link href="/apps/cash-bank" class="nav-item" :class="{ active: $page.url.startsWith('/apps/cash-bank') }">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-label">Kas & Bank</span>
                 </Link>
 
                 <Link href="/apps/employees" class="nav-item" :class="{ active: $page.url.startsWith('/apps/employees') }">
@@ -303,23 +325,47 @@
                     <span class="nav-label">Penggajian (Payroll)</span>
                 </Link>
 
-                <div class="nav-section-label">ERP - SISTEM & ALUR</div>
+                <Link href="/apps/erp/sistem-alur" class="nav-section-link" :class="{ active: $page.url.startsWith('/apps/erp/sistem-alur') }">ERP - SISTEM & ALUR</Link>
 
-                <Link href="/apps/approval-workflows" class="nav-item" :class="{ active: $page.url.startsWith('/apps/approval-workflows') }">
+                <Link v-if="hasAnyPermission(['approval_workflows.index'])" href="/apps/approval-workflows" class="nav-item" :class="{ active: $page.url.startsWith('/apps/approval-workflows') }">
                     <span class="nav-icon">🔄</span>
                     <span class="nav-label">Approval Workflows</span>
                 </Link>
 
-                <Link href="/apps/company-profile" class="nav-item" :class="{ active: $page.url.startsWith('/apps/company-profile') }">
+                <Link v-if="hasAnyPermission(['company_profile.index'])" href="/apps/company-profile" class="nav-item" :class="{ active: $page.url.startsWith('/apps/company-profile') }">
                     <span class="nav-icon">🏢</span>
                     <span class="nav-label">Profil Perusahaan</span>
                 </Link>
-            </template>
 
-            <template v-if="hasAnyPermission(['activity_logs.index'])">
-                <div class="nav-section-label">AUDIT</div>
+                <Link v-if="hasAnyPermission(['users.index'])" href="/apps/users" class="nav-item" :class="{ active: $page.url.startsWith('/apps/users') }">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">{{ $t('sidebar.users') }}</span>
+                </Link>
 
-                <Link href="/apps/activity-logs" class="nav-item" :class="{ active: $page.url.startsWith('/apps/activity-logs') }">
+                <Link v-if="hasAnyPermission(['roles.index'])" href="/apps/roles" class="nav-item" :class="{ active: $page.url.startsWith('/apps/roles') }">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524z"/>
+                            <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">{{ $t('sidebar.roles') }}</span>
+                </Link>
+
+                <Link v-if="hasAnyPermission(['permissions.index'])" href="/apps/permissions" class="nav-item" :class="{ active: $page.url.startsWith('/apps/permissions') }">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10H7.465A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">{{ $t('sidebar.permissions') }}</span>
+                </Link>
+
+                <Link v-if="hasAnyPermission(['activity_logs.index'])" href="/apps/activity-logs" class="nav-item" :class="{ active: $page.url.startsWith('/apps/activity-logs') }">
                     <span class="nav-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M14.5 2a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V2.5a.5.5 0 0 1 1 0V14h12V2.5a.5.5 0 0 1 .5-.5zM1 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H1z"/>
@@ -327,6 +373,15 @@
                         </svg>
                     </span>
                     <span class="nav-label">{{ $t('sidebar.activity_logs') }}</span>
+                </Link>
+
+                <Link v-if="hasAnyPermission(['stock_alerts.index'])" href="/apps/stock-alerts" class="nav-item" :class="{ active: $page.url.startsWith('/apps/stock-alerts') }">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">{{ $t('sidebar.stock_alerts') }}</span>
                 </Link>
             </template>
 
@@ -352,47 +407,6 @@
                 <span class="nav-label">{{ $t('sidebar.pics') }}</span>
             </Link>
 
-            <template v-if="!isDepartmentUser">
-                <div class="nav-section-label">USER MANAGEMENT</div>
-
-                <Link v-if="hasAnyPermission(['roles.index'])" href="/apps/roles" class="nav-item" :class="{ active: $page.url.startsWith('/apps/roles') }">
-                    <span class="nav-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524z"/>
-                            <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
-                        </svg>
-                    </span>
-                    <span class="nav-label">{{ $t('sidebar.roles') }}</span>
-                </Link>
-
-                <Link v-if="hasAnyPermission(['permissions.index'])" href="/apps/permissions" class="nav-item" :class="{ active: $page.url.startsWith('/apps/permissions') }">
-                    <span class="nav-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10H7.465A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
-                        </svg>
-                    </span>
-                    <span class="nav-label">{{ $t('sidebar.permissions') }}</span>
-                </Link>
-
-                <Link v-if="hasAnyPermission(['users.index'])" href="/apps/users" class="nav-item" :class="{ active: $page.url.startsWith('/apps/users') }">
-                    <span class="nav-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-                        </svg>
-                    </span>
-                    <span class="nav-label">{{ $t('sidebar.users') }}</span>
-                </Link>
-
-                <Link v-if="hasAnyPermission(['items.index'])" href="/apps/stock-alerts" class="nav-item" :class="{ active: $page.url.startsWith('/apps/stock-alerts') }">
-                    <span class="nav-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
-                        </svg>
-                    </span>
-                    <span class="nav-label">{{ $t('sidebar.stock_alerts') }}</span>
-                </Link>
-            </template>
-
         </nav>
 
         <div class="sidebar-footer">
@@ -403,13 +417,12 @@
 
 <script>
 import { Link, usePage } from '@inertiajs/vue3';
-import logoUrl from '@/assets/logo-materialtrack.png';
 
 export default {
     components: { Link },
     emits: ['toggle'],
     data() {
-        return { collapsed: false, mobileOpen: false, logoUrl };
+        return { collapsed: false, mobileOpen: false, logoUrl: '/images/logo.png' };
     },
     computed: {
         isDepartmentUser() {
@@ -438,9 +451,9 @@ export default {
 
 <style scoped>
 .sidebar {
-    width: 260px;
+    width: 272px;
     min-height: 100vh;
-    background: linear-gradient(180deg, #0f172a 0%, #0b1120 100%);
+    background: var(--color-sidebar);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -448,28 +461,28 @@ export default {
     top: 0;
     bottom: 0;
     z-index: 100;
-    transition: width 0.3s ease;
+    border-right: 1px solid color-mix(in srgb, white 8%, transparent);
+    transition: width 0.25s ease, transform 0.25s ease;
     overflow: hidden;
 }
 
-.sidebar-collapsed { width: 70px; }
+.sidebar-collapsed { width: 72px; }
 
 .sidebar-brand {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 20px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    min-height: 70px;
+    justify-content: flex-start;
+    padding: 20px 20px 18px;
+    min-height: 76px;
     position: relative;
 }
 
 .brand-logo {
-    height: 36px;
+    height: 38px;
     width: auto;
     max-width: 200px;
     object-fit: contain;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 
 .sidebar-collapsed .brand-logo {
@@ -485,21 +498,21 @@ export default {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #1e293b;
-    border: 1px solid rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.6);
+    background: var(--color-sidebar);
+    border: 1px solid color-mix(in srgb, white 16%, transparent);
+    color: var(--color-on-sidebar-variant);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     z-index: 10;
 }
 
 .sidebar-collapse-btn:hover {
-    background: #334155;
+    background: color-mix(in srgb, white 10%, transparent);
     color: white;
-    border-color: rgba(255,255,255,0.25);
+    border-color: color-mix(in srgb, white 28%, transparent);
 }
 
 .sidebar-collapsed .sidebar-collapse-btn {
@@ -508,86 +521,128 @@ export default {
 
 .sidebar-nav {
     flex: 1;
-    padding: 12px 0;
+    padding: 4px 10px 16px;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-.sidebar-nav::-webkit-scrollbar { width: 4px; }
+.sidebar-nav::-webkit-scrollbar { width: 5px; }
 .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: color-mix(in srgb, white 14%, transparent); border-radius: 4px; }
 
 .nav-section-label {
     font-size: 10px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 1px;
-    padding: 16px 20px 6px;
+    font-weight: 700;
+    color: var(--color-on-sidebar-variant);
+    letter-spacing: 0.1em;
+    padding: 20px 10px 7px;
     white-space: nowrap;
     transition: opacity 0.3s;
 }
 
 .sidebar-collapsed .nav-section-label { opacity: 0; }
 
+.nav-section-link {
+    display: flex;
+    align-items: center;
+    padding: 20px 10px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-on-sidebar-variant);
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.nav-section-link:hover {
+    color: var(--color-on-sidebar);
+    text-decoration: none;
+}
+
+.nav-section-link.active {
+    color: var(--color-primary);
+}
+
+.sidebar-collapsed .nav-section-link { opacity: 0; }
+
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    margin: 2px 8px;
-    border-radius: 8px;
-    color: rgba(255,255,255,0.65);
+    gap: 13px;
+    min-height: 42px;
+    padding: 9px 12px;
+    margin: 2px 0;
+    border-radius: 9px;
+    color: var(--color-on-sidebar-variant);
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     white-space: nowrap;
 }
 
 .nav-item:hover {
-    background: rgba(255,255,255,0.08);
-    color: white;
+    background: color-mix(in srgb, white 8%, transparent);
+    color: var(--color-on-sidebar);
     text-decoration: none;
 }
 
 .nav-item.active {
-    background: linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba(124,58,237,0.4);
+    position: relative;
+    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    color: var(--color-on-sidebar);
+    font-weight: 600;
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    width: 3px;
+    height: 24px;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(to bottom, var(--color-primary-2), var(--color-primary));
+}
+
+.nav-item:focus-visible,
+.sidebar-collapse-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 .nav-icon {
-    width: 22px;
+    width: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.nav-label { transition: opacity 0.3s; flex: 1; }
+.nav-label { transition: opacity 0.25s ease; flex: 1; }
 .sidebar-collapsed .nav-label { opacity: 0; width: 0; overflow: hidden; }
 
 .nav-badge {
     font-size: 9px;
     font-weight: 700;
     padding: 2px 6px;
-    border-radius: 20px;
+    border-radius: 999px;
     flex-shrink: 0;
 }
 
-.badge-success { background: rgba(34,197,94,0.2); color: #4ade80; }
-.badge-danger { background: rgba(239,68,68,0.2); color: #f87171; }
-.badge-ai { background: rgba(124,58,237,0.2); color: #a78bfa; }
+.badge-success { background: color-mix(in srgb, var(--color-success) 20%, transparent); color: var(--color-success); }
+.badge-danger { background: color-mix(in srgb, var(--color-danger) 20%, transparent); color: var(--color-danger); }
+.badge-ai { background: color-mix(in srgb, var(--color-primary) 20%, transparent); color: var(--color-primary); }
 .sidebar-collapsed .nav-badge { display: none; }
 
 .sidebar-footer {
-    padding: 16px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 16px 20px;
+    border-top: 1px solid color-mix(in srgb, white 8%, transparent);
 }
 
 .footer-text {
     font-size: 11px;
-    color: rgba(255,255,255,0.25);
+    color: var(--color-on-sidebar-variant);
     text-align: center;
     white-space: nowrap;
     transition: opacity 0.3s;
@@ -609,7 +664,7 @@ export default {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0,0,0,0.5);
+        background: color-mix(in srgb, var(--color-sidebar) 72%, transparent);
         z-index: 99;
     }
 }

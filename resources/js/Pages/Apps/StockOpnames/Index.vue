@@ -1,159 +1,106 @@
 <template>
-    <Head><title>Stock Opname - MaterialTrack</title></Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border-0 rounded-3 shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-clipboard-check me-1"></i> {{ $t('stock_opname.heading') }}</span>
-                            <div class="d-flex gap-2">
-                                <a v-if="hasAnyPermission(['stock_opnames.export', 'stock_opnames.index'])" :href="`/apps/stock-opnames/export/excel?period=${currentPeriod}`" class="btn btn-success btn-sm">
-                                    <i class="fa fa-file-excel me-1"></i> Export Excel
-                                </a>
-                                <a v-if="hasAnyPermission(['stock_opnames.export', 'stock_opnames.index'])" :href="`/apps/stock-opnames/download-all/pdf?period=${currentPeriod}`" class="btn btn-outline-danger btn-sm">
-                                    <i class="fa fa-file-pdf me-1"></i> Download Semua PDF
-                                </a>
-                                <Link v-if="hasAnyPermission(['stock_opnames.create'])" :href="`/apps/stock-opnames/create?period=${currentPeriod}`" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-plus-circle me-2"></i> {{ $t('stock_opname.add') }}
-                                </Link>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-2 mb-3">
-                                <div class="col-md-3">
-                                    <select v-model="selectedPeriod" @change="changePeriod" class="form-select form-select-sm">
-                                        <option :value="currentPeriod" v-if="!availablePeriods.includes(currentPeriod)">
-                                            {{ currentPeriod }} ({{ $t('stock_opname.empty') }})
-                                        </option>
-                                        <option v-for="p in availablePeriods" :key="p" :value="p">{{ p }}</option>
-                                    </select>
-                                </div>
-                            </div>
+  <Head><title>{{ $t('stock_opname.title') }} - MaterialTrack</title></Head>
 
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-sm">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Ref</th>
-                                            <th>{{ $t('stock_opname.col_date') }}</th>
-                                            <th>{{ $t('stock_opname.col_material') }}</th>
-                                            <th>{{ $t('stock_opname.col_category') }}</th>
-                                            <th class="text-end">{{ $t('stock_opname.col_system_stock') }}</th>
-                                            <th class="text-end">{{ $t('stock_opname.col_physical_stock') }}</th>
-                                            <th class="text-center">{{ $t('stock_opname.col_diff') }}</th>
-                                            <th>{{ $t('stock_opname.col_notes') }}</th>
-                                            <th>{{ $t('stock_opname.col_by') }}</th>
-                                            <th class="text-center">Status</th>
-                                            <th class="text-center">{{ $t('stock_opname.col_action') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-if="opnames.data.length === 0">
-                                            <td colspan="11" class="text-center text-muted py-4">{{ $t('stock_opname.empty') }}</td>
-                                        </tr>
-                                        <tr v-for="op in opnames.data" :key="op.id">
-                                            <td class="text-nowrap">{{ op.reference_no }}</td>
-                                            <td class="text-nowrap">{{ formatDate(op.date) }}</td>
-                                            <td>
-                                                <div class="fw-semibold">{{ op.item?.name }}</div>
-                                                <div class="text-muted small">{{ op.item?.code }}</div>
-                                            </td>
-                                            <td>{{ op.item?.category?.name ?? '-' }}</td>
-                                            <td class="text-end">{{ op.system_stock }}</td>
-                                            <td class="text-end">{{ op.physical_stock }}</td>
-                                            <td class="text-center">
-                                                <span v-if="op.difference === 0" class="badge bg-success">{{ $t('stock_opname.diff_match') }}</span>
-                                                <span v-else-if="op.difference > 0" class="badge bg-info">+{{ op.difference }} ({{ $t('stock_opname.diff_surplus') }})</span>
-                                                <span v-else class="badge bg-danger">{{ op.difference }} ({{ $t('stock_opname.diff_deficit') }})</span>
-                                            </td>
-                                            <td>{{ op.notes ?? '-' }}</td>
-                                            <td>
-                                                <div>{{ op.user?.name ?? '-' }}</div>
-                                                <div v-if="op.status === 'verified'" class="small text-muted">
-                                                    <i class="fa fa-check-circle text-success me-1"></i>{{ op.verified_by?.name ? op.verified_by.name : 'diverifikasi' }}
-                                                </div>
-                                            </td>
-                                            <td class="text-center">
-                                                <span v-if="op.status === 'pending'" class="badge bg-warning text-dark">
-                                                    <i class="fa fa-clock me-1"></i>Menunggu Verifikasi
-                                                </span>
-                                                <span v-else class="badge bg-success">
-                                                    <i class="fa fa-check me-1"></i>Terverifikasi
-                                                </span>
-                                            </td>
-                                            <td class="text-center">
-                                                <div class="btn-group btn-group-sm">
-                                                    <Link :href="`/apps/stock-opnames/${op.id}`" class="btn btn-outline-info" :title="$t('stock_opname.view')">
-                                                        <i class="fa fa-eye"></i>
-                                                    </Link>
-                                                    <Link v-if="op.status === 'pending'" :href="`/apps/stock-opnames/${op.id}/edit`" class="btn btn-outline-warning" :title="$t('stock_opname.revision')">
-                                                        <i class="fa fa-edit"></i>
-                                                    </Link>
-                                                    <form v-if="op.status === 'pending' && hasAnyPermission(['stock_opnames.verify'])" @submit.prevent="verify(op)">
-                                                        <button class="btn btn-outline-success" :title="'Verifikasi opname'">
-                                                            <i class="fa fa-check-double"></i>
-                                                        </button>
-                                                    </form>
-                                                    <a :href="`/apps/stock-opnames/${op.id}/pdf`" class="btn btn-outline-danger" :title="$t('common.print')">
-                                                        <i class="fa fa-file-pdf"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-clipboard-check text-indigo-600"></i>
+        {{ $t('stock_opname.heading') }}
+      </h2>
+      <div class="d-flex gap-2">
+        <a v-if="hasAnyPermission(['stock_opnames.export', 'stock_opnames.index'])" :href="exportExcelUrl" class="btn-modern btn-modern-outline"><i class="fa fa-file-excel me-2"></i> Export Excel</a>
+        <Link v-if="hasAnyPermission(['stock_opnames.create'])" :href="`/apps/stock-opnames/create?period=${selectedPeriod}`" class="btn-modern btn-modern-primary"><i class="fa fa-plus-circle me-2"></i> {{ $t('stock_opname.add') }}</Link>
+      </div>
+    </div>
 
-                            <div class="d-flex justify-content-end mt-2">
-                                <nav v-if="opnames.last_page > 1">
-                                    <ul class="pagination pagination-sm mb-0">
-                                        <li v-for="link in opnames.links" :key="link.label"
-                                            class="page-item" :class="{ active: link.active, disabled: !link.url }">
-                                            <Link class="page-link" :href="link.url ?? '#'" v-html="link.label" />
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="filter-bar mb-4">
+      <div class="filter-item">
+        <i class="fa fa-calendar text-muted"></i>
+        <select v-model="selectedPeriod" class="filter-select" @change="changePeriod">
+          <option :value="currentPeriod" v-if="!availablePeriods.includes(currentPeriod)">{{ currentPeriod }} ({{ $t('stock_opname.empty') }})</option>
+          <option v-for="p in availablePeriods" :key="p" :value="p">{{ p }}</option>
+        </select>
+      </div>
+    </div>
+
+    <DataTable :columns="columns" :rows="opnames.data" :pagination="opnames" row-key="id" :striped="true" :loading="false" :empty-text="$t('stock_opname.empty')" :searchable="false">
+      <template #cell-reference_no="{ row }"><code>{{ row.reference_no }}</code></template>
+      <template #cell-date="{ row }">{{ formatDate(row.date) }}</template>
+      <template #cell-item="{ row }"><div><div class="fw-semibold">{{ row.item?.name }}</div><div class="text-muted small">{{ row.item?.code }}</div></div></template>
+      <template #cell-category="{ row }">{{ row.category?.name || '-' }}</template>
+      <template #cell-system_stock="{ row }">{{ row.system_stock ?? '-' }}</template>
+      <template #cell-physical_stock="{ row }">{{ row.physical_stock ?? '-' }}</template>
+      <template #cell-diff="{ row }">
+        <span :class="row.diff > 0 ? 'text-green-600' : row.diff < 0 ? 'text-red-600' : 'text-gray-600'">{{ row.diff > 0 ? '+' : '' }}{{ row.diff ?? 0 }}</span>
+      </template>
+      <template #cell-notes="{ row }">{{ row.notes ?? '-' }}</template>
+      <template #cell-recorded_by="{ row }">{{ row.recorded_by?.name ?? '-' }}</template>
+      <template #cell-status="{ row }">
+        <span class="px-2 py-1 text-xs rounded-full font-bold" :class="statusClass(row.status)">{{ row.status }}</span>
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link :href="`/apps/stock-opnames/${row.id}`" class="act-btn act-btn-neutral" :aria-label="$t('common.view')"><i class="fa fa-eye"></i></Link>
+          <Link v-if="row.status === 'pending'" :href="`/apps/stock-opnames/${row.id}/edit`" class="act-btn act-btn-warning" :aria-label="$t('stock_opname.revision')"><i class="fa fa-edit"></i></Link>
+          <form v-if="row.status === 'pending' && hasAnyPermission(['stock_opnames.verify'])" @submit.prevent="verify(row)">
+            <button type="submit" class="act-btn act-btn-success" :title="$t('stock_opname.verify', 'Verify')"><i class="fa fa-check-double"></i></button>
+          </form>
+          <a :href="`/apps/stock-opnames/${row.id}/pdf`" class="act-btn act-btn-danger" :aria-label="$t('common.print')" target="_blank"><i class="fa fa-file-pdf"></i></a>
         </div>
-    </main>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '@/Layouts/App.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-    layout: LayoutApp,
-    components: { Head, Link },
-    props: {
-        opnames: Object,
-        availablePeriods: Array,
-        currentPeriod: String,
-    },
-    data() {
-        return {
-            selectedPeriod: this.currentPeriod,
-        };
-    },
-    methods: {
-        changePeriod() {
-            router.get('/apps/stock-opnames', { period: this.selectedPeriod }, { preserveState: true });
-        },
-        verify(op) {
-            if (confirm(`Verifikasi opname ${op.reference_no}? Stok sistem akan disesuaikan dari ${op.system_stock} ke ${op.physical_stock}.`)) {
-                router.patch(`/apps/stock-opnames/${op.id}/verify`);
-            }
-        },
-        formatDate(dateStr) {
-            return new Date(dateStr).toLocaleDateString('id-ID', {
-                day: '2-digit', month: 'short', year: 'numeric',
-            });
-        },
-    },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: {
+    opnames: Object,
+    availablePeriods: Array,
+    currentPeriod: String,
+  },
+  setup(props) {
+    const { t } = useI18n();
+    const selectedPeriod = ref(props.currentPeriod);
+    const exportExcelUrl = `/apps/stock-opnames/export/excel?period=${props.currentPeriod}`;
+    const columns = ref([
+      { key: "reference_no", label: "Ref" },
+      { key: "date", label: t("stock_opname.col_date") },
+      { key: "item", label: t("stock_opname.col_material") },
+      { key: "category", label: t("stock_opname.col_category") },
+      { key: "system_stock", label: t("stock_opname.col_system_stock"), align: "center" },
+      { key: "physical_stock", label: t("stock_opname.col_physical_stock"), align: "center" },
+      { key: "diff", label: t("stock_opname.col_diff"), align: "center" },
+      { key: "notes", label: t("stock_opname.col_notes") },
+      { key: "recorded_by", label: t("stock_opname.col_by") },
+      { key: "status", label: t("common.status"), align: "center" },
+      { key: "actions", label: t("common.action"), align: "center", width: "150px" },
+    ]);
+    const changePeriod = () => {
+      router.get('/apps/stock-opnames', { period: selectedPeriod.value }, { preserveState: true });
+    };
+    const verify = (op) => {
+      if (confirm(`Verifikasi opname ${op.reference_no}?`)) {
+        router.patch(`/apps/stock-opnames/${op.id}/verify`);
+      }
+    };
+    const formatDate = (dateStr) => {
+      return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    };
+    const statusClass = (status) => {
+      const map = { pending: 'bg-yellow-100 text-yellow-800', approved: 'bg-green-100 text-green-800', rejected: 'bg-red-100 text-red-800' };
+      return map[status] || 'bg-secondary';
+    };
+    return { opnames: props.opnames, availablePeriods: props.availablePeriods, currentPeriod: props.currentPeriod, selectedPeriod, exportExcelUrl, columns, changePeriod, verify, formatDate, statusClass };
+  },
 };
 </script>

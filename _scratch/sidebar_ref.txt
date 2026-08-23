@@ -1,0 +1,157 @@
+﻿<aside class="w-sidebar-width h-screen sticky top-0 left-0 bg-surface-container-low border-r border-outline-variant/10 hidden xl:flex flex-col z-30">
+<div class="flex flex-col h-full py-lg">
+<!-- Brand -->
+<div class="px-lg mb-lg flex items-center gap-sm">
+<div class="w-8 h-8 rounded overflow-hidden flex items-center justify-center">
+  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTgcpB_7ganDAWMI7OKiayh4AYB8WBd9znbP8LFOozEnvY-e7RBvhzFoJ7fv5AmeroRmyCoTHMf98VDg-3R-TYWX1j5kNofLZbiZwAvDRpYygH8IzFOwdtDngv2sVJ03DNCm5Ra65cEFPoGnRuFvRkygTbQt9p5NRWcW4Tuu9B_hrMZNecbQD3UytXIYS7e54ZYNhXNts6-KK6cT7JkmORMYO-qhncmvNJnPqHo7xWm8alxsRk_d_csTi3eHE32fXwfA" alt="MaterialTrack Logo" class="w-full h-full object-cover">
+</div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed">MaterialTrack</h1>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">ERP Unified</p>
+</div>
+</div>
+<!-- Search -->
+<div class="px-md mb-md">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full bg-surface text-on-surface border border-outline-variant/30 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-colors placeholder:text-on-surface-variant/50" placeholder="Search menu..." type="text">
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 overflow-y-auto px-sm space-y-1">
+<!-- Main (Active) -->
+<div class="relative nav-active-pill rounded-lg bg-secondary-container/10">
+<a class="flex items-center gap-md text-secondary px-md py-sm transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md font-semibold">Main</span>
+<span class="material-symbols-outlined ml-auto text-sm" data-icon="expand_less">expand_less</span>
+</a>
+<div class="pl-12 pr-4 pb-2 space-y-1">
+<a class="block text-on-surface py-1 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="block text-on-surface-variant py-1 text-sm hover:text-primary transition-colors" href="#">Overview</a>
+</div>
+</div>
+<!-- Master Data (Open) -->
+<div class="relative rounded-lg group">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="font-body-md text-body-md">Master Data</span>
+<span class="material-symbols-outlined ml-auto text-sm transition-transform duration-200 rotate-180" data-icon="expand_more">expand_more</span>
+</a>
+<div class="pl-12 pr-4 pb-2 pt-1 space-y-1">
+<a class="block text-on-surface-variant py-1 text-sm hover:text-primary transition-colors" href="#">Daftar Material</a>
+<a class="block text-on-surface-variant py-1 text-sm hover:text-primary transition-colors" href="#">Kategori</a>
+<a class="block text-on-surface-variant py-1 text-sm hover:text-primary transition-colors" href="#">Gudang</a>
+</div>
+</div>
+<!-- Other Links -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-md text-body-md">Transaksi Stok</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-body-md text-body-md">Pengadaan &amp; Penjualan</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Keuangan &amp; HRM</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors text-tertiary" data-icon="smart_toy">smart_toy</span>
+<span class="font-body-md text-body-md text-tertiary-fixed-dim">AI Assistant</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="analytics">analytics</span>
+<span class="font-body-md text-body-md">Laporan &amp; Analisis</span>
+</a>
+</nav>
+<!-- Footer Actions -->
+<div class="px-md mt-auto pt-4 border-t border-outline-variant/10">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-error px-md py-sm hover:bg-error/10 transition-colors rounded-lg mt-1" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Top App Bar -->
+<header class="h-header-height sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-4 md:px-lg">
+<div class="flex items-center gap-4">
+<button class="xl:hidden p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="xl:hidden font-wordmark-material text-wordmark-material text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="inventory_2" data-weight="fill">inventory_2</span>
+                    MaterialTrack
+                </div>
+</div>
+<div class="flex items-center gap-2 md:gap-4 ml-auto">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-high border border-outline-variant/30 overflow-hidden cursor-pointer hover:border-primary transition-colors ml-2">
+<img alt="Administrator Gudang" class="w-full h-full object-cover" data-alt="A professional headshot of a warehouse administrator, male, wearing a dark grey polo shirt in a modern office setting. High quality, soft studio lighting, shallow depth of field, confident expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5tKDi_C0xfBtsGsmnw4w5gCi3TxAMxRXFH9UxYSK78j6SzPaI3OwJiA1fNvfqz-R3r-aasQc0KAxPUuHG8OA3gcSbuTjjwYEEIdlEfwGFfEmRDabkvtoE8o47CXgVtZU4x7tOuwS6t6i0myG2NOmLwH7tmKQ--7LystAYr4X1IFjxj3Q-E-OpdorJAvKMtjQPVQzjU2usHbp62joSaNz9Qq8_ZsQ9PJtN6frj12wI5UBxGJy0jyLk">
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="p-4 md:p-lg lg:p-xl space-y-6 md:space-y-8 flex-1">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Selamat Malam, Administrator Gudang</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+                        Rabu, 25 Oktober 2023 | 19:42 WIB
+                    </p>
+</div>
+<!-- Quick Actions -->
+<div class="flex flex-wrap gap-2">
+<button class="gradient-btn px-4 py-2 rounded-lg font-label-md text-label-md text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                        Tambah Material
+                    </button>
+<button class="bg-surface-container-high hover:bg-surface-container-highest px-4 py-2 rounded-lg border border-outline-variant/20 font-label-md text-label-md text-on-surface flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="arrow_downward">arrow_downward</span>
+                        Stock In
+                    </button>
+<button class="bg-surface-container-high hover:bg-surface-container-highest px-4 py-2 rounded-lg border border-outline-variant/20 font-label-md text-label-md text-on-surface flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm text-error" data-icon="arrow_upward">arrow_upward</span>
+                        Stock Out
+                    </button>
+<button class="bg-surface-container-high hover:bg-surface-container-highest px-3 py-2 rounded-lg border border-outline-variant/20 font-label-md text-label-md text-on-surface transition-colors" title="Laporan">
+<span class="material-symbols-outlined text-sm" data-icon="summarize">summarize</span>
+</button>
+</div>
+</div>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+<!-- Stat Card 1 -->
+<div class="glass-panel rounded-xl p-4 flex flex-col justify-between hover-lift">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="category">category</span>
+</div>
+<span class="flex items-center gap-1 text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[10px]" data-icon="trending_up">trending_up</span>
+                            +12%
+                        </span>
+</div>
+<div class="mt-4">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Total Material</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">4,821</h3>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="glass-panel rounded-xl p-4 flex flex-col justify-between hover-lift">

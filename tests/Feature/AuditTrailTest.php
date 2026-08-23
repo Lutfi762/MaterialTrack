@@ -33,7 +33,7 @@ class AuditTrailTest extends TestCase
     public function test_global_observer_mencatat_crud_item(): void
     {
         $user = User::first();
-        $category = Category::first();
+        $category = Category::create(['name' => 'Audit Category '.uniqid()]);
 
         $this->actingAs($user);
 

@@ -1,5 +1,5 @@
 <template>
-    <Head><title>Tambah Lokasi - MaterialTrack</title></Head>
+    <Head><title>{{ $t('locations.add') }} - MaterialTrack</title></Head>
     <main class="c-main">
         <div class="container-fluid">
             <div class="fade-in">
@@ -18,6 +18,11 @@
                                         <label class="form-label fw-semibold">{{ $t('locations.code') }}</label>
                                         <input v-model="form.code" type="text" class="form-control" :class="{ 'is-invalid': form.errors.code }">
                                         <div class="invalid-feedback">{{ form.errors.code }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">{{ $t('locations.warehouse_zone') }}</label>
+                                        <input v-model="form.warehouse_zone" type="text" class="form-control" :class="{ 'is-invalid': form.errors.warehouse_zone }">
+                                        <div class="invalid-feedback">{{ form.errors.warehouse_zone }}</div>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">{{ $t('locations.address') }}</label>
@@ -40,12 +45,14 @@
 <script>
 import LayoutApp from '@/Layouts/App.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
 
 export default {
     layout: LayoutApp,
     components: { Head, Link },
     setup() {
-        const form = useForm({ name: '', code: '', address: '' });
+        const { t } = useI18n();
+        const form = useForm({ name: '', code: '', warehouse_zone: '', address: '' });
         const submit = () => form.post('/apps/locations');
         return { form, submit };
     }

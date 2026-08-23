@@ -65,7 +65,11 @@ class SecurityHeaders
 
         $response->headers->set('Content-Security-Policy', implode('; ', $csp));
 
-        if ($isProduction) {
+        // HSTS hanya boleh dikirim di respons yang memang HTTPS — kalau dikirim lewat HTTP
+        // (mis. dev server lokal dengan APP_ENV=production), browser akan memaksa upgrade
+        // origin ini ke HTTPS selama max-age walau server tidak punya TLS → situs jadi
+        // unreachable ("ERR_SSL_PROTOCOL_ERROR" / gagal konek total).
+        if ($isProduction && $request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 

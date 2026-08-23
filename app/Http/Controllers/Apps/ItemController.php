@@ -158,6 +158,8 @@ class ItemController extends Controller
             return back()->withErrors(['error' => 'Gagal menyimpan data material.'])->withInput();
         }
 
+        CacheService::clearItemsCache();
+
         return to_route('apps.items.index')->with('success', "Material berhasil ditambahkan dengan kode {$validated['code']}.");
     }
 
@@ -314,6 +316,8 @@ class ItemController extends Controller
             return back()->withErrors(['error' => 'Gagal memperbarui data material.'])->withInput();
         }
 
+        CacheService::clearItemsCache();
+
         return to_route('apps.items.index')->with('success', 'Material berhasil diperbarui.');
     }
 
@@ -332,6 +336,8 @@ class ItemController extends Controller
 
             $item->delete();
 
+            CacheService::clearItemsCache();
+
             return to_route('apps.items.index')->with('success', 'Material berhasil dihapus.');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal menghapus material.']);
@@ -346,6 +352,8 @@ class ItemController extends Controller
 
         try {
             Excel::import(new ItemImport, $request->file('file'));
+
+            CacheService::clearItemsCache();
 
             return to_route('apps.items.index')->with('success', 'Import material berhasil diproses.');
         } catch (\Exception $e) {

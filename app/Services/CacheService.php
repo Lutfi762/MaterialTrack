@@ -333,12 +333,21 @@ class CacheService
     }
 
     /**
-     * Clear semua cache related ke items
+     * Clear semua cache related ke items — semua scope (all + tiap department),
+     * karena list item di-version per department.
      */
     public static function clearItemsCache(): void
     {
-        Cache::increment('cache_version_items_all');
-        Cache::increment('cache_version_lowstock_all');
+        $scopes = ['all'];
+
+        foreach (DB::table('departments')->pluck('id') as $departmentId) {
+            $scopes[] = $departmentId;
+        }
+
+        foreach ($scopes as $scope) {
+            Cache::increment("cache_version_items_{$scope}");
+            Cache::increment("cache_version_lowstock_{$scope}");
+        }
     }
 
     /**

@@ -7,6 +7,8 @@
         </svg>
       </button>
 
+      <img src="/images/logo.png" alt="MaterialTrack" class="header-logo-mobile" />
+
       <div class="search-bar">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="search-icon">
           <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
@@ -151,7 +153,7 @@ const isDark = ref(false)
 
 function toggleDarkMode() {
   isDark.value = !isDark.value
-  document.documentElement.classList.toggle('dark-mode', isDark.value)
+  document.documentElement.classList.toggle('dark', isDark.value)
   localStorage.setItem('darkMode', isDark.value ? '1' : '0')
 }
 
@@ -243,11 +245,12 @@ function closeAll() {
 onMounted(() => {
   document.addEventListener('click', closeAll)
 
-  // Initialize dark mode from localStorage
+  // Initialize dark mode from localStorage (respect system preference on first visit)
   const savedDark = localStorage.getItem('darkMode')
-  if (savedDark === '1') {
+  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
+  if (savedDark === '1' || (savedDark === null && prefersDark)) {
     isDark.value = true
-    document.documentElement.classList.add('dark-mode')
+    document.documentElement.classList.add('dark')
   }
 })
 
@@ -301,6 +304,18 @@ onUnmounted(() => {
   }
 }
 
+.header-logo-mobile {
+  display: none;
+  height: 28px;
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .header-logo-mobile {
+    display: block;
+  }
+}
+
 /* Search Bar */
 .search-bar {
   position: relative;
@@ -330,7 +345,7 @@ onUnmounted(() => {
 }
 
 .search-input::placeholder {
-  color: #9ca3af;
+  color: var(--color-outline);
 }
 
 .search-input:focus {
@@ -605,14 +620,14 @@ onUnmounted(() => {
 
 .notification-message {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--color-on-surface-variant);
   line-height: 1.4;
   margin-bottom: 4px;
 }
 
 .notification-time {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--color-outline);
 }
 
 .notification-footer {
@@ -695,12 +710,12 @@ onUnmounted(() => {
 
 .user-role {
   font-size: 11px;
-  color: #6b7280;
+  color: var(--color-on-surface-variant);
   line-height: 1.2;
 }
 
 .dropdown-arrow {
-  color: #9ca3af;
+  color: var(--color-outline);
   flex-shrink: 0;
 }
 
@@ -731,7 +746,7 @@ onUnmounted(() => {
 
 .dropdown-user-email {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--color-on-surface-variant);
 }
 
 .dropdown-profile-link {

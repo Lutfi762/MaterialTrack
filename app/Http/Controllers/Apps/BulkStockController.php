@@ -53,12 +53,16 @@ class BulkStockController extends Controller
 
                 if ($validated['type'] === 'in') {
                     $item->increment('current_stock', $itemData['qty']);
+                    $lastSeq = (int) DB::table('stock_ins')
+                        ->whereDate('created_at', now())
+                        ->lockForUpdate()
+                        ->max(DB::raw('CAST(SUBSTRING(reference_no, -4) AS UNSIGNED)'));
                     StockIn::create([
                         'item_id' => $item->id,
                         'qty' => $itemData['qty'],
                         'source' => $itemData['source'] ?? 'Bulk Input',
                         'user_id' => auth()->id(),
-                        'reference_no' => 'IN-'.now()->format('Ymd').'-'.str_pad(StockIn::whereDate('created_at', now())->count() + 1, 4, '0', STR_PAD_LEFT),
+                        'reference_no' => 'IN-'.now()->format('Ymd').'-'.str_pad($lastSeq + 1, 4, '0', STR_PAD_LEFT),
                         'date' => now()->toDateString(),
                     ]);
                 } else {
@@ -66,12 +70,16 @@ class BulkStockController extends Controller
                         throw new \Exception("Stok {$item->name} tidak cukup. Tersedia: {$item->current_stock}");
                     }
                     $item->decrement('current_stock', $itemData['qty']);
+                    $lastSeq = (int) DB::table('stock_outs')
+                        ->whereDate('created_at', now())
+                        ->lockForUpdate()
+                        ->max(DB::raw('CAST(SUBSTRING(reference_no, -4) AS UNSIGNED)'));
                     StockOut::create([
                         'item_id' => $item->id,
                         'qty' => $itemData['qty'],
                         'user_id' => auth()->id(),
                         'department_id' => auth()->user()->department_id,
-                        'reference_no' => 'OUT-'.now()->format('Ymd').'-'.str_pad(StockOut::whereDate('created_at', now())->count() + 1, 4, '0', STR_PAD_LEFT),
+                        'reference_no' => 'OUT-'.now()->format('Ymd').'-'.str_pad($lastSeq + 1, 4, '0', STR_PAD_LEFT),
                         'date' => now()->toDateString(),
                         'status' => 'approved',
                         'approved_by' => auth()->id(),

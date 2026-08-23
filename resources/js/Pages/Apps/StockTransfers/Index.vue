@@ -1,133 +1,130 @@
 <template>
-    <Head>
-        <title>{{ $t('stock_transfer.title') }} - MaterialTrack</title>
-    </Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 rounded-3 shadow">
-                            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                                <h6 class="m-0 font-weight-bold text-primary">
-                                    <i class="fa fa-exchange-alt me-1"></i> {{ $t('stock_transfer.heading') }}
-                                </h6>
-                                <Link v-if="hasAnyPermission(['stock_ins.create'])" href="/apps/stock-transfers/create" class="btn btn-sm btn-primary">
-                                    <i class="fa fa-plus me-1"></i> {{ $t('stock_transfer.add') }}
-                                </Link>
-                            </div>
-                            <div class="card-body">
+  <Head><title>{{ $t('stock_transfer.title') }} - MaterialTrack</title></Head>
 
-                                <!-- Filters -->
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-3">
-                                        <select class="form-select form-select-sm" v-model="filters.status" @change="applyFilter">
-                                            <option value="">{{ $t('stock_transfer.filter_all_status') }}</option>
-                                            <option value="pending">{{ $t('stock_transfer.status_pending') }}</option>
-                                            <option value="approved">{{ $t('stock_transfer.status_approved') }}</option>
-                                            <option value="rejected">{{ $t('stock_transfer.status_rejected') }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <select class="form-select form-select-sm" v-model="filters.department_id" @change="applyFilter">
-                                            <option value="">{{ $t('stock_transfer.filter_all_dept') }}</option>
-                                            <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
-                                        </select>
-                                    </div>
-                                </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-exchange-alt text-indigo-600"></i>
+        {{ $t('stock_transfer.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['stock_ins.create'])"
+        href="/apps/stock-transfers/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-1"></i> {{ $t('stock_transfer.add') }}
+      </Link>
+    </div>
 
-                                <!-- Table -->
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>{{ $t('stock_transfer.col_ref') }}</th>
-                                                <th>{{ $t('stock_transfer.material') }}</th>
-                                                <th>{{ $t('stock_transfer.col_from') }}</th>
-                                                <th>{{ $t('stock_transfer.col_to') }}</th>
-                                                <th>{{ $t('stock_transfer.col_qty') }}</th>
-                                                <th>{{ $t('stock_transfer.col_status') }}</th>
-                                                <th>{{ $t('stock_transfer.col_date') }}</th>
-                                                <th>{{ $t('stock_transfer.col_action') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-if="transfers.data.length === 0">
-                                                <td colspan="8" class="text-center text-muted">{{ $t('stock_transfer.empty') }}</td>
-                                            </tr>
-                                            <tr v-for="t in transfers.data" :key="t.id">
-                                                <td><code>{{ t.reference_no }}</code></td>
-                                                <td>{{ t.item?.name ?? '-' }}</td>
-                                                <td>{{ t.from_department?.name ?? '-' }}</td>
-                                                <td>{{ t.to_department?.name ?? '-' }}</td>
-                                                <td class="text-center fw-bold">{{ t.qty }} {{ t.unit }}</td>
-                                                <td class="text-center">
-                                                    <span class="badge" :class="statusClass(t.status)">{{ t.status }}</span>
-                                                </td>
-                                                <td>{{ t.created_at }}</td>
-                                                <td>
-                                                    <Link :href="`/apps/stock-transfers/${t.id}`" class="btn btn-sm btn-outline-info">
-                                                        <i class="fa fa-eye"></i>
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+    <div class="filter-bar mb-4">
+      <div class="filter-item">
+        <i class="fa fa-layer-group text-muted"></i>
+        <select v-model="filters.status" class="filter-select" @change="applyFilter">
+          <option value="">{{ $t('stock_transfer.filter_all_status') }}</option>
+          <option value="pending">{{ $t('stock_transfer.status_pending') }}</option>
+          <option value="approved">{{ $t('stock_transfer.status_approved') }}</option>
+          <option value="rejected">{{ $t('stock_transfer.status_rejected') }}</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <i class="fa fa-building text-muted"></i>
+        <select v-model="filters.department_id" class="filter-select" @change="applyFilter">
+          <option value="">{{ $t('stock_transfer.filter_all_dept') }}</option>
+          <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
+        </select>
+      </div>
+    </div>
 
-                                <!-- Pagination -->
-                                <div v-if="transfers.last_page > 1" class="d-flex justify-content-center mt-3">
-                                    <nav>
-                                        <ul class="pagination pagination-sm mb-0">
-                                            <li v-for="page in transfers.last_page" :key="page" class="page-item" :class="{ active: page === transfers.current_page }">
-                                                <Link :href="`?page=${page}`" class="page-link">{{ page }}</Link>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <DataTable
+      :columns="columns"
+      :rows="transfers.data"
+      :pagination="transfers"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('stock_transfer.empty')"
+    >
+      <template #cell-reference_no="{ row }">
+        <code>{{ row.reference_no }}</code>
+      </template>
+      <template #cell-item="{ row }">
+        {{ row.item?.name ?? '-' }}
+      </template>
+      <template #cell-from_department="{ row }">
+        {{ row.from_department?.name ?? '-' }}
+      </template>
+      <template #cell-to_department="{ row }">
+        {{ row.to_department?.name ?? '-' }}
+      </template>
+      <template #cell-qty="{ row }">
+        <strong>{{ row.qty }} {{ row.unit }}</strong>
+      </template>
+      <template #cell-status="{ row }">
+        <span class="badge" :class="statusClass(row.status)">{{ row.status }}</span>
+      </template>
+      <template #cell-created_at="{ row }">
+        {{ row.created_at }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex justify-center">
+          <Link
+            :href="`/apps/stock-transfers/${row.id}`"
+            class="act-btn act-btn-neutral"
+            :aria-label="$t('common.view')"
+          >
+            <i class="fa fa-eye"></i>
+          </Link>
         </div>
-    </main>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '@/Layouts/App.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { reactive } from 'vue';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { reactive, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-    layout: LayoutApp,
-    components: { Head, Link },
-    props: {
-        transfers: Object,
-        departments: Array,
-    },
-    setup(props) {
-        const filters = reactive({
-            status: '',
-            department_id: '',
-        });
-
-        const applyFilter = () => {
-            router.get('/apps/stock-transfers', {
-                status: filters.status || undefined,
-                department_id: filters.department_id || undefined,
-            }, { preserveState: true });
-        };
-
-        const statusClass = (status) => {
-            return {
-                pending: 'bg-warning text-dark',
-                approved: 'bg-success',
-                rejected: 'bg-danger',
-            }[status] || 'bg-secondary';
-        };
-
-        return { filters, applyFilter, statusClass };
-    },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: {
+    transfers: Object,
+    departments: Array,
+  },
+  setup(props) {
+    const { t } = useI18n();
+    const filters = reactive({
+      status: '',
+      department_id: '',
+    });
+    const columns = ref([
+      { key: "reference_no", label: t("stock_transfer.col_ref") },
+      { key: "item", label: t("stock_transfer.material") },
+      { key: "from_department", label: t("stock_transfer.col_from") },
+      { key: "to_department", label: t("stock_transfer.col_to") },
+      { key: "qty", label: t("stock_transfer.col_qty"), align: "center" },
+      { key: "status", label: t("stock_transfer.col_status"), align: "center" },
+      { key: "created_at", label: t("stock_transfer.col_date") },
+      { key: "actions", label: t("common.action"), align: "center", width: "100px" },
+    ]);
+    const applyFilter = () => {
+      router.get('/apps/stock-transfers', {
+        status: filters.status || undefined,
+        department_id: filters.department_id || undefined,
+      }, { preserveState: true });
+    };
+    const statusClass = (status) => {
+      return {
+        pending: 'bg-warning text-dark',
+        approved: 'bg-success',
+        rejected: 'bg-danger',
+      }[status] || 'bg-secondary';
+    };
+    return { transfers: props.transfers, departments: props.departments, filters, columns, applyFilter, statusClass };
+  },
 };
 </script>

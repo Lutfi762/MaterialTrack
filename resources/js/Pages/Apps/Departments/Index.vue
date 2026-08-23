@@ -1,87 +1,105 @@
 <template>
-    <Head><title>Department - MaterialTrack</title></Head>
-    <main>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border-0 rounded-3 shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-building me-1"></i> {{ $t('departments.heading') }}</span>
-                            <Link v-if="hasAnyPermission(['departments.create'])" href="/apps/departments/create" class="btn btn-primary btn-sm">
-                                <i class="fa fa-plus-circle me-2"></i> NEW
-                            </Link>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-striped table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>{{ $t('common.code') }}</th>
-                                        <th>{{ $t('common.name') }}</th>
-                                        <th>{{ $t('common.description') }}</th>
-                                        <th>{{ $t('departments.col_pics') }}</th>
-                                        <th>{{ $t('common.status') }}</th>
-                                        <th class="text-center" style="width:15%">{{ $t('common.action') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-if="departments.data.length === 0">
-                                        <td colspan="6" class="text-center">{{ $t('common.no_data') }}</td>
-                                    </tr>
-                                    <tr v-for="dept in departments.data" :key="dept.id">
-                                        <td><code>{{ dept.code ?? '-' }}</code></td>
-                                        <td>{{ dept.name }}</td>
-                                        <td>{{ dept.description ?? '-' }}</td>
-                                        <td>{{ dept.pics_count }}</td>
-                                        <td>
-                                            <span v-if="dept.status === 'active'" class="badge bg-success">{{ $t('common.active') }}</span>
-                                            <span v-else class="badge bg-secondary">{{ $t('common.inactive') }}</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <Link v-if="hasAnyPermission(['departments.edit'])" :href="`/apps/departments/${dept.id}/edit`" class="btn btn-success btn-sm me-2">
-                                                <i class="fa fa-pencil-alt"></i>
-                                            </Link>
-                                            <button v-if="hasAnyPermission(['departments.delete'])" class="btn btn-danger btn-sm" @click="handleDelete(dept.id)">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <Pagination :links="departments.links" align="end" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <Head><title>{{ $t('departments.heading') }} - MaterialTrack</title></Head>
+
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-building text-indigo-600"></i>
+        {{ $t('departments.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['departments.create'])"
+        href="/apps/departments/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+      </Link>
+    </div>
+
+    <DataTable
+      :columns="columns"
+      :rows="departments.data"
+      :pagination="departments"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('departments.empty')"
+    >
+      <template #cell-code="{ row }">
+        <code>{{ row.code ?? '-' }}</code>
+      </template>
+      <template #cell-name="{ row }">
+        {{ row.name }}
+      </template>
+      <template #cell-description="{ row }">
+        {{ row.description ?? '-' }}
+      </template>
+      <template #cell-pics_count="{ row }">
+        {{ row.pics_count }}
+      </template>
+      <template #cell-status="{ row }">
+        <span v-if="row.status === 'active'" class="badge bg-success">{{ $t('common.active') }}</span>
+        <span v-else class="badge bg-secondary">{{ $t('common.inactive') }}</span>
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link
+            v-if="hasAnyPermission(['departments.edit'])"
+            :href="`/apps/departments/${row.id}/edit`"
+            class="act-btn act-btn-success"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            v-if="hasAnyPermission(['departments.delete'])"
+            class="act-btn act-btn-danger"
+            :aria-label="$t('common.delete')"
+            @click="handleDelete(row.id)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
         </div>
-    </main>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '@/Layouts/App.vue';
-import Pagination from '@/Components/Pagination.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { confirmDelete } from '@/Utils/confirmDialog';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
 export default {
-    layout: LayoutApp,
-    components: { Head, Link, Pagination },
-    props: { departments: Object },
-    setup() {
-        const isLoading = ref(false);
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { departments: Object },
+  setup() {
+    const { t } = useI18n();
+    const isLoading = ref(false);
+    const columns = ref([
+      { key: "code", label: t("common.code") },
+      { key: "name", label: t("common.name"), sortable: true },
+      { key: "description", label: t("common.description") },
+      { key: "pics_count", label: t("departments.col_pics"), align: "center" },
+      { key: "status", label: t("common.status"), align: "center" },
+      { key: "actions", label: t("common.action"), align: "center", width: "150px" },
+    ]);
 
-        const handleDelete = async (id) => {
-            if (await confirmDelete($t('departments.delete_confirm'))) {
-                isLoading.value = true;
-                router.delete(`/apps/departments/${id}`, {
-                    onFinish: () => { isLoading.value = false; },
-                    onError: () => {
-                        isLoading.value = false;
-                    }
-                });
-            }
-        };
-        return { handleDelete, isLoading };
-    },
+    const handleDelete = async (id) => {
+      if (await confirmDelete(t("departments.delete_confirm"))) {
+        isLoading.value = true;
+        router.delete(`/apps/departments/${id}`, {
+          onFinish: () => { isLoading.value = false; },
+          onError: () => { isLoading.value = false; },
+        });
+      }
+    };
+    return { handleDelete, isLoading, columns };
+  },
 };
 </script>

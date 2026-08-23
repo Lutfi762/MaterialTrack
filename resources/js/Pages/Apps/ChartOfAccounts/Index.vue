@@ -1,61 +1,98 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Bagan Akun (Chart of Accounts / COA)</h2>
-        <Link :href="route('apps.chart-of-accounts.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Tambah Akun
-        </Link>
-      </div>
-    </template>
+  <Head><title>{{ $t('chart_of_accounts.title') }} - MaterialTrack</title></Head>
 
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode Akun</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Akun</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipe</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sub Tipe</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Saldo Awal</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="acc in accounts.data" :key="acc.id" :class="{'bg-gray-50 font-bold': acc.is_header}">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">{{ acc.code }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm" :class="{'pl-8': !acc.is_header}">{{ acc.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize">{{ acc.type }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize text-gray-600">{{ acc.sub_type }}</td>
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">Rp {{ Number(acc.opening_balance || 0).toLocaleString('id-ID') }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.chart-of-accounts.edit', acc.id)" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</Link>
-                  <button @click="destroy(acc.id)" class="text-red-600 hover:text-red-900">Hapus</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-book text-indigo-600"></i>
+        {{ $t('chart_of_accounts.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['chart_of_accounts.create'])"
+        href="/apps/chart-of-accounts/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+      </Link>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="accounts.data"
+      :pagination="accounts"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('chart_of_accounts.empty')"
+    >
+      <template #cell-code="{ row }">
+        <code>{{ row.code }}</code>
+      </template>
+      <template #cell-name="{ row }">
+        <span :class="{ 'pl-8': !row.is_header }">{{ row.name }}</span>
+      </template>
+      <template #cell-type="{ row }">
+        {{ row.type }}
+      </template>
+      <template #cell-sub_type="{ row }">
+        {{ row.sub_type }}
+      </template>
+      <template #cell-opening_balance="{ row }">
+        Rp {{ Number(row.opening_balance || 0).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link
+            :href="`/apps/chart-of-accounts/${row.id}/edit`"
+            class="act-btn act-btn-success"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            @click="destroy(row.id)"
+            class="act-btn act-btn-danger"
+            :aria-label="$t('common.delete')"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
 export default {
-  components: { AppLayout, Link },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
   props: { accounts: Object },
-  methods: {
-    destroy(id) {
-      if (confirm('Hapus akun ini?')) {
-        this.$inertia.delete(route('apps.chart-of-accounts.destroy', id));
+  setup() {
+    const { t } = useI18n();
+    const columns = ref([
+      { key: "code", label: t("chart_of_accounts.col_code") },
+      { key: "name", label: t("chart_of_accounts.col_name"), sortable: true },
+      { key: "type", label: t("chart_of_accounts.col_type") },
+      { key: "sub_type", label: t("chart_of_accounts.col_sub_type") },
+      { key: "opening_balance", label: t("chart_of_accounts.col_balance") },
+      { key: "actions", label: t("common.action"), align: "center", width: "120px" },
+    ]);
+
+    const destroy = async (id) => {
+      if (await confirmDelete(t("chart_of_accounts.delete_confirm"))) {
+        router.delete(`/apps/chart-of-accounts/${id}`);
       }
-    },
+    };
+
+    return { destroy, columns };
   },
 };
 </script>

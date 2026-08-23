@@ -9,14 +9,23 @@ use Inertia\Inertia;
 
 class WarehouseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $warehouses = Warehouse::withCount('items')
-            ->latest()
-            ->paginate(10);
+        $query = Warehouse::withCount('items');
+
+        if ($request->has('search') && $request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('code', 'like', "%{$request->search}%")
+                  ->orWhere('address', 'like', "%{$request->search}%");
+            });
+        }
+
+        $warehouses = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('Apps/Warehouses/Index', [
             'warehouses' => $warehouses,
+            'filters' => $request->only(['search']),
         ]);
     }
 
@@ -63,9 +72,8 @@ class WarehouseController extends Controller
     public function destroy(Warehouse $warehouse)
     {
         try {
-            if ($warehouse->items()->exists()) {
-                return back()->withErrors(['error' => 'Gudang tidak bisa dihapus karena masih memiliki material.']);
-            }
+            // Lepaskan material dari gudang (FK nullOnDelete) supaya hapus gudang tetap bisa
+            $warehouse->items()->update(['warehouse_id' => null]);
 
             $warehouse->delete();
 

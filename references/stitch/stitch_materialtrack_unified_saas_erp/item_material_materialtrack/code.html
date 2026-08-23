@@ -1,0 +1,482 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>MaterialTrack - Master Data</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Breathing Animation for AI Assistant */
+        @keyframes breath {
+            0% { box-shadow: 0 0 0 0 rgba(96, 1, 209, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 0 15px rgba(96, 1, 209, 0); transform: scale(1.05); }
+            100% { box-shadow: 0 0 0 0 rgba(96, 1, 209, 0); transform: scale(1); }
+        }
+        .ai-fab {
+            animation: breath 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            background: linear-gradient(135deg, #6001d1 0%, #2f2ebe 100%);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #33343b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #464554; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#f0dbff",
+                        "surface-tint": "#c0c1ff",
+                        "on-tertiary-fixed-variant": "#6900b3",
+                        "surface": "#111319",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "tertiary": "#ddb7ff",
+                        "surface-dim": "#111319",
+                        "primary-fixed": "#e1e0ff",
+                        "inverse-on-surface": "#2e3037",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#3f008e",
+                        "on-tertiary-fixed": "#2c0051",
+                        "background": "#111319",
+                        "outline": "#908fa0",
+                        "surface-container-high": "#282a30",
+                        "on-error": "#690005",
+                        "surface-container-low": "#191b22",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#1e1f26",
+                        "tertiary-container": "#b76dff",
+                        "on-surface-variant": "#c7c4d7",
+                        "primary": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "on-tertiary": "#490080",
+                        "on-surface": "#e2e2eb",
+                        "secondary": "#d2bbff",
+                        "inverse-primary": "#494bd6",
+                        "secondary-container": "#6001d1",
+                        "on-secondary-fixed": "#25005a",
+                        "surface-container-lowest": "#0c0e14",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e2e2eb",
+                        "primary-container": "#8083ff",
+                        "on-background": "#e2e2eb",
+                        "tertiary-fixed-dim": "#ddb7ff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-primary-fixed": "#07006c",
+                        "on-secondary-container": "#c9aeff",
+                        "on-primary-container": "#0d0096",
+                        "surface-container-highest": "#33343b",
+                        "outline-variant": "#464554",
+                        "secondary-fixed": "#eaddff",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "surface-variant": "#33343b",
+                        "surface-bright": "#373940",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "on-tertiary-container": "#400071"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width": "260px",
+                        "sidebar-collapsed": "72px",
+                        "unit": "8px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "header-height": "64px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Geist"],
+                        "wordmark-track": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "wordmark-material": ["Geist"],
+                        "label-md": ["Geist"],
+                        "body-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "wordmark-track": ["20px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "wordmark-material": ["20px", { "lineHeight": "24px", "fontWeight": "800" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased h-screen overflow-hidden flex w-full">
+<!-- SideNavBar Component -->
+<aside class="w-sidebar-width h-screen sticky top-0 left-0 bg-surface-container-low border-r border-outline-variant/10 flex flex-col py-lg z-30 shrink-0 hidden md:flex">
+<!-- Brand Header -->
+<div class="px-lg pb-xl flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center shadow-lg border border-white/10 bg-white">
+  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-uWLn1-UFnY2H4XsDFoDO5sHWshYeYp-TjusGBBcAskKY8CzEyH5ZcGF2Y_H64pxfaKR6dhITvF8cJOqEmXoyNsXiNG3wVxaNwXK9P6snsNWFwREY37VJFWVOvdGx-99XORUJltb3vIjAvPbj-Ui6hfeZuZ0MWyeDRhBcSyWa9cYE-CtMjd7DeeP7wtE-loQZJKcOr21CbDrDk6aEVM6vb7dHTfclcm8WV55IHJiQCePkIAn1S6UxcO6bJ9ODEJxGdA" alt="MaterialTrack Logo" class="w-full h-full object-cover">
+</div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed">MaterialTrack</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">ERP Unified</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto px-sm flex flex-col gap-xs">
+<!-- Main -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Main</span>
+</a>
+<!-- Master Data (Active State) -->
+<a class="flex items-center gap-md bg-secondary-container/10 text-secondary border-l-4 border-secondary px-md py-sm transition-all duration-200 rounded-r-lg" href="#">
+<span class="material-symbols-outlined" data-icon="database" style="font-variation-settings: 'FILL' 1;">database</span>
+<span class="font-body-md text-body-md font-medium">Master Data</span>
+</a>
+<!-- Transaksi Stok -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-md text-body-md">Transaksi Stok</span>
+</a>
+<!-- Pengadaan & Penjualan -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-body-md text-body-md">Pengadaan &amp; Penjualan</span>
+</a>
+<!-- Keuangan & HRM -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Keuangan &amp; HRM</span>
+</a>
+<!-- Laporan & Analisis -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="analytics">analytics</span>
+<span class="font-body-md text-body-md">Laporan &amp; Analisis</span>
+</a>
+<!-- Sistem & Alur -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="account_tree">account_tree</span>
+<span class="font-body-md text-body-md">Sistem &amp; Alur</span>
+</a>
+<!-- Departemen -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="business">business</span>
+<span class="font-body-md text-body-md">Departemen</span>
+</a>
+</nav>
+<!-- Footer Actions -->
+<div class="px-sm pt-lg mt-auto border-t border-outline-variant/10 flex flex-col gap-xs">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-error px-md py-sm hover:bg-error-container/20 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<div class="flex-1 flex flex-col h-full overflow-hidden relative bg-surface w-full">
+<!-- TopNavBar Component -->
+<header class="h-header-height sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-lg shrink-0">
+<!-- Search Bar (Left aligned per JSON) -->
+<div class="flex-1 max-w-md hidden md:block">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="w-full bg-surface-container-high border border-outline-variant/30 rounded-full py-2 pl-10 pr-4 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-surface-container transition-all text-sm shadow-[0_0_0_0_rgba(192,193,255,0)] focus:shadow-[0_0_12px_0_rgba(192,193,255,0.2)]" placeholder="Search materials, SKUs..." type="text">
+</div>
+</div>
+<!-- Mobile Brand (Visible only on small screens) -->
+<div class="md:hidden flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-title-lg text-title-lg text-primary">MaterialTrack</span>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-2">
+<button aria-label="Language" class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button aria-label="Notifications" class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-2 p-1 hover:bg-surface-container-highest/20 rounded-full transition-all pl-2 pr-4 border border-transparent hover:border-outline-variant/30">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/50">
+<img alt="Administrator Gudang" class="w-full h-full object-cover" data-alt="A professional headshot of a warehouse administrator, neutral lighting, corporate modern style, dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbjC-n-tbDCTDTgmbqjLlFY7aSfZLrZD21emVSV2qLnJYBKdxxxE5XHJhAtMcXm0_kgSwTZ3DUpsSxlnQQUSyRbj0ep6lgVyqnzMBT4tHTwMwU6adKKMirGJ_5RLtq-2w9t4dfxCx0yJa4NAPqPaKfppkz0-8ybQWkMdbzJwtK-Aapn9r-sRRHTZbdsgryHAxAEjuUh7tANy4HFRUlttE0Ohax-YdcjYhYtT_8BWi5lsrDPjwTp2lE">
+</div>
+<div class="flex flex-col items-start hidden sm:flex">
+<span class="font-label-md text-label-md font-medium text-on-surface leading-tight">Admin Gudang</span>
+<span class="text-[10px] text-on-surface-variant leading-tight">Logistics</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm ml-1" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Main Scrollable Area -->
+<main class="flex-1 overflow-y-auto p-4 md:p-lg">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="category">category</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Item / Material</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage master data registry and monitor live stock levels.</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface hover:bg-surface-container-high hover:border-outline-variant/50 transition-all font-label-md text-label-md hover:scale-[1.02]">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                        Filter
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-container to-secondary-container text-on-primary-container font-medium hover:shadow-[0_0_15px_rgba(192,193,255,0.3)] transition-all border-t border-white/20 font-label-md text-label-md hover:scale-[1.02]">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                        New Item
+                    </button>
+</div>
+</div>
+<!-- Data Table Card (Glassmorphism & Tonal Layer) -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/10 shadow-sm relative overflow-hidden group/card hover:-translate-y-1 transition-transform duration-300">
+<!-- Inner light glow top edge -->
+<div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary-fixed/30 to-transparent"></div>
+<!-- Table Controls (Filters/Export) -->
+<div class="p-4 border-b border-outline-variant/10 flex flex-wrap gap-3 items-center justify-between bg-surface/50">
+<div class="flex gap-2">
+<span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-label-md text-label-md cursor-pointer hover:bg-primary/20 transition-colors">All Categories</span>
+<span class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant/20 font-label-md text-label-md cursor-pointer hover:bg-surface-container-high transition-colors">Pipa</span>
+<span class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant/20 font-label-md text-label-md cursor-pointer hover:bg-surface-container-high transition-colors">Kabel</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                        Export CSV
+                    </button>
+</div>
+<!-- High-Density Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead>
+<tr class="bg-surface-container-highest/30 border-b border-outline-variant/20 font-label-md text-label-md text-on-surface-variant">
+<th class="px-md py-3 font-medium w-12 text-center">
+<input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary" type="checkbox">
+</th>
+<th class="px-md py-3 font-medium">SKU</th>
+<th class="px-md py-3 font-medium">Material Name</th>
+<th class="px-md py-3 font-medium">Category</th>
+<th class="px-md py-3 font-medium w-48">Stock Level</th>
+<th class="px-md py-3 font-medium">Unit</th>
+<th class="px-md py-3 font-medium text-right">Status</th>
+<th class="px-md py-3 font-medium w-12"></th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<!-- Row 1: Normal Stock -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-high/50 transition-colors even:bg-surface odd:bg-surface-container-low group/row">
+<td class="px-md py-sm text-center">
+<input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary opacity-0 group-hover/row:opacity-100 transition-opacity" type="checkbox">
+</td>
+<td class="px-md py-sm font-mono text-xs text-on-surface-variant">MT-PVC-001</td>
+<td class="px-md py-sm font-medium">Pipa PVC 3/4 Inch Wavin</td>
+<td class="px-md py-sm"><span class="px-2 py-0.5 rounded bg-surface-container border border-outline-variant/20 text-xs text-on-surface-variant">Pipa &amp; Fitting</span></td>
+<td class="px-md py-sm">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%] rounded-full shadow-[0_0_8px_rgba(192,193,255,0.4)]"></div>
+</div>
+<span class="text-xs w-10 text-right">750</span>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">Batang</td>
+<td class="px-md py-sm text-right">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-tertiary-container/10 border border-tertiary-fixed/20 text-tertiary-fixed text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed shadow-[0_0_4px_#ddb7ff]"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover/row:opacity-100 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Low Stock (Warning) -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-high/50 transition-colors even:bg-surface odd:bg-surface-container-low group/row">
+<td class="px-md py-sm text-center">
+<input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary opacity-0 group-hover/row:opacity-100 transition-opacity" type="checkbox">
+</td>
+<td class="px-md py-sm font-mono text-xs text-on-surface-variant">MT-KBL-042</td>
+<td class="px-md py-sm font-medium">Kabel Tembaga NYM 2x1.5mm</td>
+<td class="px-md py-sm"><span class="px-2 py-0.5 rounded bg-surface-container border border-outline-variant/20 text-xs text-on-surface-variant">Elektrikal</span></td>
+<td class="px-md py-sm">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-error w-[15%] rounded-full shadow-[0_0_8px_rgba(255,180,171,0.4)]"></div>
+</div>
+<span class="text-xs w-10 text-right text-error font-medium">15</span>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">Roll</td>
+<td class="px-md py-sm text-right">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-error-container/20 border border-error/30 text-error text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-error shadow-[0_0_4px_#ffb4ab] animate-pulse"></span>
+                                        Low Stock
+                                    </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover/row:opacity-100 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Normal Stock -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-high/50 transition-colors even:bg-surface odd:bg-surface-container-low group/row">
+<td class="px-md py-sm text-center">
+<input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary opacity-0 group-hover/row:opacity-100 transition-opacity" type="checkbox">
+</td>
+<td class="px-md py-sm font-mono text-xs text-on-surface-variant">MT-CAT-110</td>
+<td class="px-md py-sm font-medium">Cat Tembok Dulux Putih 25kg</td>
+<td class="px-md py-sm"><span class="px-2 py-0.5 rounded bg-surface-container border border-outline-variant/20 text-xs text-on-surface-variant">Finishing</span></td>
+<td class="px-md py-sm">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[45%] rounded-full"></div>
+</div>
+<span class="text-xs w-10 text-right">120</span>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">Pail</td>
+<td class="px-md py-sm text-right">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-tertiary-container/10 border border-tertiary-fixed/20 text-tertiary-fixed text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover/row:opacity-100 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Normal Stock -->
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container-high/50 transition-colors even:bg-surface odd:bg-surface-container-low group/row">
+<td class="px-md py-sm text-center">
+<input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary opacity-0 group-hover/row:opacity-100 transition-opacity" type="checkbox">
+</td>
+<td class="px-md py-sm font-mono text-xs text-on-surface-variant">MT-SMN-005</td>
+<td class="px-md py-sm font-medium">Semen Portland Tiga Roda 50kg</td>
+<td class="px-md py-sm"><span class="px-2 py-0.5 rounded bg-surface-container border border-outline-variant/20 text-xs text-on-surface-variant">Material Dasar</span></td>
+<td class="px-md py-sm">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[85%] rounded-full shadow-[0_0_8px_rgba(192,193,255,0.4)]"></div>
+</div>
+<span class="text-xs w-10 text-right">850</span>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">Sak</td>
+<td class="px-md py-sm text-right">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-tertiary-container/10 border border-tertiary-fixed/20 text-tertiary-fixed text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover/row:opacity-100 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: Inactive/Empty -->
+<tr class="hover:bg-surface-container-high/50 transition-colors even:bg-surface odd:bg-surface-container-low group/row text-on-surface-variant opacity-75">
+<td class="px-md py-sm text-center">
+<input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary opacity-0 group-hover/row:opacity-100 transition-opacity" type="checkbox">
+</td>
+<td class="px-md py-sm font-mono text-xs">MT-BSB-012</td>
+<td class="px-md py-sm font-medium">Besi Beton Ulir 12mm x 12m</td>
+<td class="px-md py-sm"><span class="px-2 py-0.5 rounded bg-surface-container border border-outline-variant/20 text-xs">Struktural</span></td>
+<td class="px-md py-sm">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-outline-variant w-[0%] rounded-full"></div>
+</div>
+<span class="text-xs w-10 text-right">0</span>
+</div>
+</td>
+<td class="px-md py-sm">Batang</td>
+<td class="px-md py-sm text-right">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-surface-container-highest border border-outline-variant/30 text-on-surface-variant text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+                                        Out of Stock
+                                    </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover/row:opacity-100 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination footer -->
+<div class="p-4 border-t border-outline-variant/10 flex items-center justify-between bg-surface-container-low/50">
+<span class="text-xs text-on-surface-variant">Showing 1 to 5 of 248 entries</span>
+<div class="flex gap-1">
+<button class="p-1 rounded hover:bg-surface-container text-on-surface-variant disabled:opacity-50"><span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span></button>
+<button class="w-7 h-7 rounded bg-primary/20 text-primary text-xs font-medium flex items-center justify-center border border-primary/30">1</button>
+<button class="w-7 h-7 rounded hover:bg-surface-container text-on-surface-variant text-xs font-medium flex items-center justify-center">2</button>
+<button class="w-7 h-7 rounded hover:bg-surface-container text-on-surface-variant text-xs font-medium flex items-center justify-center">3</button>
+<button class="p-1 rounded hover:bg-surface-container text-on-surface-variant"><span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span></button>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating AI Assistant -->
+<button aria-label="AI Assistant" class="ai-fab fixed bottom-lg right-lg w-14 h-14 rounded-full flex items-center justify-center text-white z-50 group border border-white/20 hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined group-hover:rotate-12 transition-transform duration-300" data-icon="smart_toy">smart_toy</span>
+<!-- Tooltip -->
+<div class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-surface-container-highest border border-outline-variant/30 px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap">
+<p class="font-label-md text-label-md text-on-surface m-0">Ask AI about stock levels</p>
+<!-- Arrow -->
+<div class="absolute top-1/2 -translate-y-1/2 -right-1.5 w-3 h-3 bg-surface-container-highest border-r border-b border-outline-variant/30 transform rotate-[-45deg]"></div>
+</div>
+</button>
+</div>
+
+
+</body></html>

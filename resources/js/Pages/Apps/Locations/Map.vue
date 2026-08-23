@@ -72,6 +72,9 @@
                                                     </span>
                                                 </div>
 
+                                                <p v-if="loc.warehouse_zone" class="mb-1 small" style="color: #475569;">
+                                                    <i class="fa fa-tag me-1"></i> {{ $t('locations.warehouse_zone') }}: {{ loc.warehouse_zone }}
+                                                </p>
                                                 <p v-if="loc.address" class="mb-3 small" style="color: #64748B;">
                                                     <i class="fa fa-location-dot me-1"></i> {{ loc.address }}
                                                 </p>

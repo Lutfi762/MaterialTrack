@@ -1,67 +1,106 @@
 <template>
-    <nav v-if="links.length > 3" class="pagination-modern-wrapper">
-        <ul :class="`pagination justify-content-${align} mb-0`">
-            <li
-                v-for="(link, index) in links"
-                :key="index"
-                :class="[
-                    'page-item',
-                    link.url == null ? 'disabled' : '',
-                    link.active ? 'active' : '',
-                ]"
-            >
-                <Link
-                    class="page-link"
-                    :href="link.url === null ? '#' : link.url"
-                >
-                    <span v-if="link.label === '&laquo; Previous'">&laquo; Previous</span>
-                    <span v-else-if="link.label === 'Next &raquo;'">Next &raquo;</span>
-                    <span v-else>{{ link.label }}</span>
-                </Link>
-            </li>
-        </ul>
-    </nav>
+  <nav v-if="links && links.length > 2" :aria-label="paginationAriaLabel" class="flex items-center justify-center gap-1">
+    <button
+      @click="goToPage(prevLink.url)"
+      :disabled="!prevLink.url"
+      class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+      :aria-label="prevLabel"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <template v-for="link in pageLinks" :key="link.url || link.label">
+      <span v-if="link.active" class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 cursor-default" aria-current="page">
+        {{ link.label }}
+      </span>
+      <span v-else-if="link.label === '...'" class="px-2 py-1.5 text-sm text-gray-400" aria-hidden="true">…</span>
+      <button
+        v-else
+        @click="goToPage(link.url)"
+        :disabled="!link.url"
+        class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+        :aria-label="pageLabel + ' ' + link.label"
+      >
+        {{ link.label }}
+      </button>
+    </template>
+
+    <button
+      @click="goToPage(nextLink.url)"
+      :disabled="!nextLink.url"
+      class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+      :aria-label="nextLabel"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  </nav>
 </template>
 
 <script>
-import { Link } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 
 export default {
-    components: { Link },
-    props: {
-        links: Array,
-        align: {
-            type: String,
-            default: 'end',
-        },
+  name: 'Pagination',
+  props: {
+    links: {
+      type: Array,
+      required: true,
     },
-}
+    align: {
+      type: String,
+      default: 'end',
+    },
+    prevLabel: {
+      type: String,
+      default: 'Previous',
+    },
+    nextLabel: {
+      type: String,
+      default: 'Next',
+    },
+    pageLabel: {
+      type: String,
+      default: 'Page',
+    },
+    paginationAriaLabel: {
+      type: String,
+      default: 'Pagination',
+    },
+  },
+  emits: ['page-change'],
+  computed: {
+    // Laravel paginator links(): [prev, ...pages, next] — label datang sbg
+    // HTML entity mentah ('&laquo; Previous' / 'Next &raquo;'), jadi dipakai
+    // hanya utk deteksi posisi, bukan ditampilkan (icon SVG dipakai instead).
+    prevLink() {
+      return this.links[0] ?? { url: null };
+    },
+    nextLink() {
+      return this.links[this.links.length - 1] ?? { url: null };
+    },
+    pageLinks() {
+      return this.links.slice(1, -1);
+    },
+  },
+  methods: {
+    goToPage(url) {
+      if (!url) return;
+      // Emit utk parent yang mau handle manual; jika tak ada listener,
+      // navigasi sendiri via Inertia (perbaikan: sebelumnya emit tak
+      // pernah didengarkan sehingga klik nomor halaman tidak berefek).
+      this.$emit('page-change', url);
+      if (this.$attrs.onPageChange === undefined) {
+        router.get(url, {}, { preserveState: true, preserveScroll: true, replace: true });
+      }
+    },
+  },
+};
 </script>
 
-<style scoped>
-.pagination-modern-wrapper {
-    margin-top: 20px;
-}
-.pagination-modern-wrapper :deep(.page-link) {
-    border-radius: 8px;
-    margin: 0 3px;
-    border: 1.5px solid #e5e9f0;
-    color: #495057;
-    font-weight: 500;
-    font-size: 13px;
-    padding: 8px 14px;
-}
-.pagination-modern-wrapper :deep(.page-item.active .page-link) {
-    background: #3b82f6;
-    border-color: #3b82f6;
-    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
-}
-.pagination-modern-wrapper :deep(.page-item.disabled .page-link) {
-    color: #cbd5e1;
-    border-color: #eef1f6;
-}
-.pagination-modern-wrapper :deep(.page-link:hover:not(.disabled)) {
-    background: #eef4ff;
-    border-color: #3b82f6;
-}
+<style>
+/* Empty — inline utility classes used instead of @apply */
 </style>

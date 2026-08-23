@@ -1,0 +1,52 @@
+
+<script>
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref, reactive } from "vue";
+import { useI18n } from "vue-i18n";
+
+export default {
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { adjustments: Object, items: Array, filters: Object, pendingCount: Number },
+  setup(props) {
+    const { t } = useI18n();
+    const filterForm = reactive({
+      status: props.filters?.status || '',
+      item_id: props.filters?.item_id || '',
+      date_from: props.filters?.date_from || '',
+      date_to: props.filters?.date_to || '',
+    });
+    const columns = ref([
+      { key: "reference_no", label: t("stock_adjustments.col_ref") },
+      { key: "created_at", label: t("stock_adjustments.col_date") },
+      { key: "item", label: t("stock_adjustments.col_item") },
+      { key: "qty", label: t("stock_adjustments.col_qty"), align: "center" },
+      { key: "reason", label: t("stock_adjustments.col_reason") },
+      { key: "user", label: t("stock_adjustments.col_by") },
+      { key: "status", label: t("stock_adjustments.col_status"), align: "center" },
+      { key: "actions", label: t("common.action"), align: "center", width: "180px" },
+    ]);
+    const applyFilter = () => { router.get('/apps/stock-adjustments', filterForm, { preserveState: true }); };
+    const resetFilter = () => {
+      filterForm.status = ''; filterForm.item_id = ''; filterForm.date_from = ''; filterForm.date_to = '';
+      router.get('/apps/stock-adjustments');
+    };
+    const approve = (adj) => {
+      if (confirm(t("stock_adjustments.approve_confirm", "Approve this adjustment?"))) {
+        router.patch(`/apps/stock-adjustments/${adj.id}/approve`);
+      }
+    };
+    const reject = (adj) => {
+      if (confirm(t("stock_adjustments.reject_confirm", "Reject this adjustment?"))) {
+        router.patch(`/apps/stock-adjustments/${adj.id}/reject`);
+      }
+    };
+    const formatDate = (d) => new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    const statusClass = (s) => ({ pending: 'bg-yellow-100 text-yellow-800', approved: 'bg-green-100 text-green-800', rejected: 'bg-red-100 text-red-800' }[s] || 'bg-secondary');
+    return { adjustments: props.adjustments, items: props.items, filters: filterForm, pendingCount: props.pendingCount, columns, applyFilter, resetFilter, approve, reject, formatDate, statusClass };
+  },
+};
+</script>

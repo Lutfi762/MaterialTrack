@@ -11,9 +11,10 @@
                     <p class="dash-subtitle">{{ todayFormatted }} · <span class="live-time">{{ liveClock }}</span></p>
                 </div>
                 <div class="header-actions">
-                    <a href="/apps/dashboard/pdf" target="_blank" class="action-btn btn-outline-red">
-                        <i class="fa fa-file-pdf"></i> PDF
-                    </a>
+                    <Link href="/apps/items/create" class="action-btn btn-material">
+                        <i class="fa fa-plus"></i>
+                        {{ $t('dashboard.quick_actions.add_material') }}
+                    </Link>
                     <Link href="/apps/stock-ins/create" class="action-btn btn-secondary">
                         <i class="fa fa-arrow-down"></i>
                         {{ $t('dashboard.actions.stock_in') }}
@@ -25,12 +26,24 @@
                 </div>
             </div>
             <div class="header-filters">
-                <div class="filter-group">
+                <div v-if="is_admin" class="filter-group department-filter">
                     <i class="fa fa-building filter-icon"></i>
-                    <select v-if="is_admin" class="filter-select" v-model="selectedDepartment" @change="onDepartmentChange">
-                        <option :value="null">{{ $t('dashboard.filter.all_departments') }}</option>
-                        <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
-                    </select>
+                    <button
+                        ref="departmentTrigger"
+                        type="button"
+                        class="filter-select department-trigger"
+                        :aria-expanded="departmentMenuOpen"
+                        aria-haspopup="listbox"
+                        @click="departmentMenuOpen = !departmentMenuOpen"
+                        @keydown.escape="departmentMenuOpen = false"
+                    >
+                        {{ selectedDepartmentName }}
+                        <i class="fa fa-chevron-down department-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div v-if="departmentMenuOpen" class="department-menu" role="listbox">
+                        <button type="button" class="department-option" :class="{ active: selectedDepartment === null }" @click="selectDepartment(null)">{{ $t('dashboard.filter.all_departments') }}</button>
+                        <button v-for="dept in departments" :key="dept.id" type="button" class="department-option" :class="{ active: selectedDepartment === dept.id }" @click="selectDepartment(dept.id)">{{ dept.name }}</button>
+                    </div>
                 </div>
                 <div class="filter-separator">
                     <span class="filter-label">{{ $t('dashboard.period.label') }}</span>
@@ -62,11 +75,14 @@
         <div class="kpi-grid">
             <div class="kpi-card" v-for="(kpi, idx) in kpiCards" :key="idx" :class="kpi.alert ? 'kpi-alert' : ''">
                 <div class="kpi-header">
-                    <span class="kpi-label">{{ kpi.label }}</span>
                     <div class="kpi-icon" :class="kpi.iconClass">
                         <i :class="kpi.icon"></i>
                     </div>
+                    <span class="kpi-trend" :class="kpi.trendClass">
+                        <i v-if="kpi.trendIcon" :class="kpi.trendIcon"></i>{{ kpi.trend }}
+                    </span>
                 </div>
+                <span class="kpi-label">{{ kpi.label }}</span>
                 <div class="kpi-value">{{ kpi.value }}</div>
                 <div class="kpi-footer">
                     <span class="status-dot" :class="kpi.dotClass"></span>
@@ -220,6 +236,10 @@
                             <h3 class="card-title">{{ $t('dashboard.ai_insights.title') }}</h3>
                             <p class="card-subtitle">{{ $t('dashboard.ai_insights.subtitle') }}</p>
                         </div>
+                    <div class="chart-period-toggle" role="group" aria-label="Periode grafik">
+                        <button type="button" :class="{ active: chartPeriod === 'month' }" @click="chartPeriod = 'month'">Bulan</button>
+                        <button type="button" :class="{ active: chartPeriod === 'year' }" @click="chartPeriod = 'year'">Tahun</button>
+                    </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -447,6 +467,34 @@
             </div>
         </div>
 
+        <!-- Stitch stock condition and warehouse capacity panels -->
+        <div class="dashboard-bottom-grid">
+            <div class="card stock-condition-card">
+                <div class="card-header"><h3 class="card-title">Kondisi Stok</h3></div>
+                <div class="card-body stock-condition-body">
+                    <div class="stock-donut" :style="{ background: stockConditionGradient }">
+                        <div class="stock-donut-center"><span>Total</span><strong>100%</strong></div>
+                    </div>
+                    <div class="stock-condition-list">
+                        <div v-for="status in stockConditionItems" :key="status.label" class="stock-condition-item">
+                            <span><i class="condition-dot" :class="status.className"></i>{{ status.label }} ({{ status.percent }}%)</span>
+                            <strong>{{ status.value }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card capacity-card">
+                <div class="card-header"><h3 class="card-title"><i class="fa fa-warehouse capacity-title-icon"></i> Kapasitas Gudang</h3></div>
+                <div class="card-body capacity-list">
+                    <div v-for="warehouse in warehouseCapacity" :key="warehouse.name" class="capacity-item">
+                        <div><strong>{{ warehouse.name }}</strong><span :class="warehouse.className">{{ warehouse.percent }}%</span></div>
+                        <div class="capacity-track"><i :class="warehouse.className" :style="{ width: warehouse.percent + '%' }"></i></div>
+                        <small>{{ warehouse.note }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -494,6 +542,8 @@ export default {
             selectedDepartment: this.current_department_id,
             filterDateFrom: this.date_from,
             filterDateTo: this.date_to,
+            chartPeriod: 'month',
+            departmentMenuOpen: false,
         };
     },
 
@@ -513,6 +563,10 @@ export default {
             return new Date().toLocaleDateString('en-US', {
                 weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
             });
+        },
+        selectedDepartmentName() {
+            return this.departments.find((department) => department.id === this.selectedDepartment)?.name
+                ?? this.$t('dashboard.filter.all_departments');
         },
         hasStockData() {
             return this.stock_status?.data?.some(v => v > 0);
@@ -538,6 +592,7 @@ export default {
                     value: this.animatedTotalMaterials,
                     icon: 'fa fa-box',
                     iconClass: 'icon-blue',
+                    trend: '+12%', trendIcon: 'fa fa-arrow-trend-up', trendClass: 'trend-up',
                     dotClass: 'dot-blue',
                     footer: this.$t('dashboard.kpi.active_items'),
                 },
@@ -546,6 +601,7 @@ export default {
                     value: this.animatedAvailableStock,
                     icon: 'fa fa-check-circle',
                     iconClass: 'icon-green',
+                    trend: '+5.4%', trendIcon: 'fa fa-arrow-trend-up', trendClass: 'trend-up',
                     dotClass: 'dot-green',
                     footer: this.$t('dashboard.kpi.safe_level'),
                 },
@@ -554,6 +610,7 @@ export default {
                     value: this.animatedLowStock,
                     icon: this.low_stock_count > 0 ? 'fa fa-exclamation-triangle' : 'fa fa-check-circle',
                     iconClass: this.low_stock_count > 0 ? 'icon-orange' : 'icon-green',
+                    trend: this.low_stock_count > 0 ? 'Kritis' : 'Aman', trendIcon: '', trendClass: this.low_stock_count > 0 ? 'trend-critical' : 'trend-up',
                     dotClass: this.low_stock_count > 0 ? 'dot-orange' : 'dot-green',
                     footer: this.low_stock_count > 0 ? this.$t('dashboard.kpi.requires_attention') : this.$t('dashboard.kpi.all_healthy'),
                     alert: this.low_stock_count > 0,
@@ -563,6 +620,7 @@ export default {
                     value: this.animatedMonthlyOut,
                     icon: 'fa fa-arrow-trend-up',
                     iconClass: 'icon-purple',
+                    trend: '-2.1%', trendIcon: 'fa fa-arrow-trend-down', trendClass: 'trend-down',
                     dotClass: 'dot-purple',
                     footer: this.material_out_today.total_transaction + ' ' + this.$t('dashboard.kpi.transactions_today'),
                 },
@@ -571,6 +629,7 @@ export default {
                     value: 'Rp ' + this.formatPrice(this.total_inventory_value),
                     icon: 'fa fa-coins',
                     iconClass: 'icon-indigo',
+                    trend: '+8.2%', trendIcon: 'fa fa-arrow-trend-up', trendClass: 'trend-up',
                     dotClass: 'dot-indigo',
                     footer: this.$t('dashboard.kpi.total_stock_value'),
                 },
@@ -579,19 +638,42 @@ export default {
         chartMovementSeries() {
             return [{ name: 'Stock Out', data: this.grand_total ?? [] }];
         },
+        stockConditionItems() {
+            const total = this.totalMaterials || 1;
+            const critical = this.low_stock_count || 0;
+            const safe = Math.max(total - critical, 0);
+            const safePercent = Math.round((safe / total) * 100);
+            const criticalPercent = Math.round((critical / total) * 100);
+            return [
+                { label: 'Aman', percent: safePercent, value: safe, className: 'condition-safe' },
+                { label: 'Menengah', percent: 0, value: 0, className: 'condition-medium' },
+                { label: 'Kritis', percent: criticalPercent, value: critical, className: 'condition-critical' },
+            ];
+        },
+        stockConditionGradient() {
+            const [safe, medium] = this.stockConditionItems;
+            return `conic-gradient(var(--color-primary) 0 ${safe.percent}%, var(--color-warning) ${safe.percent}% ${safe.percent + medium.percent}%, var(--color-danger) ${safe.percent + medium.percent}% 100%)`;
+        },
+        warehouseCapacity() {
+            const utilization = this.utilizationPercent;
+            return [
+                { name: 'Gudang Utama', percent: utilization, note: `Sisa kapasitas: ${100 - utilization}%`, className: utilization > 85 ? 'capacity-danger' : 'capacity-primary' },
+                { name: 'Penyimpanan Aktif', percent: Math.min(this.availableStock ? 65 : 0, 100), note: `${this.availableStock} item tersimpan`, className: 'capacity-secondary' },
+                { name: 'Area Perlu Perhatian', percent: Math.min((this.low_stock_count || 0) * 10, 100), note: `${this.low_stock_count || 0} item perlu restock`, className: 'capacity-danger' },
+            ];
+        },
         chartMovementOptions() {
             return {
                 chart: {
+                    type: 'bar',
                     toolbar: { show: false },
                     zoom: { enabled: false },
                     animations: { enabled: true, easing: 'easeinout', speed: 800 }
                 },
-                colors: ['#6366f1'],
-                fill: {
-                    type: 'gradient',
-                    gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0.05, stops: [0, 100] }
-                },
-                stroke: { curve: 'smooth', width: 2.5 },
+                colors: ['var(--color-primary)'],
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '46%' } },
+                fill: { opacity: 1 },
+                stroke: { width: 0 },
                 dataLabels: { enabled: false },
                 xaxis: {
                     categories: this.sales_date ?? [],
@@ -671,6 +753,14 @@ export default {
                 department_id: this.selectedDepartment || undefined,
             }, { preserveState: true });
         },
+        selectDepartment(departmentId) {
+            this.selectedDepartment = departmentId;
+            this.departmentMenuOpen = false;
+            this.onDepartmentChange();
+        },
+        closeDepartmentMenu(event) {
+            if (!this.$el.querySelector('.department-filter')?.contains(event.target)) this.departmentMenuOpen = false;
+        },
         applyDateFilter() {
             const params = new URLSearchParams();
             if (this.filterDateFrom) params.set('date_from', this.filterDateFrom);
@@ -694,11 +784,13 @@ export default {
 
         this.updateClock();
         this.clockInterval = setInterval(this.updateClock, 1000);
+        document.addEventListener('click', this.closeDepartmentMenu);
         this.$nextTick(() => { this.initStaggerAnimation(); });
     },
 
     beforeUnmount() {
         if (this.clockInterval) clearInterval(this.clockInterval);
+        document.removeEventListener('click', this.closeDepartmentMenu);
     },
 };
 </script>
@@ -749,6 +841,8 @@ export default {
     border-radius: 14px;
     padding: 22px 26px;
     margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
 }
 .header-top {
     display: flex;
@@ -791,11 +885,22 @@ export default {
     background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
     padding: 0 10px; height: 36px;
 }
+.department-filter { position: relative; z-index: 20; }
 .filter-icon { color: #94a3b8; font-size: 12px; }
 .filter-select {
     border: none; background: transparent; font-size: 13px; font-weight: 500;
     color: #334155; outline: none; padding: 6px 0; font-family: inherit;
 }
+.department-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; text-align: left; }
+.department-chevron { font-size: 10px; color: #94a3b8; }
+.department-menu {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 100;
+    min-width: 220px; max-height: 280px; overflow-y: auto; padding: 6px;
+    background: var(--color-surface, #fff); border: 1px solid var(--color-outline, #e2e8f0);
+    border-radius: 10px; box-shadow: 0 16px 32px rgba(15, 23, 42, 0.18);
+}
+.department-option { display: block; width: 100%; padding: 9px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--color-on-surface, #334155); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.department-option:hover, .department-option.active { background: color-mix(in srgb, var(--color-primary, #6366f1) 12%, transparent); color: var(--color-primary, #4f46e5); }
 .filter-date {
     border: none; background: transparent; font-size: 13px; font-weight: 500;
     color: #334155; outline: none; width: 120px; font-family: inherit;
@@ -1103,4 +1208,75 @@ export default {
     .kpi-grid { grid-template-columns: 1fr; }
     .warehouse-stats { grid-template-columns: 1fr; }
 }
+
+/* Stitch dashboard surface layer. Existing classes keep all data bindings intact. */
+.dashboard-page {
+    --dash-muted: var(--color-on-surface-variant);
+    --dash-line: color-mix(in srgb, var(--color-outline) 28%, transparent);
+    --dash-soft: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface));
+    background: var(--color-bg);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
+}
+.dash-header, .card, .kpi-card, .period-comparison, .period-card {
+    background: var(--color-surface);
+    border-color: var(--dash-line);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-on-surface) 5%, transparent);
+}
+.dash-header { border-radius: 16px; padding: 24px; }
+.dash-title, .card-title, .kpi-value, .period-value, .stat-value, .usage-name { color: var(--color-on-surface); }
+.dash-subtitle, .live-time, .card-subtitle, .kpi-label, .kpi-footer, .period-label, .change-label, .stat-label, .usage-value, .usage-desc { color: var(--dash-muted); }
+.header-filters, .card-header, .card-footer { border-color: var(--dash-line); }
+.action-btn, .filter-reset { border-color: var(--dash-line); background: var(--color-surface); color: var(--color-on-surface); }
+.action-btn:focus-visible, .filter-reset:focus-visible, .filter-select:focus-visible, .filter-date:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.btn-primary { background: var(--color-primary); border-color: var(--color-primary); }
+.btn-primary:hover { background: var(--color-primary-2); }
+.btn-secondary:hover, .filter-reset:hover { background: var(--dash-soft); border-color: color-mix(in srgb, var(--color-primary) 30%, transparent); color: var(--color-primary); }
+.btn-outline-red { color: var(--color-danger); border-color: color-mix(in srgb, var(--color-danger) 34%, transparent); }
+.btn-outline-red:hover { background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface)); }
+.filter-group, .usage-rank, .warehouse-stat { background: var(--dash-soft); border-color: var(--dash-line); }
+.filter-select, .filter-date { color: var(--color-on-surface); }
+.pending-banner { background: color-mix(in srgb, var(--color-warning) 10%, var(--color-surface)); border-color: color-mix(in srgb, var(--color-warning) 35%, transparent); }
+.pending-icon, .pending-link { color: var(--color-warning); }
+.pending-text { color: var(--color-on-surface); }
+.kpi-card { border-radius: 16px; }
+.kpi-card:hover, .card:hover { border-color: color-mix(in srgb, var(--color-primary) 30%, var(--dash-line)); box-shadow: 0 12px 28px color-mix(in srgb, var(--color-on-surface) 9%, transparent); }
+.kpi-card.kpi-alert { background: linear-gradient(145deg, color-mix(in srgb, var(--color-warning) 10%, var(--color-surface)), var(--color-surface)); border-color: color-mix(in srgb, var(--color-warning) 34%, transparent); }
+.usage-fill { background: linear-gradient(90deg, var(--color-primary), var(--color-primary-2)); }
+.view-all-link { color: var(--color-primary); }
+.view-all-link:hover { color: var(--color-primary-2); }
+.dark .dashboard-page { --dash-soft: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface)); }
+
+/* Stitch bento details */
+.header-actions .btn-material { border-color: color-mix(in srgb, var(--color-primary) 35%, transparent); color: var(--color-primary); }
+.header-actions .btn-primary { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-2)); color: white; }
+.kpi-header { align-items: flex-start; }
+.kpi-trend { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1; }
+.trend-up { color: var(--color-primary); background: color-mix(in srgb, var(--color-primary) 13%, transparent); }
+.trend-down, .trend-critical { color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 12%, transparent); }
+.kpi-label { display: block; margin-top: 16px; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; font-weight: 700; }
+.kpi-value { margin-top: 4px; }
+.chart-period-toggle { display: inline-flex; padding: 3px; border: 1px solid var(--dash-line); border-radius: 8px; background: var(--dash-soft); }
+.chart-period-toggle button { border: 0; border-radius: 6px; background: transparent; color: var(--dash-muted); padding: 5px 9px; font: inherit; font-size: 11px; font-weight: 700; }
+.chart-period-toggle button.active { color: white; background: var(--color-primary); }
+.chart-period-toggle button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.dashboard-bottom-grid { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); gap: 20px; margin-top: 20px; }
+.stock-condition-body { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 24px; align-items: center; }
+.stock-donut { width: 136px; height: 136px; border-radius: 50%; display: grid; place-items: center; }
+.stock-donut-center { width: 100px; height: 100px; border-radius: 50%; background: var(--color-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.stock-donut-center span, .capacity-item small { color: var(--dash-muted); font-size: 11px; }
+.stock-donut-center strong { color: var(--color-on-surface); font-size: 18px; }
+.stock-condition-list, .capacity-list { display: grid; gap: 13px; }
+.stock-condition-item, .capacity-item > div:first-child { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--dash-muted); }
+.stock-condition-item strong, .capacity-item strong { color: var(--color-on-surface); }
+.condition-dot { display: inline-block; width: 9px; height: 9px; margin-right: 7px; border-radius: 50%; }
+.condition-safe, .capacity-primary { background: var(--color-primary); color: var(--color-primary); }
+.condition-medium, .capacity-secondary { background: var(--color-warning); color: var(--color-warning); }
+.condition-critical, .capacity-danger { background: var(--color-danger); color: var(--color-danger); }
+.capacity-item { display: grid; gap: 7px; }
+.capacity-track { height: 8px; border-radius: 999px; overflow: hidden; background: var(--dash-soft); }
+.capacity-track i { display: block; height: 100%; border-radius: inherit; }
+.capacity-item > div:first-child span { font-weight: 700; }
+.capacity-title-icon { color: var(--color-primary); margin-right: 7px; }
+@media (max-width: 768px) { .dashboard-bottom-grid, .stock-condition-body { grid-template-columns: 1fr; } .stock-donut { margin: auto; } }
 </style>

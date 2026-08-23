@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Head title="Stock Reservations" />
+        <Head :title="$t('stock_reservation.heading')" />
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="page-title mb-1">{{ $t('stock_reservation.heading') }}</h1>

@@ -30,8 +30,14 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ gr.purchase_order?.supplier?.name }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">{{ gr.receipt_date }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm capitalize">{{ gr.status }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link :href="route('apps.goods-receipts.show', gr.id)" class="text-indigo-600 hover:text-indigo-900">Detail</Link>
+                  <template v-if="hasAnyPermission(['goods_receipts.edit'])">
+                    <Link :href="route('apps.goods-receipts.edit', gr.id)" class="text-amber-600 hover:text-amber-900 ml-2">Edit</Link>
+                  </template>
+                  <template v-if="hasAnyPermission(['goods_receipts.delete'])">
+                    <button @click="remove(gr)" type="button" class="text-red-600 hover:text-red-900 ml-2 font-medium">Hapus</button>
+                  </template>
                 </td>
               </tr>
               <tr v-if="goodsReceipts.data.length === 0">
@@ -48,9 +54,17 @@
 <script>
 import AppLayout from '@/Layouts/App.vue';
 import { Link } from '@inertiajs/vue3';
+import { confirmDelete } from '@/Utils/confirmDialog';
 
 export default {
   components: { AppLayout, Link },
   props: { goodsReceipts: Object },
+  methods: {
+    async remove(row) {
+      if (await confirmDelete()) {
+        this.$inertia.delete(route('apps.goods-receipts.destroy', row.id));
+      }
+    },
+  },
 };
 </script>

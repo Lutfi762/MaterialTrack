@@ -16,4 +16,19 @@ class Supplier extends Model
         'rating' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    public function stockIns()
+    {
+        return $this->hasMany(StockIn::class);
+    }
+
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
+    public function purchaseInvoices()
+    {
+        return $this->hasMany(PurchaseInvoice::class);
+    }
 }

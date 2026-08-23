@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MaterialTrack - Sales Orders</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#400071",
+                        "on-tertiary-fixed-variant": "#6900b3",
+                        "error-container": "#93000a",
+                        "primary": "#c0c1ff",
+                        "tertiary-fixed": "#f0dbff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "surface-container-highest": "#33343b",
+                        "primary-fixed": "#e1e0ff",
+                        "on-secondary": "#3f008e",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "on-primary-container": "#0d0096",
+                        "tertiary-fixed-dim": "#ddb7ff",
+                        "on-primary-fixed": "#07006c",
+                        "surface": "#111319",
+                        "on-tertiary": "#490080",
+                        "secondary-fixed": "#eaddff",
+                        "surface-container-high": "#282a30",
+                        "outline": "#908fa0",
+                        "on-error": "#690005",
+                        "outline-variant": "#464554",
+                        "surface-bright": "#373940",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "surface-dim": "#111319",
+                        "inverse-primary": "#494bd6",
+                        "on-surface-variant": "#c7c4d7",
+                        "on-tertiary-fixed": "#2c0051",
+                        "background": "#111319",
+                        "secondary": "#d2bbff",
+                        "surface-container-low": "#191b22",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#1e1f26",
+                        "on-secondary-fixed": "#25005a",
+                        "on-secondary-container": "#c9aeff",
+                        "primary-container": "#8083ff",
+                        "tertiary-container": "#b76dff",
+                        "secondary-container": "#6001d1",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "tertiary": "#ddb7ff",
+                        "inverse-surface": "#e2e2eb",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-background": "#e2e2eb",
+                        "surface-variant": "#33343b",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-on-surface": "#2e3037",
+                        "on-surface": "#e2e2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "24px",
+                        "header-height": "64px",
+                        "xl": "32px",
+                        "sidebar-width": "260px",
+                        "sm": "8px",
+                        "sidebar-collapsed": "72px",
+                        "md": "16px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "wordmark-track": ["Geist"],
+                        "wordmark-material": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "title-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "wordmark-track": ["20px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "wordmark-material": ["20px", { "lineHeight": "24px", "fontWeight": "800" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0F1117;
+            color: #e2e2eb;
+            font-family: 'Geist', sans-serif;
+        }
+        
+        .glass-panel {
+            background: rgba(26, 29, 39, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hover-lift {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.15);
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #494bd6 0%, #6001d1 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-gradient:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
+        .ai-fab-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(192, 193, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(192, 193, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(192, 193, 255, 0); }
+        }
+        
+        /* Inner glow border for active state */
+        .active-nav-item {
+            position: relative;
+        }
+        .active-nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #c0c1ff;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111319; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #33343b; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #464554; 
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col h-screen sticky top-0 left-0 w-sidebar-width bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant/10 py-lg z-20 flex-shrink-0">
+<!-- Brand Header -->
+<div class="px-lg mb-xl flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.3)] border border-white/20">
+<span class="material-symbols-outlined text-surface-container-lowest" style="font-variation-settings: 'FILL' 1;">warehouse</span>
+</div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed tracking-tight">MaterialTrack</h1>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">ERP Unified</p>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 overflow-y-auto px-md space-y-1">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+<span class="font-body-md text-body-md">Main</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">database</span>
+<span class="font-body-md text-body-md">Master Data</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">inventory_2</span>
+<span class="font-body-md text-body-md">Transaksi Stok</span>
+</a>
+<a class="flex items-center gap-md bg-secondary-container/10 text-secondary border-l-4 border-secondary px-md py-sm transition-all duration-200 rounded-r-lg active-nav-item hover:scale-[1.02]" href="#">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<span class="font-body-md text-body-md font-medium">Pengadaan &amp; Penjualan</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Keuangan &amp; HRM</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">smart_toy</span>
+<span class="font-body-md text-body-md flex-1">AI Assistant</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Beta</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+<span class="font-body-md text-body-md">Laporan &amp; Analisis</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">account_tree</span>
+<span class="font-body-md text-body-md">Sistem &amp; Alur</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">business</span>
+<span class="font-body-md text-body-md">Departemen</span>
+</a>
+</nav>
+<!-- Footer Actions -->
+<div class="mt-auto px-md space-y-1 pt-md border-t border-outline-variant/10">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-error px-md py-sm hover:bg-error-container/20 hover:scale-[1.02] transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-error transition-colors">logout</span>
+<span class="font-body-md text-body-md group-hover:text-error transition-colors">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+<!-- TopAppBar -->
+<header class="h-header-height sticky top-0 z-40 w-full bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-lg flex-shrink-0">
+<!-- Mobile Menu & Brand (visible only on mobile) -->
+<div class="flex items-center gap-sm md:hidden">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-wordmark-material text-wordmark-material text-primary tracking-tight">MaterialTrack</span>
+</div>
+<!-- Search (Left Aligned on Desktop) -->
+<div class="hidden md:flex items-center flex-1 max-w-md relative group">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg py-2 pl-10 pr-4 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all duration-200 shadow-inner" placeholder="Search orders, customers, or items (Cmd+K)" type="text"/>
+<div class="absolute right-3 flex gap-1">
+<kbd class="px-1.5 py-0.5 bg-surface-container rounded text-[10px] text-on-surface-variant font-mono border border-outline-variant/20">⌘</kbd>
+<kbd class="px-1.5 py-0.5 bg-surface-container rounded text-[10px] text-on-surface-variant font-mono border border-outline-variant/20">K</kbd>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90 relative">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full shadow-[0_0_8px_rgba(255,180,171,0.8)]"></span>
+</button>
+<div class="h-6 w-px bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-2 hover:bg-surface-container-highest/20 p-1.5 rounded-lg transition-all scale-95 active:scale-90">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/30 overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</div>
+<div class="hidden lg:block text-left">
+<p class="font-label-md text-label-md text-on-surface leading-tight">Admin Gudang</p>
+<p class="text-[10px] text-on-surface-variant">Operations</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm hidden lg:block">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 overflow-y-auto p-4 md:p-lg">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-xl">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-md bg-secondary-container/20 text-secondary text-[10px] font-bold uppercase tracking-wider border border-secondary/20">Module</span>
+<span class="text-on-surface-variant material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Pengadaan &amp; Penjualan</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">Sales Orders (SO)</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manajemen pesanan penjualan pelanggan</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-high border border-outline-variant/30 text-on-surface font-label-md text-label-md hover:bg-surface-container-highest transition-colors hover-lift">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg btn-gradient text-white font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">add</span>
+                        Baru
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Stats (Optional Context) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-xl">
+<div class="glass-panel rounded-xl p-4 hover-lift">
+<div class="flex items-start justify-between">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Orders (Bulan Ini)</p>
+<h3 class="font-headline-md text-headline-md text-on-surface">1,248</h3>
+</div>
+<div class="p-2 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-1 text-xs text-primary">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+12.5% vs last month</span>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-4 hover-lift">
+<div class="flex items-start justify-between">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Pending Processing</p>
+<h3 class="font-headline-md text-headline-md text-secondary">42</h3>
+</div>
+<div class="p-2 rounded-lg bg-secondary/10 text-secondary">
+<span class="material-symbols-outlined">hourglass_empty</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-1 text-xs text-on-surface-variant">
+<span>Requires immediate action</span>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-4 md:col-span-2 relative overflow-hidden group">
+<div class="absolute inset-0 opacity-20 pointer-events-none bg-gradient-to-r from-transparent via-primary/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+<div class="flex items-center h-full justify-between z-10 relative">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Revenue MTD</p>
+<h3 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Rp 4.25B</h3>
+<div class="mt-2 flex items-center gap-2">
+<div class="w-full bg-surface-container-high rounded-full h-1.5 w-32">
+<div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+<span class="text-xs text-on-surface-variant">75% to target</span>
+</div>
+</div>
+<div class="w-24 h-16 opacity-50">
+<!-- Simulated mini chart -->
+<svg class="w-full h-full stroke-primary fill-none stroke-2" viewbox="0 0 100 40">
+<path d="M0 30 Q 15 25, 25 35 T 50 15 T 75 20 T 100 5" stroke-linecap="round" stroke-linejoin="round"></path>
+<path class="fill-primary/10 stroke-none" d="M0 30 Q 15 25, 25 35 T 50 15 T 75 20 T 100 5 L 100 40 L 0 40 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+</div>
+<!-- Table Section -->
+<div class="glass-panel rounded-xl overflow-hidden flex flex-col h-[500px]">
+<!-- Table Toolbar -->
+<div class="p-4 border-b border-outline-variant/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface/50">
+<div class="flex items-center gap-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">filter_list</span>
+<select class="pl-9 pr-8 py-1.5 bg-surface-container rounded-lg border border-outline-variant/30 text-body-md text-on-surface appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 text-sm">
+<option>Semua Status</option>
+<option>Pending</option>
+<option>Processed</option>
+<option>Shipped</option>
+</select>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">calendar_today</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container rounded-lg border border-outline-variant/30 text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 text-sm [color-scheme:dark]" type="date"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-on-surface-variant">Menampilkan 1-10 dari 124</span>
+<div class="flex gap-1">
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Table Content -->
+<div class="overflow-auto flex-1 relative">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead class="sticky top-0 bg-[#151720] z-10 border-b border-outline-variant/10 shadow-sm">
+<tr>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider w-12">
+<input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary" type="checkbox"/>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors group">
+<div class="flex items-center gap-1">No. SO <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">arrow_downward</span></div>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors">
+                                    Tanggal
+                                </th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors">
+                                    Pelanggan
+                                </th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right cursor-pointer hover:text-on-surface transition-colors">
+                                    Total Amount
+                                </th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">
+                                    Status
+                                </th>
+<th class="py-3 px-4 w-12"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10 font-body-md text-body-md text-on-surface">
+<!-- Row 1: Pending -->
+<tr class="table-row-hover transition-colors group cursor-pointer">
+<td class="py-2.5 px-4"><input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary" type="checkbox"/></td>
+<td class="py-2.5 px-4 font-medium text-primary-fixed">SO-202310-001</td>
+<td class="py-2.5 px-4 text-on-surface-variant">12 Okt 2023</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-on-surface">PT</div>
+<span>PT Maju Jaya Bersama</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right font-mono">Rp 45.500.000</td>
+<td class="py-2.5 px-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant text-xs font-medium">
+<div class="w-1.5 h-1.5 rounded-full bg-on-surface-variant animate-pulse"></div>
+                                        Pending
+                                    </div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Processed -->
+<tr class="table-row-hover transition-colors group cursor-pointer bg-surface-container-lowest/30">
+<td class="py-2.5 px-4"><input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary" type="checkbox"/></td>
+<td class="py-2.5 px-4 font-medium text-primary-fixed">SO-202310-002</td>
+<td class="py-2.5 px-4 text-on-surface-variant">11 Okt 2023</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-on-surface">CV</div>
+<span>CV Makmur Sentosa</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right font-mono">Rp 12.250.000</td>
+<td class="py-2.5 px-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-medium">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                                        Processed
+                                    </div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Shipped -->
+<tr class="table-row-hover transition-colors group cursor-pointer">
+<td class="py-2.5 px-4"><input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary" type="checkbox"/></td>
+<td class="py-2.5 px-4 font-medium text-primary-fixed">SO-202310-003</td>
+<td class="py-2.5 px-4 text-on-surface-variant">10 Okt 2023</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-on-surface">TS</div>
+<span>Toko Sinar Mas</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right font-mono">Rp 8.750.000</td>
+<td class="py-2.5 px-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                        Shipped
+                                    </div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Shipped -->
+<tr class="table-row-hover transition-colors group cursor-pointer bg-surface-container-lowest/30">
+<td class="py-2.5 px-4"><input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary" type="checkbox"/></td>
+<td class="py-2.5 px-4 font-medium text-primary-fixed">SO-202310-004</td>
+<td class="py-2.5 px-4 text-on-surface-variant">09 Okt 2023</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-on-surface">GI</div>
+<span>Global Industri Cemerlang</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right font-mono">Rp 156.000.000</td>
+<td class="py-2.5 px-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                        Shipped
+                                    </div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: Pending -->
+<tr class="table-row-hover transition-colors group cursor-pointer">
+<td class="py-2.5 px-4"><input class="rounded border-outline-variant/50 bg-surface focus:ring-primary text-primary" type="checkbox"/></td>
+<td class="py-2.5 px-4 font-medium text-primary-fixed">SO-202310-005</td>
+<td class="py-2.5 px-4 text-on-surface-variant">09 Okt 2023</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-on-surface">BB</div>
+<span>Bintang Bangunan</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right font-mono">Rp 24.100.000</td>
+<td class="py-2.5 px-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant text-xs font-medium">
+<div class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></div>
+                                        Pending
+                                    </div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Bottom Spacer -->
+<div class="h-24"></div>
+</main>
+<!-- Floating AI Assistant Button -->
+<button class="absolute bottom-6 right-6 w-14 h-14 rounded-full btn-gradient flex items-center justify-center shadow-lg ai-fab-pulse z-50 group">
+<span class="material-symbols-outlined text-white text-2xl group-hover:scale-110 transition-transform">smart_toy</span>
+<span class="absolute -top-1 -right-1 flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-tertiary-fixed-dim border-2 border-surface"></span>
+</span>
+</button>
+</div>
+</body></html>

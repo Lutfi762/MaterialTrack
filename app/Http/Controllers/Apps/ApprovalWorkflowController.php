@@ -8,6 +8,7 @@ use App\Models\ApprovalWorkflow;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class ApprovalWorkflowController extends Controller
@@ -37,14 +38,26 @@ class ApprovalWorkflowController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'module' => 'required|string',
+            'module' => 'required|string|in:purchase_request,purchase_order,sales_order,leave,stock_out,other',
             'min_amount' => 'nullable|numeric|min:0',
             'max_amount' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'steps' => 'required|array|min:1',
             'steps.*.approver_type' => 'required|in:user,role,manager',
-            'steps.*.approver_value' => 'nullable|string',
+            'steps.*.approver_value' => 'required_if:steps.*.approver_type,user|required_if:steps.*.approver_type,role|nullable|string',
         ]);
+
+        if ($validated['max_amount'] !== null && $validated['max_amount'] < ($validated['min_amount'] ?? 0)) {
+            throw ValidationException::withMessages(['max_amount' => 'Nominal maksimal tidak boleh lebih kecil dari minimal.']);
+        }
+
+        $exists = ApprovalWorkflow::where('module', $validated['module'])
+            ->where('name', $validated['name'])
+            ->exists();
+
+        if ($exists) {
+            throw ValidationException::withMessages(['name' => 'Workflow dengan nama tersebut sudah terdaftar untuk modul ini.']);
+        }
 
         DB::transaction(function () use ($validated) {
             $workflow = ApprovalWorkflow::create([

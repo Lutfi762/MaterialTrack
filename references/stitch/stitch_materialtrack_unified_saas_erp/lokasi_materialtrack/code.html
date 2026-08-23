@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lokasi / Rak - MaterialTrack</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#400071",
+                        "on-tertiary-fixed-variant": "#6900b3",
+                        "error-container": "#93000a",
+                        "primary": "#c0c1ff",
+                        "tertiary-fixed": "#f0dbff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "surface-container-highest": "#33343b",
+                        "primary-fixed": "#e1e0ff",
+                        "on-secondary": "#3f008e",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "on-primary-container": "#0d0096",
+                        "tertiary-fixed-dim": "#ddb7ff",
+                        "on-primary-fixed": "#07006c",
+                        "surface": "#111319",
+                        "on-tertiary": "#490080",
+                        "secondary-fixed": "#eaddff",
+                        "surface-container-high": "#282a30",
+                        "outline": "#908fa0",
+                        "on-error": "#690005",
+                        "outline-variant": "#464554",
+                        "surface-bright": "#373940",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "surface-dim": "#111319",
+                        "inverse-primary": "#494bd6",
+                        "on-surface-variant": "#c7c4d7",
+                        "on-tertiary-fixed": "#2c0051",
+                        "background": "#111319",
+                        "secondary": "#d2bbff",
+                        "surface-container-low": "#191b22",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#1e1f26",
+                        "on-secondary-fixed": "#25005a",
+                        "on-secondary-container": "#c9aeff",
+                        "primary-container": "#8083ff",
+                        "tertiary-container": "#b76dff",
+                        "secondary-container": "#6001d1",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "tertiary": "#ddb7ff",
+                        "inverse-surface": "#e2e2eb",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-background": "#e2e2eb",
+                        "surface-variant": "#33343b",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-on-surface": "#2e3037",
+                        "on-surface": "#e2e2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "24px",
+                        "header-height": "64px",
+                        "xl": "32px",
+                        "sidebar-width": "260px",
+                        "sm": "8px",
+                        "sidebar-collapsed": "72px",
+                        "md": "16px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "wordmark-track": ["Geist"],
+                        "wordmark-material": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "title-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "wordmark-track": ["20px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "wordmark-material": ["20px", { "lineHeight": "24px", "fontWeight": "800" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glass-panel {
+            background: rgba(26, 29, 39, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel-hover:hover {
+            background: rgba(26, 29, 39, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(255,255,255,0.03);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #6001d1, #494bd6);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-gradient:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111319;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #33343b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #464554;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden flex h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant/10 w-sidebar-width h-screen sticky top-0 left-0 flex flex-col h-full py-lg hidden md:flex shrink-0 z-50">
+<!-- Logo Area -->
+<div class="px-lg pb-xl flex items-center gap-md border-b border-outline-variant/10 mb-md">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-container to-secondary-container flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+</div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed tracking-tight">MaterialTrack</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">ERP Unified</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto px-sm space-y-xs">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+                Main
+            </a>
+<!-- Active Tab: Master Data -->
+<a class="flex items-center gap-md bg-secondary-container/10 text-secondary border-l-4 border-secondary px-md py-sm transition-all duration-200 font-body-md text-body-md rounded-r-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">database</span>
+                Master Data
+            </a>
+<!-- Sub-items for Master Data (Implied by context) -->
+<div class="pl-xl pr-md py-xs flex flex-col gap-xs border-l border-outline-variant/20 ml-lg mb-sm">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary py-xs transition-colors" href="#">Barang / Item</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary py-xs transition-colors" href="#">Kategori</a>
+<a class="font-body-md text-body-md text-primary font-medium py-xs flex items-center gap-xs" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Lokasi / Rak
+                </a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary py-xs transition-colors" href="#">Supplier</a>
+</div>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">inventory_2</span>
+                Transaksi Stok
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">shopping_cart</span>
+                Pengadaan &amp; Penjualan
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">account_balance_wallet</span>
+                Keuangan &amp; HRM
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined text-tertiary group-hover:text-tertiary-fixed transition-colors">smart_toy</span>
+                AI Assistant
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+                Laporan &amp; Analisis
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">account_tree</span>
+                Sistem &amp; Alur
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">business</span>
+                Departemen
+            </a>
+</nav>
+<!-- Footer Tabs -->
+<div class="mt-auto px-sm pt-md border-t border-outline-variant/10">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors font-body-md text-body-md rounded-lg mx-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-md text-error px-md py-sm hover:bg-error-container/20 transition-colors font-body-md text-body-md rounded-lg mx-xs group mt-xs" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+<!-- Subtle background glow -->
+<div class="absolute top-0 left-1/4 w-[800px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md h-header-height sticky top-0 z-40 w-full border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-lg shrink-0">
+<!-- Mobile Menu Trigger -->
+<button class="md:hidden text-on-surface-variant p-2 hover:bg-surface-container-highest/20 rounded-full transition-all">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Search Bar (Left) -->
+<div class="hidden md:flex relative w-96 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 text-on-surface font-body-md text-body-md rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-outline-variant" placeholder="Search data, locations, or items..." type="text"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+<kbd class="hidden xl:inline-block bg-surface-container px-2 py-0.5 rounded text-[10px] text-outline border border-outline-variant/30 font-mono">⌘K</kbd>
+</div>
+</div>
+<!-- Actions & Profile -->
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full p-2 transition-all">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full p-2 transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full p-1 pr-3 transition-all">
+<img alt="Administrator Gudang" class="w-8 h-8 rounded-full object-cover border border-outline-variant/30" data-alt="A small circular avatar of an Asian male warehouse administrator with short dark hair, wearing a high-vis vest in a modern dark-mode industrial setting. Professional lighting, 32x32 resolution scale." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdjrZ_A4kU1fCF-woNcfLrrWhGniGbFzj65qWJbSY5TEQ5NF6O1zzHF6HmaYnYerekTUHtvZR6Jp36FPANM_HvGOT3K574tOroYV0IU4gmDBxa7_P1fGbTLjcielZuZvZY8PlnU5YyZlhX-4ADL69claXvIfXxwkZPBpj6V7F862_yFtzV_m6FZsB_aHJE3GflKhBnfU3Pu9KyaPN0BgPkLfK1DXHY0Sy68louyTcMXdJNj4R8OxWv"/>
+<span class="font-label-md text-label-md hidden md:block">Admin Gudang</span>
+<span class="material-symbols-outlined text-[18px] hidden md:block">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto p-4 md:p-lg z-10 relative">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs flex items-center gap-sm">
+                        Lokasi / Rak
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-primary-container/10 text-primary border border-primary/20 font-label-md text-[10px] ml-2">Master Data</span>
+</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Mapping rak dan area penyimpanan di dalam gudang</p>
+</div>
+<div class="flex items-center gap-sm">
+<button class="glass-panel text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+<button class="glass-panel text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Export
+                    </button>
+<button class="btn-gradient text-white px-5 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2 shadow-lg ml-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Baru
+                    </button>
+</div>
+</div>
+<!-- Stats/Summary Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md mb-lg">
+<div class="glass-panel p-md rounded-xl relative overflow-hidden group hover:border-primary/30 transition-colors">
+<div class="absolute top-0 right-0 w-16 h-16 bg-primary/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Rak</p>
+<h3 class="font-headline-md text-headline-md text-primary-fixed">142</h3>
+<div class="mt-2 flex items-center gap-1 text-[12px] text-emerald-400">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+<span>+12 mgg ini</span>
+</div>
+</div>
+<div class="glass-panel p-md rounded-xl relative overflow-hidden group hover:border-secondary/30 transition-colors">
+<div class="absolute top-0 right-0 w-16 h-16 bg-secondary/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Kapasitas Terpakai</p>
+<h3 class="font-headline-md text-headline-md text-secondary-fixed">78%</h3>
+<div class="mt-2 w-full bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<div class="glass-panel p-md rounded-xl relative overflow-hidden group hover:border-tertiary/30 transition-colors">
+<div class="absolute top-0 right-0 w-16 h-16 bg-tertiary/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Area Aktif</p>
+<h3 class="font-headline-md text-headline-md text-tertiary-fixed">5</h3>
+<div class="mt-2 text-[12px] text-on-surface-variant">Dari 6 Area Total</div>
+</div>
+<div class="glass-panel p-md rounded-xl relative overflow-hidden group border-error/20 hover:border-error/50 transition-colors">
+<div class="absolute top-0 right-0 w-16 h-16 bg-error/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Rak Penuh</p>
+<h3 class="font-headline-md text-headline-md text-error">24</h3>
+<div class="mt-2 flex items-center gap-1 text-[12px] text-error">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+<span>Perlu reorganisasi</span>
+</div>
+</div>
+</div>
+<!-- Data Table Container (Glassmorphism) -->
+<div class="glass-panel rounded-xl flex flex-col overflow-hidden mb-xl">
+<!-- Table Toolbar -->
+<div class="p-md border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/50">
+<div class="flex items-center gap-sm text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">view_list</span>
+                        Menampilkan 1-10 dari 142 Lokasi
+                    </div>
+<div class="flex items-center gap-xs">
+<div class="relative">
+<select class="bg-surface border border-outline-variant/30 text-on-surface text-[13px] rounded-lg pl-3 pr-8 py-1.5 appearance-none focus:outline-none focus:border-primary">
+<option>Semua Gudang</option>
+<option>Gudang Utama (A)</option>
+<option>Gudang Transit (B)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- High-Density Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/10 bg-surface-container-low/80">
+<th class="py-3 px-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold w-12 text-center">
+<input class="rounded border-outline-variant/50 bg-surface text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold group cursor-pointer hover:text-primary transition-colors">
+                                    Kode Lokasi
+                                    <span class="material-symbols-outlined text-[14px] align-middle ml-1 opacity-0 group-hover:opacity-100">arrow_downward</span>
+</th>
+<th class="py-3 px-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">Gudang</th>
+<th class="py-3 px-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">Area</th>
+<th class="py-3 px-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">No. Rak</th>
+<th class="py-3 px-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">Kapasitas</th>
+<th class="py-3 px-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="table-row-hover group transition-colors bg-surface/20">
+<td class="py-2.5 px-4 text-center">
+<input class="rounded border-outline-variant/50 bg-surface text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-[16px] text-primary">shelves</span>
+</div>
+<span class="font-medium text-on-surface group-hover:text-primary transition-colors cursor-pointer">LOK-A-01-001</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-on-surface-variant">Gudang Utama (A)</td>
+<td class="py-2.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-surface-container-highest text-[12px] text-on-surface-variant border border-outline-variant/20">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                        Bahan Baku
+                                    </span>
+</td>
+<td class="py-2.5 px-4 text-on-surface-variant">R-01</td>
+<td class="py-2.5 px-4">
+<div class="flex flex-col gap-1 w-32">
+<div class="flex justify-between text-[11px]">
+<span class="text-error font-medium">95%</span>
+<span class="text-outline">190/200 kg</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-error h-1.5 rounded-full" style="width: 95%"></div>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="table-row-hover group transition-colors">
+<td class="py-2.5 px-4 text-center">
+<input class="rounded border-outline-variant/50 bg-surface text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">shelves</span>
+</div>
+<span class="font-medium text-on-surface group-hover:text-primary transition-colors cursor-pointer">LOK-A-01-002</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-on-surface-variant">Gudang Utama (A)</td>
+<td class="py-2.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-surface-container-highest text-[12px] text-on-surface-variant border border-outline-variant/20">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                        Bahan Baku
+                                    </span>
+</td>
+<td class="py-2.5 px-4 text-on-surface-variant">R-01</td>
+<td class="py-2.5 px-4">
+<div class="flex flex-col gap-1 w-32">
+<div class="flex justify-between text-[11px]">
+<span class="text-secondary-fixed-dim font-medium">45%</span>
+<span class="text-outline">90/200 kg</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-secondary-fixed-dim h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="table-row-hover group transition-colors bg-surface/20">
+<td class="py-2.5 px-4 text-center">
+<input class="rounded border-outline-variant/50 bg-surface text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</td>
+<td class="py-2.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">shelves</span>
+</div>
+<span class="font-medium text-on-surface group-hover:text-primary transition-colors cursor-pointer">LOK-A-02-001</span>
+</div>
+</td>
+<td class="py-2.5 px-4 text-on-surface-variant">Gudang Utama (A)</td>
+<td class="py-2.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-surface-container-highest text-[12px] text-on-surface-variant border border-outline-variant/20">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+                                        Barang Jadi
+                                    </span>
+</td>
+<td class="py-2.5 px-4 text-on-surface-variant">R-02</td>
+<td class="py-2.5 px-4">
+<div class="flex flex-col gap-1 w-32">
+<div class="flex justify-between text-[11px]">
+<span class="text-emerald-400 font-medium">15%</span>
+<span class="text-outline">45/300 kg</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-emerald-400 h-1.5 rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-md border-t border-outline-variant/10 flex justify-center items-center gap-2 bg-surface-container-low/50">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/20 text-outline hover:text-on-surface hover:bg-surface-container-highest disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary/10 border border-primary/30 text-primary font-medium text-[13px]">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/20 text-on-surface hover:bg-surface-container-highest transition-colors text-[13px]">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/20 text-on-surface hover:bg-surface-container-highest transition-colors text-[13px]">3</button>
+<span class="text-outline-variant px-1">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/20 text-on-surface hover:bg-surface-container-highest transition-colors text-[13px]">15</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/20 text-outline hover:text-on-surface hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="h-8"></div> <!-- Bottom padding -->
+</div>
+<!-- Floating AI Assistant Button (Design System specific) -->
+<button class="absolute bottom-lg right-lg w-14 h-14 rounded-full btn-gradient flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] group z-50">
+<span class="material-symbols-outlined text-white text-[24px] group-hover:scale-110 transition-transform">smart_toy</span>
+<div class="absolute inset-0 rounded-full border-2 border-white/20 scale-100 group-hover:scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"></div>
+</button>
+</main>
+</body></html>

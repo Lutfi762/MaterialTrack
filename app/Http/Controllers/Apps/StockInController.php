@@ -11,12 +11,15 @@ use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Services\ActivityLogService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StockInController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index(Request $request)
     {
         $user = auth()->user();
@@ -102,11 +105,18 @@ class StockInController extends Controller
                 $item->current_stock = $stockAfter;
                 $item->save();
 
+                // lockForUpdate + MAX (bukan count()+1) agar aman dari race
+                // condition nomor referensi saat request konkuren.
+                $lastSeq = (int) DB::table('stock_ins')
+                    ->whereDate('created_at', now())
+                    ->lockForUpdate()
+                    ->max(DB::raw('CAST(SUBSTRING(reference_no, -4) AS UNSIGNED)'));
+
                 $stockIn = StockIn::create([
                     'item_id' => $validated['item_id'],
                     'department_id' => $validated['department_id'] ?? null,
                     'user_id' => $user->id,
-                    'reference_no' => 'IN-'.now()->format('Ymd').'-'.str_pad(StockIn::whereDate('created_at', now())->count() + 1, 4, '0', STR_PAD_LEFT),
+                    'reference_no' => 'IN-'.now()->format('Ymd').'-'.str_pad($lastSeq + 1, 4, '0', STR_PAD_LEFT),
                     'po_number' => $validated['po_number'] ?? null,
                     'qty' => $validated['qty'],
                     'source' => $validated['source'] ?? null,

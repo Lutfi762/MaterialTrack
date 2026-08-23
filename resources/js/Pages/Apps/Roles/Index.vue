@@ -1,151 +1,128 @@
 <template>
-    <Head>
-        <title>Roles - MaterialTrack</title>
-    </Head>
-    <main>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border-0 rounded-3 shadow">
-                        <div class="card-header">
-                            <span class="font-weight-bold">
-                                <i class="fa fa-shield-alt"></i> {{ $t('roles.heading') }}
-                            </span>
-                        </div>
-                        <div class="card-body">
+  <Head><title>{{ $t('roles.heading') }} - MaterialTrack</title></Head>
 
-                            <form @submit.prevent="handleSearch">
-                                <div class="input-group mb-3">
-                                    <Link
-                                        v-if="hasAnyPermission(['roles.create'])"
-                                        href="/apps/roles/create"
-                                        class="btn btn-primary input-group-text"
-                                    >
-                                        <i class="fa fa-plus-circle me-2"></i> NEW
-                                    </Link>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        v-model="search"
-                                        :placeholder="$t('roles.search_placeholder')"
-                                    />
-                                    <button class="btn btn-primary input-group-text" type="submit">
-                                        <i class="fa fa-search me-2"></i> SEARCH
-                                    </button>
-                                </div>
-                            </form>
-
-                            <table class="table table-striped table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>{{ $t('roles.col_name') }}</th>
-                                        <th style="width:50%">{{ $t('roles.col_permissions') }}</th>
-                                        <th style="width:20%" class="text-center">{{ $t('common.action') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-if="roles.data.length === 0">
-                                        <td colspan="3" class="text-center">{{ $t('common.no_data') }}</td>
-                                    </tr>
-                                    <tr v-for="(role, index) in roles.data" :key="index">
-                                        <td>
-                                            {{ role.name }}
-                                            <span v-if="isLockedRole(role.name)" class="badge bg-secondary ms-2">
-                                                <i class="fa fa-lock me-1"></i> {{ $t('roles.locked') }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span
-                                                v-for="(permission, i) in role.permissions"
-                                                :key="i"
-                                                class="badge bg-primary shadow border-0 ms-2 mb-2"
-                                            >
-                                                {{ permission.name }}
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <template v-if="!isLockedRole(role.name)">
-                                                <Link
-                                                    v-if="hasAnyPermission(['roles.edit'])"
-                                                    :href="`/apps/roles/${role.id}/edit`"
-                                                    class="btn btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-pencil-alt me-1"></i> EDIT
-                                                </Link>
-                                                <button
-                                                    v-if="hasAnyPermission(['roles.delete'])"
-                                                    class="btn btn-danger btn-sm"
-                                                    @click="handleDelete(role.id)"
-                                                >
-                                                    <i class="fa fa-trash"></i> DELETE
-                                                </button>
-                                            </template>
-                                            <span v-else class="text-muted small">-</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <Pagination :links="roles.links" align="end" />
-
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-shield-alt text-indigo-600"></i>
+        {{ $t('roles.heading') }}
+      </h2>
+      <div class="flex items-center gap-4">
+        <div class="search-box">
+          <input
+            type="text"
+            v-model="search"
+            :placeholder="$t('roles.search_placeholder')"
+            class="search-input"
+            @input="handleSearch"
+          />
+          <i class="fa fa-search search-icon"></i>
         </div>
-    </main>
+        <Link
+          v-if="hasAnyPermission(['roles.create'])"
+          href="/apps/roles/create"
+          class="btn-modern btn-modern-primary"
+        >
+          <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+        </Link>
+      </div>
+    </div>
+
+    <DataTable
+      :columns="columns"
+      :rows="roles.data"
+      :pagination="roles"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('roles.empty')"
+    >
+      <template #cell-name="{ row }">
+        <div class="flex items-center gap-2">
+          {{ row.name }}
+          <span v-if="isLockedRole(row.name)" class="badge bg-secondary ms-2">
+            <i class="fa fa-lock me-1"></i> {{ $t('roles.locked') }}
+          </span>
+        </div>
+      </template>
+      <template #cell-permissions="{ row }">
+        <div class="flex flex-wrap gap-1">
+          <span
+            v-for="(permission, i) in row.permissions"
+            :key="i"
+            class="badge bg-primary shadow border-0"
+          >
+            {{ permission.name }}
+          </span>
+        </div>
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <template v-if="!isLockedRole(row.name)">
+            <Link
+              v-if="hasAnyPermission(['roles.edit'])"
+              :href="`/apps/roles/${row.id}/edit`"
+              class="act-btn act-btn-success"
+              :aria-label="$t('common.edit')"
+            >
+              <i class="fa fa-pencil-alt"></i>
+            </Link>
+            <button
+              v-if="hasAnyPermission(['roles.delete'])"
+              class="act-btn act-btn-danger"
+              :aria-label="$t('common.delete')"
+              @click="handleDelete(row.id)"
+            >
+              <i class="fa fa-trash"></i>
+            </button>
+          </template>
+          <span v-else class="text-muted small">-</span>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '../../../Layouts/App.vue';
-import Pagination from '../../../Components/Pagination.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { confirmDelete } from '@/Utils/confirmDialog';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
-const LOCKED_ROLES = ['department_user'];
+const LOCKED_ROLES = ["department_user"];
 
 export default {
-    layout: LayoutApp,
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { roles: Object },
+  setup() {
+    const { t } = useI18n();
+    const search = ref(
+      (new URL(document.location)).searchParams.get("q") ?? ""
+    );
 
-    components: {
-        Head,
-        Link,
-        Pagination,
-    },
+    const columns = ref([
+      { key: "name", label: t("roles.col_name"), sortable: true },
+      { key: "permissions", label: t("roles.col_permissions") },
+      { key: "actions", label: t("common.action"), align: "center", width: "150px" },
+    ]);
 
-    props: {
-        roles: Object,
-    },
+    const handleSearch = () => {
+      router.get("/apps/roles", { q: search.value }, { preserveState: true, replace: true });
+    };
 
-    setup() {
-        const search = ref(
-            (new URL(document.location)).searchParams.get('q') ?? ''
-        );
+    const handleDelete = async (id) => {
+      if (await confirmDelete(t("roles.delete_confirm"))) {
+        router.delete(`/apps/roles/${id}`);
+      }
+    };
 
-        const handleSearch = () => {
-            router.get('/apps/roles', {
-                q: search.value,
-            }, {
-                preserveState: true,
-                replace: true,
-            });
-        };
+    const isLockedRole = (roleName) => LOCKED_ROLES.includes(roleName);
 
-        const handleDelete = async (id) => {
-            if (await confirmDelete($t('roles.delete_confirm'))) {
-                router.delete(`/apps/roles/${id}`);
-            }
-        };
-
-        const isLockedRole = (roleName) => LOCKED_ROLES.includes(roleName);
-
-        return {
-            search,
-            handleSearch,
-            handleDelete,
-            isLockedRole,
-        };
-    },
+    return { search, handleSearch, handleDelete, isLockedRole, columns };
+  },
 };
 </script>

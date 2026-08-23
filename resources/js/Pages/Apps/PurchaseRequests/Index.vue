@@ -1,67 +1,121 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Permintaan Pembelian (Purchase Requests)</h2>
-        <Link :href="route('apps.purchase-requests.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Buat PR Baru
-        </Link>
-      </div>
-    </template>
+  <Head><title>{{ $t('purchase_requests.heading') }} - MaterialTrack</title></Head>
 
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. PR</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departemen</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pemohon</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prioritas</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="pr in purchaseRequests.data" :key="pr.id">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-semibold">{{ pr.pr_number }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ pr.department?.name || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ pr.requester?.name || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize">
-                  <span :class="{'text-red-600 font-bold': pr.priority === 'urgent', 'text-orange-500': pr.priority === 'high'}">{{ pr.priority }}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize"
-                    :class="{
-                      'bg-yellow-100 text-yellow-800': pr.status === 'pending',
-                      'bg-green-100 text-green-800': pr.status === 'approved',
-                      'bg-red-100 text-red-800': pr.status === 'rejected'
-                    }">
-                    {{ pr.status }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.purchase-requests.show', pr.id)" class="text-indigo-600 hover:text-indigo-900">Detail</Link>
-                </td>
-              </tr>
-              <tr v-if="purchaseRequests.data.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada dokumen PR.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-file-alt text-indigo-600"></i>
+        {{ $t('purchase_requests.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['purchase_requests.create'])"
+        href="/apps/purchase-requests/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+      </Link>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="purchaseRequests.data"
+      :pagination="purchaseRequests"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('purchase_requests.empty')"
+    >
+      <template #cell-pr_number="{ row }">
+        <code>{{ row.pr_number }}</code>
+      </template>
+      <template #cell-department="{ row }">
+        {{ row.department?.name || '-' }}
+      </template>
+      <template #cell-requester="{ row }">
+        {{ row.requester?.name || '-' }}
+      </template>
+      <template #cell-priority="{ row }">
+        <span :class="{
+          'text-red-600 font-bold': row.priority === 'urgent',
+          'text-orange-500': row.priority === 'high',
+          'text-blue-600': row.priority === 'medium',
+          'text-gray-600': row.priority === 'low'
+        }">{{ row.priority }}</span>
+      </template>
+      <template #cell-status="{ row }">
+        <span
+          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize"
+          :class="{
+            'bg-yellow-100 text-yellow-800': row.status === 'pending',
+            'bg-green-100 text-green-800': row.status === 'approved',
+            'bg-red-100 text-red-800': row.status === 'rejected'
+          }"
+        >
+          {{ row.status }}
+        </span>
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link
+            :href="`/apps/purchase-requests/${row.id}`"
+            class="act-btn act-btn-neutral"
+            :aria-label="$t('common.view')"
+          >
+            <i class="fa fa-eye"></i>
+          </Link>
+          <Link
+            v-if="hasAnyPermission(['purchase_requests.edit'])"
+            :href="`/apps/purchase-requests/${row.id}/edit`"
+            class="act-btn act-btn-success"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            v-if="hasAnyPermission(['purchase_requests.delete'])"
+            class="act-btn act-btn-danger"
+            :aria-label="$t('common.delete')"
+            @click="remove(row)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
 export default {
-  components: { AppLayout, Link },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
   props: { purchaseRequests: Object, filters: Object },
+  setup(props) {
+    const { t } = useI18n();
+    const columns = ref([
+      { key: "pr_number", label: t("purchase_requests.col_pr") },
+      { key: "department", label: t("purchase_requests.col_department") },
+      { key: "requester", label: t("purchase_requests.col_requester") },
+      { key: "priority", label: t("purchase_requests.col_priority"), align: "center" },
+      { key: "status", label: t("purchase_requests.col_status"), align: "center" },
+      { key: "actions", label: t("common.action"), align: "center", width: "150px" },
+    ]);
+
+    const remove = async (row) => {
+      if (await confirmDelete(t("purchase_requests.delete_confirm"))) {
+        router.delete(`/apps/purchase-requests/${row.id}`);
+      }
+    };
+
+    return { remove, columns };
+  },
 };
 </script>

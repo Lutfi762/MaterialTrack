@@ -56,22 +56,31 @@ class PermissionsTableSeeder extends Seeder
             // 18. ERP Extensions
             'company_profile.index', 'company_profile.edit',
             'customers.index', 'customers.create', 'customers.edit', 'customers.delete',
-            'purchase_requests.index', 'purchase_requests.create', 'purchase_requests.approve',
-            'purchase_orders.index', 'purchase_orders.create', 'purchase_orders.approve',
-            'goods_receipts.index', 'goods_receipts.create',
-            'purchase_invoices.index', 'purchase_invoices.create',
-            'quotations.index', 'quotations.create',
-            'sales_orders.index', 'sales_orders.create', 'sales_orders.approve',
-            'deliveries.index', 'deliveries.create',
-            'sales_invoices.index', 'sales_invoices.create',
+            'purchase_requests.index', 'purchase_requests.create', 'purchase_requests.edit', 'purchase_requests.delete', 'purchase_requests.approve',
+            'purchase_orders.index', 'purchase_orders.create', 'purchase_orders.edit', 'purchase_orders.delete', 'purchase_orders.approve',
+            'goods_receipts.index', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.delete',
+            'purchase_invoices.index', 'purchase_invoices.create', 'purchase_invoices.edit', 'purchase_invoices.delete',
+            'quotations.index', 'quotations.create', 'quotations.edit', 'quotations.delete',
+            'sales_orders.index', 'sales_orders.create', 'sales_orders.edit', 'sales_orders.delete', 'sales_orders.approve',
+            'deliveries.index', 'deliveries.create', 'deliveries.edit', 'deliveries.delete',
+            'sales_invoices.index', 'sales_invoices.create', 'sales_invoices.edit', 'sales_invoices.delete',
             'chart_of_accounts.index', 'chart_of_accounts.create', 'chart_of_accounts.edit', 'chart_of_accounts.delete',
             'journal_entries.index', 'journal_entries.create',
+            'financial_reports.index',
+            'cash_bank.index', 'cash_bank.create',
+            'sales_returns.index', 'sales_returns.create', 'sales_returns.edit', 'sales_returns.delete', 'sales_returns.approve',
+            'notifications.index',
             'employees.index', 'employees.create', 'employees.edit', 'employees.delete',
             'attendances.index', 'attendances.create',
             'leaves.index', 'leaves.create', 'leaves.approve',
             'payroll.index', 'payroll.create', 'payroll.approve',
             'approval_workflows.index', 'approval_workflows.create',
             'stock_alerts.index', 'stock_alerts.edit',
+
+            // 19. Master Data - Suppliers, Warehouses, Stock Reservations
+            'suppliers.index', 'suppliers.create', 'suppliers.edit', 'suppliers.delete',
+            'warehouses.index', 'warehouses.create', 'warehouses.edit', 'warehouses.delete',
+            'stock_reservations.index', 'stock_reservations.create',
         ];
 
         foreach ($permissions as $permission) {
@@ -88,6 +97,8 @@ class PermissionsTableSeeder extends Seeder
             'items.index',
             'stock_outs.index',
             'stock_outs.create',
+            'stock_reservations.index',
+            'stock_reservations.create',
             'ai_assistant.use',
         ]);
 
@@ -105,6 +116,10 @@ class PermissionsTableSeeder extends Seeder
             'stock_adjustments.index',
             'reports.index',
             'activity_logs.index', 'activity_logs.export',
+            'financial_reports.index',
+            'cash_bank.index',
+            'sales_returns.index',
+            'notifications.index',
         ]);
     }
 }

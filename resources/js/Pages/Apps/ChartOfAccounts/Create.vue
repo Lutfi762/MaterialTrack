@@ -46,6 +46,7 @@
               <div>
                 <label class="block font-medium text-sm text-gray-700">Saldo Awal (Rp)</label>
                 <input v-model="form.opening_balance" type="number" step="any" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                <p class="text-xs text-gray-400 mt-1">Konvensi debit-positive: aset/beban positif; kewajiban/ekuitas/pendapatan negatif (mis. modal -155000000).</p>
               </div>
 
               <div class="flex items-center">

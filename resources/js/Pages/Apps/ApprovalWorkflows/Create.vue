@@ -21,7 +21,14 @@
                   <option value="purchase_order">Purchase Order</option>
                   <option value="sales_order">Sales Order</option>
                   <option value="leave">Leave Request</option>
+                  <option value="stock_out">Stock Out</option>
+                  <option value="other">Lainnya</option>
                 </select>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block font-medium text-sm text-gray-700">Deskripsi</label>
+                <textarea v-model="form.description" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Keterangan alur persetujuan ini"></textarea>
               </div>
 
               <div>

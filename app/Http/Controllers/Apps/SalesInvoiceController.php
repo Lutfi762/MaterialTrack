@@ -89,4 +89,39 @@ class SalesInvoiceController extends Controller
             'invoice' => $salesInvoice->load(['salesOrder', 'customer', 'creator', 'items.item']),
         ]);
     }
+
+    public function edit(SalesInvoice $salesInvoice)
+    {
+        return Inertia::render('Apps/SalesInvoices/Edit', [
+            'invoice' => $salesInvoice->load(['salesOrder', 'customer', 'items.item']),
+        ]);
+    }
+
+    public function update(Request $request, SalesInvoice $salesInvoice)
+    {
+        if (! in_array($salesInvoice->status, ['draft', 'sent', 'pending'])) {
+            return back()->withErrors(['status' => 'Hanya faktur berstatus draft/sent/pending yang dapat diedit.']);
+        }
+
+        $validated = $request->validate([
+            'invoice_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:invoice_date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $salesInvoice->update($validated);
+
+        return to_route('apps.sales-invoices.index')->with('success', 'Faktur Penjualan berhasil diperbarui.');
+    }
+
+    public function destroy(SalesInvoice $salesInvoice)
+    {
+        if (! in_array($salesInvoice->status, ['draft', 'sent', 'pending'])) {
+            return back()->withErrors(['status' => 'Faktur yang sudah lunas/sebagian bayar tidak dapat dihapus.']);
+        }
+
+        $salesInvoice->delete();
+
+        return to_route('apps.sales-invoices.index')->with('success', 'Faktur Penjualan berhasil dihapus.');
+    }
 }

@@ -1,56 +1,105 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Pesanan Pembelian (Purchase Orders)</h2>
-        <Link :href="route('apps.purchase-orders.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Buat PO Baru
-        </Link>
-      </div>
-    </template>
+  <Head><title>{{ $t('purchase_orders.heading') }} - MaterialTrack</title></Head>
 
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. PO</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pemasok (Supplier)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total (Rp)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="po in purchaseOrders.data" :key="po.id">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-semibold">{{ po.po_number }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ po.supplier?.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ po.order_date }}</td>
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">Rp {{ Number(po.total).toLocaleString('id-ID') }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize font-semibold">{{ po.status }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.purchase-orders.show', po.id)" class="text-indigo-600 hover:text-indigo-900">Detail</Link>
-                </td>
-              </tr>
-              <tr v-if="purchaseOrders.data.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada PO.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-shopping-cart text-indigo-600"></i>
+        {{ $t('purchase_orders.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['purchase_orders.create'])"
+        href="/apps/purchase-orders/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+      </Link>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="purchaseOrders.data"
+      :pagination="purchaseOrders"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('purchase_orders.empty')"
+    >
+      <template #cell-po_number="{ row }">
+        <code>{{ row.po_number }}</code>
+      </template>
+      <template #cell-supplier="{ row }">
+        {{ row.supplier?.name }}
+      </template>
+      <template #cell-order_date="{ row }">
+        {{ row.order_date }}
+      </template>
+      <template #cell-total="{ row }">
+        Rp {{ Number(row.total).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-status="{ row }">
+        {{ row.status }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link
+            :href="`/apps/purchase-orders/${row.id}`"
+            class="act-btn act-btn-neutral"
+            :aria-label="$t('common.view')"
+          >
+            <i class="fa fa-eye"></i>
+          </Link>
+          <Link
+            v-if="hasAnyPermission(['purchase_orders.edit'])"
+            :href="`/apps/purchase-orders/${row.id}/edit`"
+            class="act-btn act-btn-success"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            v-if="hasAnyPermission(['purchase_orders.delete'])"
+            class="act-btn act-btn-danger"
+            :aria-label="$t('common.delete')"
+            @click="remove(row)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
 export default {
-  components: { AppLayout, Link },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
   props: { purchaseOrders: Object },
+  setup() {
+    const { t } = useI18n();
+    const columns = ref([
+      { key: "po_number", label: t("purchase_orders.col_po") },
+      { key: "supplier", label: t("purchase_orders.col_supplier") },
+      { key: "order_date", label: t("purchase_orders.col_date") },
+      { key: "total", label: t("purchase_orders.col_total") },
+      { key: "status", label: t("purchase_orders.col_status") },
+      { key: "actions", label: t("common.action"), align: "center", width: "150px" },
+    ]);
+    const remove = async (row) => {
+      if (await confirmDelete(t("purchase_orders.delete_confirm"))) {
+        router.delete(`/apps/purchase-orders/${row.id}`);
+      }
+    };
+    return { remove, columns };
+  },
 };
 </script>

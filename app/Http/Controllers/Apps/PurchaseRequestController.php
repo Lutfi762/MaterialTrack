@@ -84,6 +84,67 @@ class PurchaseRequestController extends Controller
         ]);
     }
 
+    public function edit(PurchaseRequest $purchaseRequest)
+    {
+        return Inertia::render('Apps/PurchaseRequests/Edit', [
+            'purchaseRequest' => $purchaseRequest->load(['items']),
+            'departments' => Department::orderBy('name')->get(['id', 'name']),
+            'items' => Item::orderBy('name')->get(['id', 'name', 'code', 'unit', 'price']),
+        ]);
+    }
+
+    public function update(Request $request, PurchaseRequest $purchaseRequest)
+    {
+        if (! in_array($purchaseRequest->status, ['draft', 'pending', 'rejected'])) {
+            return back()->withErrors(['status' => 'Hanya PR berstatus draft/pending/rejected yang dapat diedit.']);
+        }
+
+        $validated = $request->validate([
+            'department_id' => 'required|exists:departments,id',
+            'needed_date' => 'nullable|date',
+            'priority' => 'required|in:low,medium,high,urgent',
+            'notes' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.qty' => 'required|integer|min:1',
+            'items.*.estimated_price' => 'nullable|numeric|min:0',
+        ]);
+
+        DB::transaction(function () use ($validated, $purchaseRequest) {
+            $purchaseRequest->update([
+                'department_id' => $validated['department_id'],
+                'needed_date' => $validated['needed_date'] ?? null,
+                'priority' => $validated['priority'],
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            $purchaseRequest->items()->delete();
+            foreach ($validated['items'] as $item) {
+                $purchaseRequest->items()->create([
+                    'item_id' => $item['item_id'],
+                    'qty' => $item['qty'],
+                    'estimated_price' => $item['estimated_price'] ?? 0,
+                ]);
+            }
+        });
+
+        return to_route('apps.purchase-requests.index')->with('success', 'Permintaan Pembelian (PR) berhasil diperbarui.');
+    }
+
+    public function destroy(PurchaseRequest $purchaseRequest)
+    {
+        if (! in_array($purchaseRequest->status, ['draft', 'pending', 'rejected'])) {
+            return back()->withErrors(['status' => 'PR berstatus approved tidak dapat dihapus.']);
+        }
+        if (\App\Models\PurchaseOrder::where('purchase_request_id', $purchaseRequest->id)->exists()) {
+            return back()->withErrors(['status' => 'PR ini sudah dipakai sebagai referensi Purchase Order, tidak dapat dihapus.']);
+        }
+
+        $purchaseRequest->delete();
+
+        return to_route('apps.purchase-requests.index')->with('success', 'Permintaan Pembelian (PR) berhasil dihapus.');
+    }
+
     public function approve(Request $request, PurchaseRequest $purchaseRequest)
     {
         if (! in_array($purchaseRequest->status, ['pending', 'draft'])) {

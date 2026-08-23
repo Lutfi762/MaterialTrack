@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daftar Gudang - MaterialTrack</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#400071",
+                      "on-tertiary-fixed-variant": "#6900b3",
+                      "error-container": "#93000a",
+                      "primary": "#c0c1ff",
+                      "tertiary-fixed": "#f0dbff",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "surface-container-highest": "#33343b",
+                      "primary-fixed": "#e1e0ff",
+                      "on-secondary": "#3f008e",
+                      "secondary-fixed-dim": "#d2bbff",
+                      "on-primary-container": "#0d0096",
+                      "tertiary-fixed-dim": "#ddb7ff",
+                      "on-primary-fixed": "#07006c",
+                      "surface": "#111319",
+                      "on-tertiary": "#490080",
+                      "secondary-fixed": "#eaddff",
+                      "surface-container-high": "#282a30",
+                      "outline": "#908fa0",
+                      "on-error": "#690005",
+                      "outline-variant": "#464554",
+                      "surface-bright": "#373940",
+                      "error": "#ffb4ab",
+                      "surface-tint": "#c0c1ff",
+                      "on-primary": "#1000a9",
+                      "surface-dim": "#111319",
+                      "inverse-primary": "#494bd6",
+                      "on-surface-variant": "#c7c4d7",
+                      "on-tertiary-fixed": "#2c0051",
+                      "background": "#111319",
+                      "secondary": "#d2bbff",
+                      "surface-container-low": "#191b22",
+                      "on-error-container": "#ffdad6",
+                      "surface-container": "#1e1f26",
+                      "on-secondary-fixed": "#25005a",
+                      "on-secondary-container": "#c9aeff",
+                      "primary-container": "#8083ff",
+                      "tertiary-container": "#b76dff",
+                      "secondary-container": "#6001d1",
+                      "on-secondary-fixed-variant": "#5a00c6",
+                      "tertiary": "#ddb7ff",
+                      "inverse-surface": "#e2e2eb",
+                      "surface-container-lowest": "#0c0e14",
+                      "on-background": "#e2e2eb",
+                      "surface-variant": "#33343b",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "inverse-on-surface": "#2e3037",
+                      "on-surface": "#e2e2eb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "lg": "24px",
+                      "header-height": "64px",
+                      "xl": "32px",
+                      "sidebar-width": "260px",
+                      "sm": "8px",
+                      "sidebar-collapsed": "72px",
+                      "md": "16px",
+                      "unit": "8px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "wordmark-track": [
+                              "Geist"
+                      ],
+                      "wordmark-material": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "title-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "wordmark-track": [
+                              "20px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "wordmark-material": [
+                              "20px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-hidden flex h-screen">
+<!-- SideNavBar -->
+<aside class="w-sidebar-width h-screen sticky top-0 left-0 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant/10 flex flex-col h-full py-lg z-50">
+<!-- Header -->
+<div class="px-lg pb-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-container to-secondary-container flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">inventory</span>
+</div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed tracking-tight">MaterialTrack</h1>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">ERP Unified</p>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 overflow-y-auto mt-md px-sm">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md font-medium">Main</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md bg-secondary-container/10 text-secondary border-l-4 border-secondary px-md py-sm transition-all duration-200 scale-[1.02] rounded-r-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">database</span>
+<span class="font-body-md text-body-md font-medium">Master Data</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md font-medium">Transaksi Stok</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-body-md text-body-md font-medium">Pengadaan &amp; Penjualan</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-body-md text-body-md font-medium">Keuangan &amp; HRM</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined text-tertiary-container">smart_toy</span>
+<span class="font-body-md text-body-md font-medium text-tertiary-container">AI Assistant</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md font-medium">Laporan &amp; Analisis</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-body-md text-body-md font-medium">Sistem &amp; Alur</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">business</span>
+<span class="font-body-md text-body-md font-medium">Departemen</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Footer -->
+<div class="px-sm mt-auto border-t border-outline-variant/10 pt-md">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md font-medium">Settings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high hover:scale-[1.02] transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md font-medium">Logout</span>
+</a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden bg-[#0F1117] relative">
+<!-- TopNavBar -->
+<header class="h-header-height sticky top-0 z-40 w-full bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-lg w-full">
+<!-- Left Side / Search -->
+<div class="flex-1 max-w-md">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-[#12141C] border border-outline-variant/30 rounded-lg pl-10 pr-4 py-2 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-[0_0_0_0_rgba(99,102,241,0)] focus:shadow-[0_0_10px_0_rgba(99,102,241,0.15)] transition-all font-body-md" placeholder="Search master data..." type="text"/>
+</div>
+</div>
+<!-- Right Side / Actions -->
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200 relative">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/20 rounded-full p-2 transition-all scale-95 active:scale-90 duration-200 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full animate-pulse"></span>
+</button>
+<button class="flex items-center gap-2 ml-2 pl-2 border-l border-outline-variant/20 hover:opacity-80 transition-opacity">
+<img alt="Administrator Gudang" class="w-8 h-8 rounded-full border border-outline-variant/50 object-cover" data-alt="A professional headshot of a warehouse administrator, neutral background, cinematic lighting, modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0AwI1AupiRBlHMOuAAI10HdcAXCZD_tLbSg2zclianygHfuK0S6ZQY3HDUCGrrrPPbnLcEhud5GfZqn3j9jHFJOBJ2qt2_FnvkJTijOTB3vG5z4HZ7dmYIvZLdSL2-FhhaT1tIRTjrqZoDtD7xrgQmKam9ozgQOUSWLpb2AT2ExPVv6lUQde4MwxCqojHXXY0Z-DDgNDiyBoi0Vb2mUEh1cY-JrYgMq8z5F-hhblM5WmZaqVj8j2g"/>
+</button>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-lg pb-32">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Daftar Gudang</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manajemen gudang fisik dan virtual</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 bg-[#1A1D27] border border-outline-variant/20 rounded-lg text-on-surface font-label-md flex items-center gap-2 hover:bg-surface-container-high hover:-translate-y-0.5 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+<button class="px-4 py-2 bg-gradient-to-r from-primary-container to-inverse-primary text-white rounded-lg font-label-md flex items-center gap-2 hover:scale-[1.02] hover:shadow-[0_4px_15px_rgba(99,102,241,0.3)] transition-all border-t border-white/20 shadow-md">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Baru
+                    </button>
+</div>
+</div>
+<!-- Bento Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stat Card 1 -->
+<div class="bg-[#1A1D27] border border-white/10 rounded-xl p-5 relative overflow-hidden group hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] transition-all duration-300">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between mb-4 relative z-10">
+<span class="font-label-md text-label-md text-on-surface-variant">Total Gudang</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-primary text-[18px]">warehouse</span>
+</div>
+</div>
+<div class="relative z-10">
+<span class="font-display-lg text-display-lg text-on-surface">12</span>
+<div class="flex items-center gap-1 mt-1 text-emerald-400 font-label-md">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>+2 dari bulan lalu</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-[#1A1D27] border border-white/10 rounded-xl p-5 relative overflow-hidden group hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] transition-all duration-300">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-tertiary/5 rounded-full blur-2xl group-hover:bg-tertiary/10 transition-colors"></div>
+<div class="flex items-center justify-between mb-4 relative z-10">
+<span class="font-label-md text-label-md text-on-surface-variant">Kapasitas Terpakai</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px]">pie_chart</span>
+</div>
+</div>
+<div class="relative z-10">
+<span class="font-display-lg text-display-lg text-on-surface">78%</span>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-gradient-to-r from-tertiary to-secondary-container h-full w-[78%] rounded-full shadow-[0_0_10px_rgba(221,183,255,0.5)]"></div>
+</div>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-[#1A1D27] border border-white/10 rounded-xl p-5 relative overflow-hidden group hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] transition-all duration-300">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-error/5 rounded-full blur-2xl group-hover:bg-error/10 transition-colors"></div>
+<div class="flex items-center justify-between mb-4 relative z-10">
+<span class="font-label-md text-label-md text-on-surface-variant">Perlu Perhatian</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-error text-[18px]">warning</span>
+</div>
+</div>
+<div class="relative z-10">
+<span class="font-display-lg text-display-lg text-on-surface">2</span>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Gudang mendekati kapasitas maksimal</p>
+</div>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-[#1A1D27] border border-white/10 rounded-xl overflow-hidden shadow-sm relative group">
+<div class="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+<div class="overflow-x-auto relative z-10">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-white/10 bg-surface/50 backdrop-blur-sm">
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Kode Gudang</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Nama Gudang</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Lokasi Kota</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Penanggung Jawab</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<tr class="border-b border-white/5 hover:bg-surface-container-high/50 transition-colors group/row">
+<td class="py-2 px-4 font-medium font-mono text-primary-fixed-dim">GDG-JKT-01</td>
+<td class="py-2 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container border border-white/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">warehouse</span>
+</div>
+                                    Gudang Utama Jakarta
+                                </td>
+<td class="py-2 px-4 text-on-surface-variant">Jakarta Pusat</td>
+<td class="py-2 px-4">Budi Santoso</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.5)]"></span>
+                                        Aktif
+                                    </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-white/5 bg-[#141720] hover:bg-surface-container-high/50 transition-colors group/row">
+<td class="py-2 px-4 font-medium font-mono text-primary-fixed-dim">GDG-SBY-02</td>
+<td class="py-2 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container border border-white/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">warehouse</span>
+</div>
+                                    Hub Logistik Surabaya
+                                </td>
+<td class="py-2 px-4 text-on-surface-variant">Surabaya</td>
+<td class="py-2 px-4">Andi Wijaya</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.5)]"></span>
+                                        Aktif
+                                    </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-white/5 hover:bg-surface-container-high/50 transition-colors group/row">
+<td class="py-2 px-4 font-medium font-mono text-primary-fixed-dim">GDG-BDG-01</td>
+<td class="py-2 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container border border-white/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">warehouse</span>
+</div>
+                                    Depo Bandung
+                                </td>
+<td class="py-2 px-4 text-on-surface-variant">Bandung</td>
+<td class="py-2 px-4">Siti Aminah</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.5)]"></span>
+                                        Penuh
+                                    </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-white/5 bg-[#141720] hover:bg-surface-container-high/50 transition-colors group/row">
+<td class="py-2 px-4 font-medium font-mono text-primary-fixed-dim">GDG-MDN-01</td>
+<td class="py-2 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container border border-white/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">warehouse</span>
+</div>
+                                    Gudang Transit Medan
+                                </td>
+<td class="py-2 px-4 text-on-surface-variant">Medan</td>
+<td class="py-2 px-4">Rudi Hermawan</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant border border-outline-variant/30 font-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+                                        Maintenance
+                                    </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover/row:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="border-t border-white/10 p-4 flex items-center justify-between bg-[#1A1D27] relative z-10">
+<span class="font-body-md text-body-md text-on-surface-variant">Menampilkan 1-4 dari 12 gudang</span>
+<div class="flex items-center gap-2">
+<button class="p-1.5 rounded bg-surface-container border border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors disabled:opacity-50">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="p-1.5 rounded bg-surface-container border border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating AI Assistant -->
+<button class="fixed bottom-lg right-lg w-14 h-14 rounded-full bg-gradient-to-br from-primary-container to-secondary-container flex items-center justify-center shadow-[0_4px_20px_rgba(99,102,241,0.4)] hover:scale-110 hover:shadow-[0_8px_30px_rgba(99,102,241,0.6)] transition-all duration-300 border-t border-white/30 z-50 group">
+<span class="material-symbols-outlined text-white text-[28px] group-hover:animate-pulse" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<!-- Tooltip -->
+<div class="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-surface-container-highest rounded text-on-surface font-label-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-lg">
+                Tanya AI Assistant
+            </div>
+</button>
+</main>
+</body></html>

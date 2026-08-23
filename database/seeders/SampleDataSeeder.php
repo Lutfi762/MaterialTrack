@@ -46,6 +46,9 @@ class SampleDataSeeder extends Seeder
         $coa1 = ChartOfAccount::firstOrCreate(['code' => '1000'], ['name' => 'Kas & Bank', 'type' => 'asset', 'sub_type' => 'current_asset', 'is_header' => true]);
         ChartOfAccount::firstOrCreate(['code' => '1001'], ['name' => 'Kas Kecil', 'type' => 'asset', 'sub_type' => 'current_asset', 'parent_id' => $coa1->id, 'opening_balance' => 5000000]);
         ChartOfAccount::firstOrCreate(['code' => '1002'], ['name' => 'Bank BCA', 'type' => 'asset', 'sub_type' => 'current_asset', 'parent_id' => $coa1->id, 'opening_balance' => 150000000]);
+        // Penyeimbang saldo awal (modal): bernilai negatif karena konvensi debit-positive
+        // (aset +155jt -> ekuitas -155jt) agar neraca saldo tetap balance.
+        ChartOfAccount::firstOrCreate(['code' => '3001'], ['name' => 'Modal / Saldo Awal', 'type' => 'equity', 'sub_type' => 'equity', 'opening_balance' => -155000000]);
 
         // 6. Employees & Workflows
         $deptIt = Department::where('code', 'DEPT-IT')->first();

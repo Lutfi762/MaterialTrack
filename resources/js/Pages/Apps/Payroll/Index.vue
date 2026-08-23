@@ -1,65 +1,92 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Penggajian Karyawan (Payroll)</h2>
-        <Link :href="route('apps.payroll.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Buat Periode Gaji
-        </Link>
-      </div>
-    </template>
+  <Head><title>{{ $t('payroll.heading') }} - MaterialTrack</title></Head>
 
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode Gaji</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rentang Tanggal</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Bayar</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Nominal (Rp)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="p in periods.data" :key="p.id">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">{{ p.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ p.start_date }} s/d {{ p.end_date }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ p.pay_date }}</td>
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-bold">Rp {{ Number(p.total_amount || 0).toLocaleString('id-ID') }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize">
-                  <span class="px-2 py-1 text-xs rounded-full font-bold"
-                    :class="{
-                      'bg-yellow-100 text-yellow-800': p.status === 'draft',
-                      'bg-blue-100 text-blue-800': p.status === 'approved',
-                      'bg-green-100 text-green-800': p.status === 'paid'
-                    }">
-                    {{ p.status }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.payroll.show', p.id)" class="text-indigo-600 hover:text-indigo-900">Detail Slips</Link>
-                </td>
-              </tr>
-              <tr v-if="periods.data.length === 0">
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada periode gaji.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-money-bill-wave text-indigo-600"></i>
+        {{ $t('payroll.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['payroll.create'])"
+        href="/apps/payroll/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+      </Link>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="periods.data"
+      :pagination="periods"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('payroll.empty')"
+    >
+      <template #cell-name="{ row }">
+        <strong>{{ row.name }}</strong>
+      </template>
+      <template #cell-date_range="{ row }">
+        {{ row.start_date }} s/d {{ row.end_date }}
+      </template>
+      <template #cell-pay_date="{ row }">
+        {{ row.pay_date }}
+      </template>
+      <template #cell-total_amount="{ row }">
+        Rp {{ Number(row.total_amount || 0).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-status="{ row }">
+        <span
+          class="px-2 py-1 text-xs rounded-full font-bold"
+          :class="{
+            'bg-yellow-100 text-yellow-800': row.status === 'draft',
+            'bg-blue-100 text-blue-800': row.status === 'approved',
+            'bg-green-100 text-green-800': row.status === 'paid'
+          }"
+        >
+          {{ row.status }}
+        </span>
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex justify-center">
+          <Link
+            :href="`/apps/payroll/${row.id}`"
+            class="act-btn act-btn-neutral"
+            :aria-label="$t('common.view')"
+          >
+            <i class="fa fa-eye"></i>
+          </Link>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-  components: { AppLayout, Link },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
   props: { periods: Object },
+  setup() {
+    const { t } = useI18n();
+    const columns = ref([
+      { key: "name", label: t("payroll.col_period") },
+      { key: "date_range", label: t("payroll.col_date_range") },
+      { key: "pay_date", label: t("payroll.col_pay_date") },
+      { key: "total_amount", label: t("payroll.col_total") },
+      { key: "status", label: t("payroll.col_status"), align: "center" },
+      { key: "actions", label: t("common.action"), align: "center", width: "100px" },
+    ]);
+    return { columns };
+  },
 };
 </script>

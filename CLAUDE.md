@@ -110,20 +110,30 @@ Hard rule
 UI redesign tasks touch frontend only: resources/js/**, Tailwind config, and static assets. Never modify migrations, models, controllers, routes, permissions, seeders, or any app/** PHP logic as a side effect of a UI task. If a UI change seems to require a backend change, stop and ask first.
 
 Design tokens
-Sidebar: 
-#0F172A (dark navy)
-Primary/accent: 
-#7C3AED (purple)
-Background: 
-#F8FAFC
-Card: white + soft shadow, rounded-xl
-Status colors: success 
-#16A34A, warning 
-#F59E0B, danger 
-#DC2626
-Font: Inter or Plus Jakarta Sans
 
-Keep these centralized in the Tailwind config / a shared tokens file — don't hardcode hex values inline across components. If a tokens file doesn't exist yet at resources/css or tailwind.config.js, create one and reuse it everywhere.
+Centralized in resources/css/app.css under @theme (light, default) and .dark (dark mode override). Tailwind v4 darkMode is class-based via @custom-variant dark (&:where(.dark, .dark *)) — toggle the .dark class on <html> (done in Header.vue, persisted to localStorage key darkMode, applied pre-paint in resources/views/app.blade.php to avoid flash). Never hardcode these hex values inline in components — use the generated Tailwind utilities (bg-bg, bg-surface, bg-sidebar, text-primary, text-success, text-warning, text-danger) or var(--color-*) in scoped <style> blocks.
+
+Light mode (default):
+- Background (--color-bg): #F8FAFC
+- Card/surface (--color-surface): white, soft shadow, rounded-xl
+- Sidebar (--color-sidebar): #0F172A (dark navy)
+- Primary/accent (--color-primary): #7C3AED (purple)
+- Success (--color-success): #16A34A
+- Warning (--color-warning): #F59E0B
+- Danger (--color-danger): #DC2626
+
+Dark mode (.dark):
+- Background (--color-bg): #111319 (falls back to #0F1117 tone for base canvas per Stitch reference)
+- Card/surface (--color-surface): #1A1D27 (#1e1f26 container variant), 1px border #FFFFFF10
+- Sidebar (--color-sidebar): #0F172A (unchanged — already dark)
+- Primary/accent (--color-primary): #c0c1ff, gradient with --color-primary-2 (#8083ff) for buttons/highlights (indigo → lavender)
+- Success (--color-success): #10B981
+- Warning (--color-warning): #F59E0B
+- Danger (--color-danger): #F43F5E
+
+Font: Inter or Plus Jakarta Sans (Geist for the Stitch reference designs — not yet adopted app-wide).
+
+Reference: references/stitch/stitch_materialtrack_unified_saas_erp/luminous_enterprise/DESIGN.md documents the full dark-mode Material-derived palette this token set is distilled from.
 
 Component reuse
 

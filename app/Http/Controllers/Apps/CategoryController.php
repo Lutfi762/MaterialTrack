@@ -4,22 +4,32 @@ namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Department;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index()
+    use AuthorizesRequests;
+
+    public function index(Request $request)
     {
-        $categories = Category::withCount('items')
-            ->with('departments:id,name')
-            ->when(request('q'), fn($q) => $q->where('name', 'like', '%' . request('q') . '%'))
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $query = Category::withCount('items')
+            ->with('departments:id,name');
+
+        if ($request->has('search') && $request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('code_prefix', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+
+        $categories = $query->latest()->paginate(10)->withQueryString();
 
         return inertia('Apps/Categories/Index', [
             'categories' => $categories,
+            'filters' => $request->only(['search']),
         ]);
     }
 

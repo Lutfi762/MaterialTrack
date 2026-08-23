@@ -15,8 +15,13 @@ class PayrollController extends Controller
     {
         $query = PayrollPeriod::latest();
 
+        if ($request->filled('status') && in_array($request->status, ['draft', 'approved', 'processing', 'paid', 'completed', 'closed'], true)) {
+            $query->where('status', $request->status);
+        }
+
         return Inertia::render('Apps/Payroll/Index', [
             'periods' => $query->paginate(10)->withQueryString(),
+            'filters' => $request->only(['status']),
         ]);
     }
 

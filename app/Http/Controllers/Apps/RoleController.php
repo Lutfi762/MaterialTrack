@@ -65,6 +65,16 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
+        // Guard: role utama tidak boleh dihapus
+        if ($role->name === 'admin') {
+            return back()->withErrors(['error' => 'Role admin adalah role utama sistem dan tidak bisa dihapus.']);
+        }
+
+        // Guard: role yang masih dipakai user tidak boleh dihapus
+        if ($role->users()->count() > 0) {
+            return back()->withErrors(['error' => "Role {$role->name} masih dipakai user dan tidak bisa dihapus."]);
+        }
+
         $role->delete();
 
         return redirect()->route('apps.roles.index');

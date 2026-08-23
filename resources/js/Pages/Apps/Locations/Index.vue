@@ -1,80 +1,131 @@
 <template>
-    <Head><title>Lokasi Gudang - MaterialTrack</title></Head>
-    <main>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border-0 rounded-3 shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-location-dot me-1"></i> {{ $t('locations.heading') }}</span>
-                            <Link v-if="hasAnyPermission(['locations.create'])" href="/apps/locations/create" class="btn btn-primary btn-sm">
-                                <i class="fa fa-plus-circle me-2"></i> NEW
-                            </Link>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-striped table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>{{ $t('locations.col_no') }}</th>
-                                        <th>{{ $t('locations.col_name') }}</th>
-                                        <th>{{ $t('locations.col_zone') }}</th>
-                                        <th class="text-center" style="width:15%">{{ $t('common.action') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-if="locations.data.length === 0">
-                                        <td colspan="4" class="text-center">{{ $t('locations.empty') }}</td>
-                                    </tr>
-                                    <tr v-for="(loc, i) in locations.data" :key="loc.id">
-                                        <td>{{ i + 1 }}</td>
-                                        <td>{{ loc.name }}</td>
-                                        <td>{{ loc.warehouse_zone ?? '-' }}</td>
-                                        <td class="text-center">
-                                            <Link v-if="hasAnyPermission(['locations.edit'])" :href="`/apps/locations/${loc.id}/edit`" class="btn btn-success btn-sm me-2">
-                                                <i class="fa fa-pencil-alt"></i>
-                                            </Link>
-                                            <button v-if="hasAnyPermission(['locations.delete'])" class="btn btn-danger btn-sm" @click="handleDelete(loc.id)">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <Pagination :links="locations.links" align="end" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <Head>
+    <title>{{ $t('locations.heading') }} - MaterialTrack</title>
+  </Head>
+
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-location-dot text-indigo-600"></i>
+        {{ $t('locations.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['locations.create'])"
+        href="/apps/locations/create"
+        class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <i class="fa fa-plus-circle me-2"></i>
+        {{ $t('common.new') }}
+      </Link>
+    </div>
+
+    <div class="flex flex-wrap gap-3 mb-4">
+      <div class="flex-1 min-w-[250px]">
+        <div class="input-group">
+          <input
+            v-model="search"
+            type="text"
+            class="form-control"
+            :placeholder="$t('locations.search_placeholder')"
+            @keyup.enter="applyFilters"
+          />
+          <button class="btn btn-outline-secondary" @click="applyFilters">
+            <i class="fa fa-search"></i>
+          </button>
         </div>
-    </main>
+      </div>
+      <div class="w-auto">
+        <button class="btn btn-outline-secondary btn-sm" @click="resetFilters">
+          <i class="fa fa-redo me-1"></i> {{ $t('common.reset') }}
+        </button>
+      </div>
+    </div>
+
+    <DataTable
+      :columns="columns"
+      :rows="locations.data"
+      :pagination="locations"
+      row-key="id"
+      :striped="true"
+      :loading="isLoading"
+      :empty-text="$t('locations.empty')"
+    >
+      <template #cell-actions="{ row, index }">
+        <div class="flex items-center gap-2 justify-center">
+          <Link
+            v-if="hasAnyPermission(['locations.edit'])"
+            :href="`/apps/locations/${row.id}/edit`"
+            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            v-if="hasAnyPermission(['locations.delete'])"
+            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            :aria-label="$t('common.delete')"
+            @click="handleDelete(row.id)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '../../../Layouts/App.vue';
-import Pagination from '../../../Components/Pagination.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { confirmDelete } from '@/Utils/confirmDialog';
+import LayoutApp from "../../../Layouts/App.vue";
+import DataTable from "../../../Components/DataTable.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { confirmDelete } from "@/Utils/confirmDialog";
+import { useI18n } from "vue-i18n";
 
 export default {
-    layout: LayoutApp,
-    components: { Head, Link, Pagination },
-    props: { locations: Object },
-    setup() {
-        const isLoading = ref(false);
+  layout: LayoutApp,
+  components: { Head, Link, DataTable },
+  props: {
+    locations: Object,
+    filters: Object,
+  },
+  setup(props) {
+    const { t } = useI18n();
+    const search = ref(props.filters?.search ?? "");
+    const isLoading = ref(false);
 
-        const handleDelete = async (id) => {
-            if (await confirmDelete($t('locations.delete_confirm'))) {
-                isLoading.value = true;
-                router.delete(`/apps/locations/${id}`, {
-                    onFinish: () => { isLoading.value = false; },
-                    onError: () => {
-                        isLoading.value = false;
-                    }
-                });
-            }
-        };
-        return { handleDelete, isLoading };
-    },
+    const columns = [
+      { key: (row, i) => (props.locations.from ?? 1) + i, label: t("locations.col_no"), align: "center", width: "60px" },
+      { key: "name", label: t("locations.col_name"), sortable: true },
+      { key: "warehouse_zone", label: t("locations.col_zone") },
+      { key: "actions", label: t("common.action"), align: "center", width: "120px" },
+    ];
+
+    const applyFilters = () => {
+      router.get("/apps/locations", {
+        search: search.value,
+      }, {
+        preserveState: true,
+        replace: true,
+      });
+    };
+
+    const resetFilters = () => {
+      search.value = "";
+      router.get("/apps/locations", {}, { preserveState: true, replace: true });
+    };
+
+    const handleDelete = async (id) => {
+      if (await confirmDelete(t("locations.delete_confirm"))) {
+        isLoading.value = true;
+        router.delete(`/apps/locations/${id}`, {
+          onFinish: () => { isLoading.value = false; },
+          onError: () => { isLoading.value = false; },
+        });
+      }
+    };
+
+    return { search, columns, handleDelete, applyFilters, resetFilters, isLoading };
+  },
 };
 </script>

@@ -1,177 +1,102 @@
 <template>
-    <Head><title>Penyesuaian Stok - MaterialTrack</title></Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border-0 rounded-3 shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-balance-scale me-1"></i> Penyesuaian Stok</span>
-                            <div class="d-flex gap-2">
-                                <a v-if="hasAnyPermission(['activity_logs.index'])" href="/apps/activity-logs" class="btn btn-outline-secondary btn-sm">
-                                    <i class="fa fa-history me-1"></i> Audit Trail
-                                </a>
-                                <Link v-if="hasAnyPermission(['stock_adjustments.create'])" href="/apps/stock-adjustments/create" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-plus-circle me-2"></i> Ajukan Penyesuaian
-                                </Link>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div v-if="pendingCount > 0 && hasAnyPermission(['stock_adjustments.approve'])" class="alert alert-warning py-2">
-                                <i class="fa fa-clock me-1"></i> {{ pendingCount }} penyesuaian menunggu persetujuan.
-                            </div>
+  <Head><title>{{ $t('stock_adjustments.title') }} - MaterialTrack</title></Head>
 
-                            <form @submit.prevent="applyFilter" class="row g-2 mb-3">
-                                <div class="col-md-2">
-                                    <select v-model="filters.status" class="form-select form-select-sm">
-                                        <option value="">Semua Status</option>
-                                        <option value="pending">Menunggu</option>
-                                        <option value="approved">Disetujui</option>
-                                        <option value="rejected">Ditolak</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <select v-model="filters.item_id" class="form-select form-select-sm">
-                                        <option value="">Semua Item</option>
-                                        <option v-for="item in items" :key="item.id" :value="item.id">{{ item.code }} - {{ item.name }}</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="date" v-model="filters.date_from" class="form-control form-control-sm">
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="date" v-model="filters.date_to" class="form-control form-control-sm">
-                                </div>
-                                <div class="col-md-3 d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter me-1"></i> Filter</button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" @click="resetFilter"><i class="fa fa-undo"></i></button>
-                                </div>
-                            </form>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-balance-scale text-indigo-600"></i>
+        {{ $t('stock_adjustments.title') }}
+      </h2>
+      <div class="d-flex gap-2">
+        <a v-if="hasAnyPermission(['activity_logs.index'])" href="/apps/activity-logs" class="btn-modern btn-modern-outline"><i class="fa fa-history me-1"></i> Audit Trail</a>
+        <Link v-if="hasAnyPermission(['stock_adjustments.create'])" href="/apps/stock-adjustments/create" class="btn-modern btn-modern-primary"><i class="fa fa-plus-circle me-2"></i> {{ $t('stock_adjustments.add') }}</Link>
+      </div>
+    </div>
 
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-sm">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Ref</th>
-                                            <th>Tanggal</th>
-                                            <th>Material</th>
-                                            <th class="text-end">Qty</th>
-                                            <th>Alasan</th>
-                                            <th>Diajukan</th>
-                                            <th>Status</th>
-                                            <th class="text-center">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-if="adjustments.data.length === 0">
-                                            <td colspan="8" class="text-center text-muted py-4">Belum ada penyesuaian stok.</td>
-                                        </tr>
-                                        <tr v-for="adj in adjustments.data" :key="adj.id">
-                                            <td class="text-nowrap">{{ adj.reference_no }}</td>
-                                            <td class="text-nowrap">{{ formatDate(adj.created_at) }}</td>
-                                            <td>
-                                                <div class="fw-semibold">{{ adj.item?.name }}</div>
-                                                <div class="text-muted small">{{ adj.item?.code }}</div>
-                                            </td>
-                                            <td class="text-end">
-                                                <span :class="adj.qty > 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">
-                                                    {{ adj.qty > 0 ? '+' + adj.qty : adj.qty }}
-                                                </span>
-                                                <span class="text-muted small"> {{ adj.item?.unit }}</span>
-                                            </td>
-                                            <td style="max-width: 240px;">
-                                                <span class="d-inline-block text-truncate" style="max-width: 240px;" :title="adj.reason">{{ adj.reason }}</span>
-                                            </td>
-                                            <td>{{ adj.user?.name ?? '-' }}</td>
-                                            <td>
-                                                <span v-if="adj.status === 'pending'" class="badge bg-warning text-dark">Menunggu</span>
-                                                <span v-else-if="adj.status === 'approved'" class="badge bg-success">Disetujui</span>
-                                                <span v-else class="badge bg-danger">Ditolak</span>
-                                                <div v-if="adj.approver" class="small text-muted mt-1">oleh {{ adj.approver.name }}</div>
-                                            </td>
-                                            <td class="text-center">
-                                                <div v-if="adj.status === 'pending'" class="btn-group btn-group-sm">
-                                                    <form v-if="hasAnyPermission(['stock_adjustments.approve'])" @submit.prevent="approve(adj)">
-                                                        <button class="btn btn-outline-success" title="Setujui"><i class="fa fa-check"></i></button>
-                                                    </form>
-                                                    <form v-if="hasAnyPermission(['stock_adjustments.approve'])" @submit.prevent="reject(adj)">
-                                                        <button class="btn btn-outline-danger" title="Tolak"><i class="fa fa-times"></i></button>
-                                                    </form>
-                                                    <form v-if="hasAnyPermission(['stock_adjustments.create'])" @submit.prevent="destroy(adj)">
-                                                        <button class="btn btn-outline-secondary" title="Hapus"><i class="fa fa-trash"></i></button>
-                                                    </form>
-                                                </div>
-                                                <span v-else class="text-muted small">-</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+    <div v-if="pendingCount > 0 && hasAnyPermission(['stock_adjustments.approve'])" class="alert alert-warning py-2 mb-4"><i class="fa fa-clock me-1"></i> {{ pendingCount }} penyesuaian menunggu persetujuan.</div>
 
-                            <div class="d-flex justify-content-end mt-2">
-                                <nav v-if="adjustments.last_page > 1">
-                                    <ul class="pagination pagination-sm mb-0">
-                                        <li v-for="link in adjustments.links" :key="link.label"
-                                            class="page-item" :class="{ active: link.active, disabled: !link.url }">
-                                            <Link class="page-link" :href="link.url ?? '#'" v-html="link.label" />
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="filter-bar mb-4">
+      <div class="filter-item"><i class="fa fa-layer-group text-muted"></i><select v-model="filters.status" class="filter-select"><option value="">{{ $t('common.all') }}</option><option value="pending">{{ $t('stock_adjustments.status_pending') }}</option><option value="approved">{{ $t('stock_adjustments.status_approved') }}</option><option value="rejected">{{ $t('stock_adjustments.status_rejected') }}</option></select></div>
+      <div class="filter-item"><i class="fa fa-box text-muted"></i><select v-model="filters.item_id" class="filter-select"><option value="">{{ $t('common.all') }}</option><option v-for="item in items" :key="item.id" :value="item.id">{{ item.code }} - {{ item.name }}</option></select></div>
+      <div class="filter-item"><i class="fa fa-calendar text-muted"></i><input type="date" v-model="filters.date_from" class="filter-select"></div>
+      <div class="filter-item"><span class="text-muted small">{{ $t('common.to') }}</span><input type="date" v-model="filters.date_to" class="filter-select"></div>
+      <div class="filter-item"><button class="btn-modern btn-modern-primary" @click="applyFilter"><i class="fa fa-filter me-2"></i>{{ $t('common.apply') }}</button><button class="btn-modern btn-modern-outline" @click="resetFilter"><i class="fa fa-undo"></i></button></div>
+    </div>
+
+    <DataTable :columns="columns" :rows="adjustments.data" :pagination="adjustments" row-key="id" :striped="true" :loading="false" :empty-text="$t('stock_adjustments.empty')" :searchable="false">
+      <template #cell-reference_no="{ row }"><code>{{ row.reference_no }}</code></template>
+      <template #cell-created_at="{ row }">{{ formatDate(row.created_at) }}</template>
+      <template #cell-item="{ row }"><div><div class="fw-semibold">{{ row.item?.name }}</div><div class="text-muted small">{{ row.item?.code }}</div></div></template>
+      <template #cell-qty="{ row }">
+        <span :class="row.qty > 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">{{ row.qty > 0 ? '+' : '' }}{{ row.qty }} <span class="text-muted small">{{ row.item?.unit }}</span></span>
+      </template>
+      <template #cell-reason="{ row }"><span class="d-inline-block text-truncate" :title="row.reason">{{ row.reason }}</span></template>
+      <template #cell-user="{ row }">{{ row.user?.name ?? '-' }}</template>
+      <template #cell-status="{ row }">
+        <span class="px-2 py-1 text-xs rounded-full font-bold" :class="statusClass(row.status)">{{ row.status }}</span>
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <template v-if="row.status === 'pending'">
+            <form v-if="hasAnyPermission(['stock_adjustments.approve'])" @submit.prevent="approve(row)"><button type="submit" class="act-btn act-btn-success" :title="$t('common.approve')"><i class="fa fa-check"></i></button></form>
+            <form v-if="hasAnyPermission(['stock_adjustments.approve'])" @submit.prevent="reject(row)"><button type="submit" class="act-btn act-btn-danger" :title="$t('common.reject')"><i class="fa fa-times"></i></button></form>
+            <Link v-if="hasAnyPermission(['stock_adjustments.create'])" :href="`/apps/stock-adjustments/${row.id}/edit`" class="act-btn act-btn-warning"><i class="fa fa-edit"></i></Link>
+          </template>
+          <a v-else :href="`/apps/stock-adjustments/${row.id}/pdf`" class="act-btn act-btn-danger" :aria-label="$t('common.print')" target="_blank"><i class="fa fa-file-pdf"></i></a>
         </div>
-    </main>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import LayoutApp from '@/Layouts/App.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref, reactive } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-    layout: LayoutApp,
-    components: { Head, Link },
-    props: {
-        adjustments: Object,
-        items: Array,
-        filters: Object,
-        pendingCount: Number,
-    },
-    data() {
-        return {
-            filters: { ...this.filters },
-        };
-    },
-    methods: {
-        formatDate(dateStr) {
-            return new Date(dateStr).toLocaleDateString('id-ID', {
-                day: '2-digit', month: 'short', year: 'numeric',
-            });
-        },
-        applyFilter() {
-            router.get('/apps/stock-adjustments', this.filters, { preserveState: true });
-        },
-        resetFilter() {
-            this.filters = { status: '', item_id: '', date_from: '', date_to: '' };
-            this.applyFilter();
-        },
-        approve(adj) {
-            if (confirm(`Setujui penyesuaian ${adj.reference_no} (${adj.qty > 0 ? '+' : ''}${adj.qty})? Stok akan diperbarui.`)) {
-                router.patch(`/apps/stock-adjustments/${adj.id}/approve`);
-            }
-        },
-        reject(adj) {
-            if (confirm(`Tolak penyesuaian ${adj.reference_no}?`)) {
-                router.patch(`/apps/stock-adjustments/${adj.id}/reject`);
-            }
-        },
-        destroy(adj) {
-            if (confirm(`Hapus penyesuaian ${adj.reference_no}?`)) {
-                router.delete(`/apps/stock-adjustments/${adj.id}`);
-            }
-        },
-    },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
+  props: { adjustments: Object, items: Array, filters: Object, pendingCount: Number },
+  setup(props) {
+    const { t } = useI18n();
+    const filterForm = reactive({
+      status: props.filters?.status || '',
+      item_id: props.filters?.item_id || '',
+      date_from: props.filters?.date_from || '',
+      date_to: props.filters?.date_to || '',
+    });
+    const columns = ref([
+      { key: "reference_no", label: t("stock_adjustments.col_ref") },
+      { key: "created_at", label: t("stock_adjustments.col_date") },
+      { key: "item", label: t("stock_adjustments.col_item") },
+      { key: "qty", label: t("stock_adjustments.col_qty"), align: "center" },
+      { key: "reason", label: t("stock_adjustments.col_reason") },
+      { key: "user", label: t("stock_adjustments.col_by") },
+      { key: "status", label: t("stock_adjustments.col_status"), align: "center" },
+      { key: "actions", label: t("common.action"), align: "center", width: "180px" },
+    ]);
+    const applyFilter = () => { router.get('/apps/stock-adjustments', filterForm, { preserveState: true }); };
+    const resetFilter = () => {
+      filterForm.status = ''; filterForm.item_id = ''; filterForm.date_from = ''; filterForm.date_to = '';
+      router.get('/apps/stock-adjustments');
+    };
+    const approve = (adj) => {
+            if (confirm(t("stock_adjustments.approve_confirm"))) {
+        router.patch(`/apps/stock-adjustments/${adj.id}/approve`);
+      }
+    };
+    const reject = (adj) => {
+      if (confirm(t("stock_adjustments.reject_confirm", "Reject this adjustment?"))) {
+        router.patch(`/apps/stock-adjustments/${adj.id}/reject`);
+      }
+    };
+    const formatDate = (d) => new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    const statusClass = (s) => ({ pending: 'bg-yellow-100 text-yellow-800', approved: 'bg-green-100 text-green-800', rejected: 'bg-red-100 text-red-800' }[s] || 'bg-secondary');
+    return { adjustments: props.adjustments, items: props.items, filters: filterForm, pendingCount: props.pendingCount, columns, applyFilter, resetFilter, approve, reject, formatDate, statusClass };
+  },
 };
 </script>

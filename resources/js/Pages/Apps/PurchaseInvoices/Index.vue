@@ -1,58 +1,109 @@
 <template>
-  <AppLayout>
-    <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Faktur Pembelian (Purchase Invoices)</h2>
-        <Link :href="route('apps.purchase-invoices.create')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
-          + Buat Faktur Pembelian
-        </Link>
-      </div>
-    </template>
+  <Head><title>{{ $t('purchase_invoices.heading') }} - MaterialTrack</title></Head>
 
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. Faktur</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. PO</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pemasok</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jatuh Tempo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="inv in invoices.data" :key="inv.id">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-semibold">{{ inv.invoice_number }}</td>
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">{{ inv.purchase_order?.po_number }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ inv.supplier?.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ inv.due_date }}</td>
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-bold">Rp {{ Number(inv.total).toLocaleString('id-ID') }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm capitalize">{{ inv.status }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link :href="route('apps.purchase-invoices.show', inv.id)" class="text-indigo-600 hover:text-indigo-900">Detail</Link>
-                </td>
-              </tr>
-              <tr v-if="invoices.data.length === 0">
-                <td colspan="7" class="px-6 py-4 text-center text-gray-500">Belum ada faktur pembelian.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <main class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa fa-file-invoice text-indigo-600"></i>
+        {{ $t('purchase_invoices.heading') }}
+      </h2>
+      <Link
+        v-if="hasAnyPermission(['purchase_invoices.create'])"
+        href="/apps/purchase-invoices/create"
+        class="btn-modern btn-modern-primary"
+      >
+        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+      </Link>
     </div>
-  </AppLayout>
+
+    <DataTable
+      :columns="columns"
+      :rows="invoices.data"
+      :pagination="invoices"
+      row-key="id"
+      :striped="true"
+      :loading="false"
+      :empty-text="$t('purchase_invoices.empty')"
+    >
+      <template #cell-invoice_number="{ row }">
+        <code>{{ row.invoice_number }}</code>
+      </template>
+      <template #cell-purchase_order="{ row }">
+        {{ row.purchase_order?.po_number }}
+      </template>
+      <template #cell-supplier="{ row }">
+        {{ row.supplier?.name }}
+      </template>
+      <template #cell-due_date="{ row }">
+        {{ row.due_date }}
+      </template>
+      <template #cell-total="{ row }">
+        Rp {{ Number(row.total).toLocaleString('id-ID') }}
+      </template>
+      <template #cell-status="{ row }">
+        {{ row.status }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="flex items-center justify-center gap-2">
+          <Link
+            :href="`/apps/purchase-invoices/${row.id}`"
+            class="act-btn act-btn-neutral"
+            :aria-label="$t('common.view')"
+          >
+            <i class="fa fa-eye"></i>
+          </Link>
+          <Link
+            v-if="hasAnyPermission(['purchase_invoices.edit'])"
+            :href="`/apps/purchase-invoices/${row.id}/edit`"
+            class="act-btn act-btn-success"
+            :aria-label="$t('common.edit')"
+          >
+            <i class="fa fa-pencil-alt"></i>
+          </Link>
+          <button
+            v-if="hasAnyPermission(['purchase_invoices.delete'])"
+            class="act-btn act-btn-danger"
+            :aria-label="$t('common.delete')"
+            @click="remove(row)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
+  </main>
 </template>
 
 <script>
-import AppLayout from '@/Layouts/App.vue';
-import { Link } from '@inertiajs/vue3';
+import LayoutApp from "@/Layouts/App.vue";
+import DataTable from "@/Components/DataTable.vue";
+import Pagination from "@/Components/Pagination.vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { confirmDelete } from "@/Utils/confirmDialog";
 
 export default {
-  components: { AppLayout, Link },
+  layout: LayoutApp,
+  components: { Head, Link, DataTable, Pagination },
   props: { invoices: Object },
+  setup() {
+    const { t } = useI18n();
+    const columns = ref([
+      { key: "invoice_number", label: t("purchase_invoices.col_invoice") },
+      { key: "purchase_order", label: t("purchase_invoices.col_po") },
+      { key: "supplier", label: t("purchase_invoices.col_supplier") },
+      { key: "due_date", label: t("purchase_invoices.col_due") },
+      { key: "total", label: t("purchase_invoices.col_total") },
+      { key: "status", label: t("purchase_invoices.col_status") },
+      { key: "actions", label: t("common.action"), align: "center", width: "150px" },
+    ]);
+    const remove = async (row) => {
+      if (await confirmDelete(t("purchase_invoices.delete_confirm"))) {
+        router.delete(`/apps/purchase-invoices/${row.id}`);
+      }
+    };
+    return { remove, columns };
+  },
 };
 </script>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MaterialTrack - Data Karyawan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#400071",
+                        "on-tertiary-fixed-variant": "#6900b3",
+                        "error-container": "#93000a",
+                        "primary": "#c0c1ff",
+                        "tertiary-fixed": "#f0dbff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "surface-container-highest": "#33343b",
+                        "primary-fixed": "#e1e0ff",
+                        "on-secondary": "#3f008e",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "on-primary-container": "#0d0096",
+                        "tertiary-fixed-dim": "#ddb7ff",
+                        "on-primary-fixed": "#07006c",
+                        "surface": "#111319",
+                        "on-tertiary": "#490080",
+                        "secondary-fixed": "#eaddff",
+                        "surface-container-high": "#282a30",
+                        "outline": "#908fa0",
+                        "on-error": "#690005",
+                        "outline-variant": "#464554",
+                        "surface-bright": "#373940",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "surface-dim": "#111319",
+                        "inverse-primary": "#494bd6",
+                        "on-surface-variant": "#c7c4d7",
+                        "on-tertiary-fixed": "#2c0051",
+                        "background": "#111319",
+                        "secondary": "#d2bbff",
+                        "surface-container-low": "#191b22",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#1e1f26",
+                        "on-secondary-fixed": "#25005a",
+                        "on-secondary-container": "#c9aeff",
+                        "primary-container": "#8083ff",
+                        "tertiary-container": "#b76dff",
+                        "secondary-container": "#6001d1",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "tertiary": "#ddb7ff",
+                        "inverse-surface": "#e2e2eb",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-background": "#e2e2eb",
+                        "surface-variant": "#33343b",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-on-surface": "#2e3037",
+                        "on-surface": "#e2e2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "24px",
+                        "header-height": "64px",
+                        "xl": "32px",
+                        "sidebar-width": "260px",
+                        "sm": "8px",
+                        "sidebar-collapsed": "72px",
+                        "md": "16px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "wordmark-track": ["Geist"],
+                        "wordmark-material": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "title-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "wordmark-track": ["20px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "wordmark-material": ["20px", { "lineHeight": "24px", "fontWeight": "800" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(26, 29, 39, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-header {
+            background: rgba(17, 19, 25, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Hover Lift & Glow */
+        .hover-lift {
+            transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Gradient Button with Inner Light */
+        .btn-gradient {
+            background: linear-gradient(135deg, #6001d1, #494bd6);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 12px rgba(96, 1, 209, 0.3);
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-gradient:hover {
+            transform: scale(1.02);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 16px rgba(96, 1, 209, 0.4);
+        }
+        
+        /* Input Focus Glow */
+        .input-glow:focus-within {
+            border-color: #c0c1ff;
+            box-shadow: 0 0 0 4px rgba(192, 193, 255, 0.1);
+        }
+
+        /* Status Badges */
+        .badge-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .badge-resign {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        /* Custom Scrollbar for ERP Tables */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111319;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #33343b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #464554;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex">
+<!-- SideNavBar Component -->
+<aside class="hidden md:flex flex-col w-sidebar-width h-screen sticky top-0 left-0 bg-surface-container-low border-r border-outline-variant/10 py-lg shrink-0 z-50">
+<!-- Brand Header -->
+<div class="px-lg pb-xl flex items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-container to-inverse-primary flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="inventory_2" data-weight="fill">inventory_2</span>
+</div>
+<div>
+<h1 class="font-wordmark-material text-wordmark-material text-primary-fixed">MaterialTrack</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">ERP Unified</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto px-sm space-y-xs">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Main</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="font-body-md text-body-md">Master Data</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-md text-body-md">Transaksi Stok</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-body-md text-body-md">Pengadaan &amp; Penjualan</span>
+</a>
+<a class="flex items-center gap-md bg-secondary-container/10 text-secondary border-l-4 border-secondary px-md py-sm transition-all duration-200 rounded-r-lg" href="#">
+<span class="material-symbols-outlined icon-fill" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md font-medium">Keuangan &amp; HRM</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-body-md text-body-md">AI Assistant</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-md text-body-md">Laporan &amp; Analisis</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-body-md text-body-md">Sistem &amp; Alur</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="business">business</span>
+<span class="font-body-md text-body-md">Departemen</span>
+</a>
+</nav>
+<!-- Footer Actions -->
+<div class="px-sm pt-md border-t border-outline-variant/10 mt-auto">
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors hover:scale-[1.02] duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden bg-background">
+<!-- TopNavBar Component -->
+<header class="h-header-height sticky top-0 z-40 w-full glass-header border-b border-outline-variant/10 flex justify-between items-center px-lg shrink-0">
+<!-- Search Bar (on_left as per JSON) -->
+<div class="flex-1 max-w-md">
+<div class="relative flex items-center bg-surface-container-highest rounded-full px-4 py-2 border border-outline-variant/30 input-glow transition-all">
+<span class="material-symbols-outlined text-outline mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface w-full font-body-md text-body-md placeholder:text-outline" placeholder="Search Data Karyawan..." type="text"/>
+</div>
+</div>
+<!-- Mobile Menu Toggle (Visible only on mobile) -->
+<button class="md:hidden p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90 mr-4">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90" title="Language">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-all scale-95 active:scale-90 relative" title="Notifications">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 ml-2 pl-4 border-l border-outline-variant/20 cursor-pointer hover:bg-surface-container-highest/20 p-2 rounded-lg transition-colors">
+<img alt="Administrator Gudang" class="w-8 h-8 rounded-full object-cover border border-outline-variant/50" data-alt="A professional headshot of an Asian male warehouse administrator in a clean, modern industrial setting. High-quality lighting, shallow depth of field, reflecting a high-end corporate ERP environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2YhYmMBcNFTR46__S7lJuj7y_-UXal9wz0eZpFcq_KVboHe6P_dGzFXMnx92ex2NZC-epA-B3rMLFYF9vX87c2FAA0SKKC78hS3kLAwwcBccVw-pCx_mtgpqMKQFJ7gy5Mnl3d2bpln6-iomndZvGxNEzah2Vt5J1EAigCDSqM7lDe6h3491leuKKZDKhewubLsVCTDflzxhmY5E-XldBM924CvDHMh5I9oTpeg9XJG0rb56yJuVl"/>
+<div class="hidden lg:block text-left">
+<p class="font-label-md text-label-md text-on-surface">Admin Utama</p>
+<p class="text-[10px] text-on-surface-variant">Administrator Gudang</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Content Canvas -->
+<div class="flex-1 overflow-y-auto p-4 md:p-lg">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">Data Karyawan</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manajemen profil dan informasi karyawan</p>
+</div>
+<button class="btn-gradient px-6 py-2.5 rounded-lg flex items-center gap-2 text-white font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                    Baru
+                </button>
+</div>
+<!-- Bento Grid Layout for Content -->
+<div class="grid grid-cols-1 xl:grid-cols-4 gap-lg">
+<!-- Main Table Card (Spans 3 cols on large screens) -->
+<div class="xl:col-span-3 glass-panel rounded-xl flex flex-col h-[600px] hover-lift">
+<div class="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/50 rounded-t-xl">
+<h3 class="font-title-lg text-title-lg text-on-surface">Daftar Pegawai</h3>
+<div class="flex gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors bg-surface-container rounded">
+<span class="material-symbols-outlined text-[20px]" data-icon="filter_list">filter_list</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors bg-surface-container rounded">
+<span class="material-symbols-outlined text-[20px]" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-low/95 backdrop-blur-sm z-10">
+<tr>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant/10 whitespace-nowrap">NIK</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant/10">Nama</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant/10">Jabatan</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant/10">Departemen</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant/10">Status</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant/10 text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-highest/30 transition-colors group">
+<td class="py-2 px-4 text-on-surface font-mono text-sm">EMP-2023-001</td>
+<td class="py-2 px-4 text-on-surface flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary font-bold text-xs">BK</div>
+                                        Budi Santoso
+                                    </td>
+<td class="py-2 px-4 text-on-surface-variant">Manager Gudang</td>
+<td class="py-2 px-4 text-on-surface-variant">Operasional</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full badge-active text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Aktif
+                                        </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/30 transition-colors bg-surface-container-lowest/30 group">
+<td class="py-2 px-4 text-on-surface font-mono text-sm">EMP-2023-014</td>
+<td class="py-2 px-4 text-on-surface flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary font-bold text-xs">SL</div>
+                                        Siti Lestari
+                                    </td>
+<td class="py-2 px-4 text-on-surface-variant">Staf Administrasi</td>
+<td class="py-2 px-4 text-on-surface-variant">HRD</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full badge-active text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Aktif
+                                        </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/30 transition-colors group">
+<td class="py-2 px-4 text-on-surface font-mono text-sm">EMP-2022-089</td>
+<td class="py-2 px-4 text-on-surface flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary font-bold text-xs">AW</div>
+                                        Andi Wijaya
+                                    </td>
+<td class="py-2 px-4 text-on-surface-variant">Operator Forklift</td>
+<td class="py-2 px-4 text-on-surface-variant">Logistik</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full badge-resign text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Resign
+                                        </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/30 transition-colors bg-surface-container-lowest/30 group">
+<td class="py-2 px-4 text-on-surface font-mono text-sm">EMP-2024-002</td>
+<td class="py-2 px-4 text-on-surface flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary font-bold text-xs">DP</div>
+                                        Dewi Putri
+                                    </td>
+<td class="py-2 px-4 text-on-surface-variant">Analis Data</td>
+<td class="py-2 px-4 text-on-surface-variant">IT</td>
+<td class="py-2 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full badge-active text-xs font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Aktif
+                                        </span>
+</td>
+<td class="py-2 px-4 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline-variant/10 flex justify-between items-center text-sm text-on-surface-variant bg-surface-container-low/50 rounded-b-xl">
+<span>Menampilkan 1-4 dari 42 karyawan</span>
+<div class="flex gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-highest disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary/20 text-primary font-medium">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-highest">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Side Widget Area -->
+<div class="flex flex-col gap-lg">
+<!-- Stats Card -->
+<div class="glass-panel rounded-xl p-5 hover-lift">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-4">Ringkasan Status</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="text-on-surface-variant">Aktif</span>
+<span class="text-on-surface font-medium">38</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-emerald-400 w-[90%] rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="text-on-surface-variant">Resign</span>
+<span class="text-on-surface font-medium">4</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-red-400 w-[10%] rounded-full shadow-[0_0_10px_rgba(248,113,113,0.5)]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Department Distribution (Visual placeholder) -->
+<div class="glass-panel rounded-xl p-5 hover-lift flex-1 flex flex-col">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-2">Sebaran Departemen</h4>
+<div class="flex-1 flex items-center justify-center relative min-h-[200px]">
+<!-- Abstract Representation of a chart to avoid data URIs -->
+<div class="w-32 h-32 rounded-full border-[16px] border-primary-container relative">
+<div class="absolute inset-0 rounded-full border-[16px] border-tertiary-container" style="clip-path: polygon(50% 50%, 100% 0, 100% 100%, 50% 100%);"></div>
+<div class="absolute inset-0 rounded-full border-[16px] border-secondary-container" style="clip-path: polygon(50% 50%, 0 0, 50% 0); transform: rotate(45deg);"></div>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+<span class="block text-2xl font-bold text-on-surface">42</span>
+<span class="text-[10px] text-on-surface-variant">Total</span>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary-container"></span> Operasional</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-tertiary-container"></span> Logistik</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-secondary-container"></span> HRD</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-surface-container-highest"></span> Lainnya</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating AI Assistant -->
+<button class="fixed bottom-6 right-6 w-14 h-14 rounded-full btn-gradient flex items-center justify-center shadow-lg z-50 animate-pulse">
+<span class="material-symbols-outlined text-white text-[24px]" data-icon="smart_toy">smart_toy</span>
+</button>
+</main>
+</body></html>

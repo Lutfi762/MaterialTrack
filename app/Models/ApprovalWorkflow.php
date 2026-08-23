@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ApprovalWorkflow extends Model
 {
     protected $fillable = [
-        'name', 'module', 'min_amount', 'max_amount', 'is_active',
+        'name', 'module', 'min_amount', 'max_amount', 'is_active', 'description',
     ];
 
     protected $casts = [

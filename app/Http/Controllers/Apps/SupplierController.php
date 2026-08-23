@@ -94,12 +94,20 @@ class SupplierController extends Controller
 
     public function destroy(Supplier $supplier)
     {
+        if ($supplier->purchaseOrders()->exists()) {
+            return back()->withErrors(['error' => 'Supplier tidak dapat dihapus karena masih memiliki data Purchase Order.']);
+        }
+
+        if ($supplier->stockIns()->exists()) {
+            return back()->withErrors(['error' => 'Supplier tidak dapat dihapus karena masih digunakan pada data Stock Masuk.']);
+        }
+
         try {
             $supplier->delete();
 
             return to_route('apps.suppliers.index')->with('success', 'Supplier berhasil dihapus.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal menghapus supplier.']);
+            return back()->withErrors(['error' => 'Gagal menghapus supplier. Data mungkin masih terpakai di modul lain.']);
         }
     }
 }

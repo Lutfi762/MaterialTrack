@@ -11,12 +11,15 @@ use App\Models\StockMovement;
 use App\Models\StockOut;
 use App\Services\ActivityLogService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StockOutController extends Controller
 {
+    use AuthorizesRequests;
+
     const APPROVAL_THRESHOLD = 50;
 
     public function index(Request $request)
@@ -156,12 +159,19 @@ class StockOutController extends Controller
                 $item->save();
             }
 
+            // lockForUpdate + MAX (bukan count()+1) agar aman dari race
+            // condition nomor referensi saat request konkuren.
+            $lastSeq = (int) DB::table('stock_outs')
+                ->whereDate('created_at', now())
+                ->lockForUpdate()
+                ->max(DB::raw('CAST(SUBSTRING(reference_no, -4) AS UNSIGNED)'));
+
             $stockOut = StockOut::create([
                 'item_id' => $validated['item_id'],
                 'department_id' => $validated['department_id'],
                 'pic_id' => $validated['pic_id'],
                 'user_id' => $user->id,
-                'reference_no' => 'OUT-'.now()->format('Ymd').'-'.str_pad(StockOut::whereDate('created_at', now())->count() + 1, 4, '0', STR_PAD_LEFT),
+                'reference_no' => 'OUT-'.now()->format('Ymd').'-'.str_pad($lastSeq + 1, 4, '0', STR_PAD_LEFT),
                 'qty' => $validated['qty'],
                 'purpose' => $validated['purpose'],
                 'notes' => $validated['notes'] ?? null,

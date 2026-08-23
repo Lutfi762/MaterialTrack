@@ -91,4 +91,40 @@ class PurchaseInvoiceController extends Controller
             'invoice' => $purchaseInvoice->load(['purchaseOrder', 'supplier', 'creator', 'items.item']),
         ]);
     }
+
+    public function edit(PurchaseInvoice $purchaseInvoice)
+    {
+        return Inertia::render('Apps/PurchaseInvoices/Edit', [
+            'invoice' => $purchaseInvoice->load(['purchaseOrder', 'supplier', 'items.item']),
+        ]);
+    }
+
+    public function update(Request $request, PurchaseInvoice $purchaseInvoice)
+    {
+        if (! in_array($purchaseInvoice->status, ['draft', 'pending'])) {
+            return back()->withErrors(['status' => 'Hanya faktur berstatus draft/pending yang dapat diedit.']);
+        }
+
+        $validated = $request->validate([
+            'supplier_invoice_no' => 'nullable|string|max:100',
+            'invoice_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:invoice_date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $purchaseInvoice->update($validated);
+
+        return to_route('apps.purchase-invoices.index')->with('success', 'Faktur Pembelian berhasil diperbarui.');
+    }
+
+    public function destroy(PurchaseInvoice $purchaseInvoice)
+    {
+        if (! in_array($purchaseInvoice->status, ['draft', 'pending'])) {
+            return back()->withErrors(['status' => 'Hanya faktur berstatus draft/pending yang dapat dihapus.']);
+        }
+
+        $purchaseInvoice->delete();
+
+        return to_route('apps.purchase-invoices.index')->with('success', 'Faktur Pembelian berhasil dihapus.');
+    }
 }

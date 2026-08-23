@@ -15,12 +15,21 @@ class AttendanceController extends Controller
         $query = Attendance::with('employee')->latest('date');
 
         if ($request->filled('date')) {
-            $query->where('date', $request->date);
+            $query->whereDate('date', $request->date);
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('date', '<=', $request->date_to);
+        }
+        if ($request->filled('status') && in_array($request->status, ['present', 'late', 'absent', 'sick', 'leave', 'holiday'], true)) {
+            $query->where('status', $request->status);
         }
 
         return Inertia::render('Apps/Attendances/Index', [
             'attendances' => $query->paginate(15)->withQueryString(),
-            'filters' => $request->only(['date']),
+            'filters' => $request->only(['date', 'date_from', 'date_to', 'status']),
         ]);
     }
 
