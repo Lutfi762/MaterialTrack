@@ -219,7 +219,7 @@ export default {
 
 <style scoped>
 .page-header-card {
-    background: white; border-radius: 16px; padding: 22px 26px;
+    background: var(--color-surface); border: 1px solid color-mix(in srgb, var(--color-outline) 20%, transparent); border-radius: 16px; padding: 22px 26px;
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
@@ -229,20 +229,20 @@ export default {
     text-decoration: none; border: none; transition: transform 0.15s ease;
 }
 .btn-modern:hover { transform: translateY(-2px); text-decoration: none; }
-.btn-modern-danger { background: #dc3545; color: white; box-shadow: 0 4px 12px rgba(220,53,69,0.25); }
+.btn-modern-danger { background: var(--color-danger); color: white; box-shadow: 0 4px 12px color-mix(in srgb, var(--color-danger) 25%, transparent); }
 .btn-modern-danger:hover { color: white; }
-.btn-modern-primary { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
+.btn-modern-primary { background: var(--color-primary); color: white; box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 25%, transparent); }
 .btn-modern-primary:hover { color: white; }
-.btn-modern-outline { background: white; color: #059669; border: 1.5px solid #d1fae5; }
-.btn-modern-outline:hover { color: #059669; background: #f0fdf4; }
+.btn-modern-outline { background: var(--color-surface); color: var(--color-primary); border: 1.5px solid color-mix(in srgb, var(--color-outline) 30%, transparent); }
+.btn-modern-outline:hover { color: var(--color-primary); background: var(--color-bg); }
 
 .filter-bar {
-    background: white; border-radius: 14px; padding: 14px 18px;
+    background: var(--color-surface); border: 1px solid color-mix(in srgb, var(--color-outline) 20%, transparent); border-radius: 14px; padding: 14px 18px;
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 .filter-item { display: flex; align-items: center; gap: 8px; }
-.filter-select { border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 7px 12px; font-size: 13px; }
+.filter-select { background: var(--color-surface); color: var(--color-on-surface); border: 1.5px solid color-mix(in srgb, var(--color-outline) 30%, transparent); border-radius: 8px; padding: 7px 12px; font-size: 13px; }
 
 .status-tabs {
     display: flex; gap: 8px; flex-wrap: wrap;
@@ -250,14 +250,14 @@ export default {
 .status-tab {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
-    border: 1.5px solid #e2e8f0; background: white; color: #64748b;
+    border: 1.5px solid color-mix(in srgb, var(--color-outline) 30%, transparent); background: var(--color-surface); color: var(--color-on-surface-variant);
     cursor: pointer; transition: all 0.2s;
 }
-.status-tab:hover { background: #f8fafc; border-color: #cbd5e1; }
-.status-tab.active { background: #7c3aed; color: white; border-color: #7c3aed; }
-.status-tab.tab-pending.active { background: #f59e0b; border-color: #f59e0b; }
-.status-tab.tab-approved.active { background: #16a34a; border-color: #16a34a; }
-.status-tab.tab-rejected.active { background: #dc2626; border-color: #dc2626; }
+.status-tab:hover { background: var(--color-bg); border-color: var(--color-primary); }
+.status-tab.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+.status-tab.tab-pending.active { background: var(--color-warning); border-color: var(--color-warning); }
+.status-tab.tab-approved.active { background: var(--color-success); border-color: var(--color-success); }
+.status-tab.tab-rejected.active { background: var(--color-danger); border-color: var(--color-danger); }
 .tab-badge {
     background: white; color: #f59e0b; font-size: 11px; font-weight: 700;
     padding: 1px 7px; border-radius: 10px; min-width: 20px; text-align: center;
@@ -267,13 +267,13 @@ export default {
 .status-badge {
     font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
 }
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-approved { background: #d1fae5; color: #065f46; }
-.status-rejected { background: #fee2e2; color: #991b1b; }
+.status-pending { background: color-mix(in srgb, var(--color-warning) 15%, transparent); color: var(--color-warning); }
+.status-approved { background: color-mix(in srgb, var(--color-success) 15%, transparent); color: var(--color-success); }
+.status-rejected { background: color-mix(in srgb, var(--color-danger) 15%, transparent); color: var(--color-danger); }
 
 .transaction-list { display: flex; flex-direction: column; gap: 12px; }
 .transaction-card {
-    background: white; border-radius: 14px; padding: 18px 20px;
+    background: var(--color-surface); border: 1px solid color-mix(in srgb, var(--color-outline) 20%, transparent); border-radius: 14px; padding: 18px 20px;
     display: flex; gap: 16px; align-items: flex-start;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -281,16 +281,16 @@ export default {
 .transaction-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.08); transform: translateY(-2px); }
 .transaction-icon {
     width: 44px; height: 44px; border-radius: 12px;
-    background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626;
+    background: color-mix(in srgb, var(--color-danger) 12%, transparent); color: var(--color-danger);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .transaction-main { flex: 1; min-width: 0; }
 .transaction-ref { font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; }
-.transaction-item-name { font-size: 15px; font-weight: 700; color: #1e293b; margin-top: 2px; }
-.transaction-qty { font-size: 20px; font-weight: 700; color: #dc2626; white-space: nowrap; }
+.transaction-item-name { font-size: 15px; font-weight: 700; color: var(--color-on-surface); margin-top: 2px; }
+.transaction-qty { font-size: 20px; font-weight: 700; color: var(--color-danger); white-space: nowrap; }
 .transaction-qty span { font-size: 20px; }
 .transaction-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.meta-badge { font-size: 11px; color: #64748b; background: #f8fafc; padding: 4px 10px; border-radius: 20px; }
+.meta-badge { font-size: 11px; color: var(--color-on-surface-variant); background: var(--color-bg); padding: 4px 10px; border-radius: 20px; }
 .transaction-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .act-btn {
     width: 34px; height: 34px; border-radius: 9px;
@@ -298,14 +298,14 @@ export default {
     border: none; text-decoration: none; font-size: 13px; transition: transform 0.15s ease;
 }
 .act-btn:hover { transform: scale(1.1); }
-.act-btn-neutral { background: #f1f5f9; color: #64748b; }
-.act-btn-info { background: #e0f2fe; color: #0284c7; }
-.act-btn-success { background: #d1fae5; color: #059669; }
-.act-btn-danger { background: #fee2e2; color: #dc2626; }
+.act-btn-neutral { background: var(--color-bg); color: var(--color-on-surface-variant); }
+.act-btn-info { background: color-mix(in srgb, var(--color-primary) 12%, transparent); color: var(--color-primary); }
+.act-btn-success { background: color-mix(in srgb, var(--color-success) 12%, transparent); color: var(--color-success); }
+.act-btn-danger { background: color-mix(in srgb, var(--color-danger) 12%, transparent); color: var(--color-danger); }
 .transaction-notes {
-    margin-top: 8px; padding: 8px 12px; background: #fffbeb; border: 1px solid #fde68a;
-    border-radius: 8px; font-size: 12px; color: #92400e; line-height: 1.5;
+    margin-top: 8px; padding: 8px 12px; background: color-mix(in srgb, var(--color-warning) 10%, transparent); border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+    border-radius: 8px; font-size: 12px; color: var(--color-warning); line-height: 1.5;
 }
-.empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 16px; border: 1px dashed #dee2e6; }
+.empty-state { text-align: center; padding: 60px 20px; background: var(--color-surface); border-radius: 16px; border: 1px dashed color-mix(in srgb, var(--color-outline) 40%, transparent); }
 .empty-state i { font-size: 42px; color: #cbd5e1; margin-bottom: 12px; display: block; }
 </style>
