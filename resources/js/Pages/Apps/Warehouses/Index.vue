@@ -3,44 +3,49 @@
     <title>{{ $t('warehouses.title') }} - MaterialTrack</title>
   </Head>
 
-  <main class="p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-        <i class="fa fa-warehouse text-indigo-600"></i>
+  <main class="min-h-full bg-bg p-4 sm:p-6 text-on-surface">
+    <div class="mx-auto max-w-7xl">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant">Master Data</p>
+        <h2 class="flex items-center gap-2 text-2xl font-bold tracking-tight text-on-surface">
+        <i class="fa fa-warehouse text-primary"></i>
         {{ $t('warehouses.heading') }}
-      </h2>
+        </h2>
+      </div>
       <Link
         v-if="hasAnyPermission(['warehouses.create'])"
         href="/apps/warehouses/create"
-        class="btn btn-primary rounded-pill"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 dark:text-[#1000a9]"
       >
-        <i class="fa fa-plus me-1"></i>
+        <i class="fa fa-plus"></i>
         {{ $t('warehouses.add') }}
       </Link>
+      </div>
     </div>
 
-    <div class="flex flex-wrap gap-3 mb-4">
-      <div class="flex-1 min-w-[250px]">
-        <div class="input-group">
+    <div class="mb-4 flex flex-wrap gap-3">
+      <div class="relative min-w-[250px] flex-1 sm:max-w-md">
+        <i class="fa fa-search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant"></i>
           <input
             v-model="search"
             type="text"
-            class="form-control"
+            class="w-full rounded-lg border border-outline/30 bg-surface py-2.5 pl-9 pr-11 text-sm text-on-surface outline-none transition placeholder:text-on-surface-variant/70 focus:border-primary focus:ring-2 focus:ring-primary/20"
             :placeholder="$t('warehouses.search_placeholder')"
             @keyup.enter="applyFilters"
           />
-          <button class="btn btn-outline-secondary" @click="applyFilters">
+          <button class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-2 text-on-surface-variant transition hover:bg-bg hover:text-primary" :aria-label="$t('common.search')" @click="applyFilters">
             <i class="fa fa-search"></i>
           </button>
-        </div>
       </div>
-      <div class="w-auto">
-        <button class="btn btn-outline-secondary btn-sm" @click="resetFilters">
-          <i class="fa fa-redo me-1"></i> {{ $t('common.reset') }}
+      <div>
+        <button class="inline-flex items-center gap-2 rounded-lg border border-outline/30 bg-surface px-3.5 py-2.5 text-sm font-medium text-on-surface-variant transition hover:bg-bg hover:text-on-surface" @click="resetFilters">
+          <i class="fa fa-redo"></i> {{ $t('common.reset') }}
         </button>
       </div>
     </div>
 
+    <section class="overflow-hidden rounded-xl border border-outline/20 bg-surface shadow-sm">
     <DataTable
       :columns="columns"
       :rows="warehouses.data"
@@ -51,18 +56,19 @@
       :empty-text="$t('warehouses.empty')"
     >
       <template #cell-code="{ value }">
-        <code class="text-sm">{{ value }}</code>
+        <code class="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">{{ value }}</code>
       </template>
       <template #cell-items_count="{ value }">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
           {{ value }} {{ $t('warehouses.items') }}
         </span>
       </template>
       <template #cell-status="{ value }">
         <span
-          class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-          :class="value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+          class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+          :class="value ? 'bg-success/10 text-success' : 'bg-bg text-on-surface-variant'"
         >
+          <span class="h-1.5 w-1.5 rounded-full" :class="value ? 'bg-success' : 'bg-outline'"></span>
           {{ value ? $t('common.active') : $t('common.inactive') }}
         </span>
       </template>
@@ -71,14 +77,14 @@
           <Link
             v-if="hasAnyPermission(['warehouses.edit'])"
             :href="`/apps/warehouses/${row.id}/edit`"
-            class="btn btn-sm btn-outline-primary"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-on-surface-variant transition hover:bg-primary/10 hover:text-primary"
             :aria-label="$t('common.edit')"
           >
             <i class="fa fa-edit"></i>
           </Link>
           <button
             v-if="hasAnyPermission(['warehouses.delete'])"
-            class="btn btn-sm btn-outline-danger"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-on-surface-variant transition hover:bg-danger/10 hover:text-danger"
             @click="deleteWarehouse(row)"
             :aria-label="$t('common.delete')"
           >
@@ -87,6 +93,8 @@
         </div>
       </template>
     </DataTable>
+    </section>
+    </div>
   </main>
 </template>
 
