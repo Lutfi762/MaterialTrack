@@ -435,7 +435,22 @@ export default {
 .ai-assistant-page {
     max-width: 1400px;
     margin: 0 auto;
+    color: var(--color-on-surface);
 }
+
+/* Stitch surface tokens; existing chat state, API calls, and conversation controls stay unchanged. */
+.chat-layout, .config-error-card { background: var(--color-surface); border-color: color-mix(in srgb, var(--color-outline) 20%, transparent); }
+.sidebar { background: var(--color-surface); border-color: color-mix(in srgb, var(--color-outline) 20%, transparent); }
+.chat-header, .chat-input-container { background: var(--color-surface); border-color: color-mix(in srgb, var(--color-outline) 20%, transparent); }
+.chat-messages { background: var(--color-bg); }
+.new-chat-btn, .suggested-prompt { color: var(--color-primary); border-color: color-mix(in srgb, var(--color-outline) 30%, transparent); background: var(--color-surface); }
+.new-chat-btn:hover, .suggested-prompt:hover, .conversation-item:hover { background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); color: var(--color-primary); }
+.conversation-item.active { background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)); }
+.conv-title, .message-content :deep(.msg-heading) { color: var(--color-on-surface); }
+.user-message .message-bubble { background: color-mix(in srgb, var(--color-primary) 18%, var(--color-surface)); border-color: color-mix(in srgb, var(--color-primary) 30%, transparent); }
+.assistant-message .message-bubble { background: var(--color-surface); border-color: color-mix(in srgb, var(--color-outline) 20%, transparent); }
+.ai-avatar, .send-btn { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-2)); }
+.input-wrapper { background: var(--color-bg); border-color: color-mix(in srgb, var(--color-outline) 30%, transparent); }
 
 .message-content :deep(.msg-heading) {
     font-weight: 700;
