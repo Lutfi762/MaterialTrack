@@ -1,22 +1,21 @@
 <template>
   <Head><title>{{ $t('purchase_orders.heading') }} - MaterialTrack</title></Head>
 
-  <main class="p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-        <i class="fa fa-shopping-cart text-indigo-600"></i>
+  <main class="min-h-full bg-bg p-4 sm:p-6 text-on-surface"><div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4"><div><p class="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant">Procurement</p><h2 class="flex items-center gap-2 text-2xl font-bold tracking-tight text-on-surface">
+        <i class="fa fa-shopping-cart text-primary"></i>
         {{ $t('purchase_orders.heading') }}
-      </h2>
+      </h2></div>
       <Link
         v-if="hasAnyPermission(['purchase_orders.create'])"
         href="/apps/purchase-orders/create"
-        class="btn-modern btn-modern-primary"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 dark:text-[#1000a9]"
       >
-        <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+        <i class="fa fa-plus"></i> {{ $t('common.new') }}
       </Link>
     </div>
 
-    <DataTable
+    <section class="overflow-hidden rounded-xl border border-outline/20 bg-surface shadow-sm"><DataTable
       :columns="columns"
       :rows="purchaseOrders.data"
       :pagination="purchaseOrders"
@@ -26,7 +25,7 @@
       :empty-text="$t('purchase_orders.empty')"
     >
       <template #cell-po_number="{ row }">
-        <code>{{ row.po_number }}</code>
+        <code class="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">{{ row.po_number }}</code>
       </template>
       <template #cell-supplier="{ row }">
         {{ row.supplier?.name }}
@@ -67,7 +66,7 @@
           </button>
         </div>
       </template>
-    </DataTable>
+    </DataTable></section></div>
   </main>
 </template>
 
