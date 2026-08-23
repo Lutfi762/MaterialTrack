@@ -3,7 +3,7 @@
     <button
       @click="goToPage(prevLink.url)"
       :disabled="!prevLink.url"
-      class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="inline-flex items-center justify-center rounded-md border border-outline/30 bg-surface px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-bg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50"
       :aria-label="prevLabel"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,15 +12,15 @@
     </button>
 
     <template v-for="link in pageLinks" :key="link.url || link.label">
-      <span v-if="link.active" class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 cursor-default" aria-current="page">
+      <span v-if="link.active" class="inline-flex cursor-default items-center justify-center rounded-md border border-primary bg-primary px-3 py-1.5 text-sm font-semibold text-white dark:text-[#1000a9]" aria-current="page">
         {{ link.label }}
       </span>
-      <span v-else-if="link.label === '...'" class="px-2 py-1.5 text-sm text-gray-400" aria-hidden="true">…</span>
+      <span v-else-if="link.label === '...'" class="px-2 py-1.5 text-sm text-on-surface-variant" aria-hidden="true">…</span>
       <button
         v-else
         @click="goToPage(link.url)"
         :disabled="!link.url"
-        class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex items-center justify-center rounded-md border border-outline/30 bg-surface px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-bg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50"
         :aria-label="pageLabel + ' ' + link.label"
       >
         {{ link.label }}
@@ -30,7 +30,7 @@
     <button
       @click="goToPage(nextLink.url)"
       :disabled="!nextLink.url"
-      class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="inline-flex items-center justify-center rounded-md border border-outline/30 bg-surface px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-bg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50"
       :aria-label="nextLabel"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,13 +1,13 @@
 <template>
   <div class="w-full overflow-x-auto">
     <div class="relative">
-      <table class="min-w-full divide-y divide-gray-200" :class="{ 'table-fixed': fixedLayout }">
-        <thead class="bg-gray-50">
+      <table class="min-w-full divide-y divide-outline/20 text-sm text-on-surface" :class="{ 'table-fixed': fixedLayout }">
+        <thead class="bg-bg">
           <tr>
             <template v-for="col in columns" :key="col.key">
               <th
                 :class="[
-                  'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                  'px-4 py-3 text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider whitespace-nowrap',
                   col.align === 'right' ? 'text-right' : 'text-left',
                   col.align === 'center' ? 'text-center' : '',
                   col.width ? '' : 'min-w-0'
@@ -20,14 +20,14 @@
                   <button
                     type="button"
                     @click="handleSort(col.key)"
-                    class="p-0.5 hover:bg-gray-200 rounded transition-colors"
+                    class="rounded p-0.5 transition-colors hover:bg-primary/10 hover:text-primary"
                     :aria-label="'Sort by ' + col.label"
                     :aria-sort="sortBy === col.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'"
                   >
                     <svg
                       v-if="sortBy === col.key"
                       :class="sortDir === 'asc' ? 'rotate-180' : ''"
-                      class="w-4 h-4 text-gray-400"
+                      class="h-4 w-4 text-on-surface-variant"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -36,7 +36,7 @@
                     </svg>
                     <svg
                       v-else
-                      class="w-4 h-4 text-gray-300"
+                      class="h-4 w-4 text-on-surface-variant/50"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -51,11 +51,11 @@
           </tr>
         </thead>
 
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="divide-y divide-outline/20 bg-surface">
           <tr v-if="loading" class="animate-pulse">
             <td :colspan="visibleColumns.length" class="px-4 py-12 text-center">
-              <div class="flex flex-col items-center gap-3 text-gray-500">
-                <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <div class="flex flex-col items-center gap-3 text-on-surface-variant">
+                <svg class="h-8 w-8 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
@@ -66,8 +66,8 @@
 
           <tr v-else-if="!loading && (!rows || rows.length === 0)">
             <td :colspan="visibleColumns.length" class="px-4 py-12 text-center">
-              <div class="flex flex-col items-center gap-3 text-gray-500">
-                <svg v-if="emptyIcon" :class="emptyIcon" class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex flex-col items-center gap-3 text-on-surface-variant">
+                <svg v-if="emptyIcon" :class="emptyIcon" class="h-12 w-12 text-on-surface-variant/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <svg v-else class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +92,7 @@
               <template v-for="col in visibleColumns" :key="col.key">
                 <td
                   :class="[
-                    'px-4 py-3 text-sm',
+                    'px-4 py-3 text-sm text-on-surface',
                     col.align === 'right' ? 'text-right' : 'text-left',
                     col.align === 'center' ? 'text-center' : '',
                     col.className || '',
@@ -128,7 +128,7 @@
           </template>
         </tbody>
 
-        <tfoot v-if="showFooter && footerRows && footerRows.length > 0" class="bg-gray-50">
+        <tfoot v-if="showFooter && footerRows && footerRows.length > 0" class="bg-bg">
           <tr v-for="(footerRow, idx) in footerRows" :key="idx">
             <template v-for="col in visibleColumns" :key="col.key">
               <td
@@ -147,7 +147,7 @@
         </tfoot>
       </table>
 
-      <div v-if="stickyHeader" class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-b from-white to-transparent pointer-events-none" aria-hidden="true" />
+      <div v-if="stickyHeader" class="pointer-events-none absolute left-0 right-0 top-0 h-2 bg-gradient-to-b from-surface to-transparent" aria-hidden="true" />
     </div>
 
     <div v-if="showPagination && pagination" class="mt-4 flex items-center justify-between">
