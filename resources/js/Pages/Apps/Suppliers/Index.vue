@@ -3,44 +3,48 @@
     <title>{{ $t('suppliers.title') }} - MaterialTrack</title>
   </Head>
 
-  <main class="p-6">
-    <div class="mtx-page-header">
-      <h2 class="mtx-page-title">
-        <i class="fa fa-truck mtx-title-icon" aria-hidden="true"></i>
+  <main class="min-h-full bg-bg p-4 sm:p-6 text-on-surface">
+    <div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant">Partners</p>
+      <h2 class="flex items-center gap-2 text-2xl font-bold tracking-tight text-on-surface">
+        <i class="fa fa-truck text-primary" aria-hidden="true"></i>
         {{ $t('suppliers.heading') }}
       </h2>
+      </div>
       <Link
         v-if="hasAnyPermission(['suppliers.create'])"
         href="/apps/suppliers/create"
-        class="mtx-btn mtx-btn-primary"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 dark:text-[#1000a9]"
       >
         <i class="fa fa-plus" aria-hidden="true"></i>
         {{ $t('common.new') }}
       </Link>
     </div>
 
-    <div class="mtx-toolbar">
-      <div class="mtx-search-wrap">
-        <i class="fa fa-search mtx-search-icon" aria-hidden="true"></i>
+    <div class="mb-4 flex flex-wrap gap-3">
+      <div class="relative min-w-[240px] flex-1 sm:max-w-md">
+        <i class="fa fa-search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant" aria-hidden="true"></i>
         <input
           v-model="search"
           type="text"
-          class="mtx-input !pl-9"
+          class="w-full rounded-lg border border-outline/30 bg-surface py-2.5 pl-9 pr-3 text-sm text-on-surface outline-none transition placeholder:text-on-surface-variant/70 focus:border-primary focus:ring-2 focus:ring-primary/20"
           :placeholder="$t('suppliers.search_placeholder')"
           @keyup.enter="applyFilters"
         />
       </div>
-      <select v-model="filterActive" class="mtx-select w-auto" @change="applyFilters">
+      <select v-model="filterActive" class="rounded-lg border border-outline/30 bg-surface px-3 py-2.5 text-sm text-on-surface outline-none focus:border-primary" @change="applyFilters">
         <option value="">{{ $t('common.all') }}</option>
         <option :value="1">{{ $t('common.active') }}</option>
         <option :value="0">{{ $t('common.inactive') }}</option>
       </select>
-      <button class="mtx-btn mtx-btn-secondary mtx-btn-sm" @click="resetFilters">
+      <button class="inline-flex items-center gap-2 rounded-lg border border-outline/30 bg-surface px-3.5 py-2.5 text-sm font-medium text-on-surface-variant transition hover:bg-bg" @click="resetFilters">
         <i class="fa fa-rotate-left" aria-hidden="true"></i> {{ $t('common.reset') }}
       </button>
     </div>
 
-    <div class="mtx-card overflow-hidden">
+    <div class="overflow-hidden rounded-xl border border-outline/20 bg-surface shadow-sm">
       <DataTable
         :columns="columns"
         :rows="suppliers.data"
@@ -51,7 +55,8 @@
         :empty-text="$t('common.no_data')"
       >
         <template #cell-status="{ value }">
-          <span class="mtx-badge" :class="value ? 'mtx-badge-success' : 'mtx-badge-neutral'">
+          <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" :class="value ? 'bg-success/10 text-success' : 'bg-bg text-on-surface-variant'">
+            <span class="h-1.5 w-1.5 rounded-full" :class="value ? 'bg-success' : 'bg-outline'"></span>
             {{ value ? $t('common.active') : $t('common.inactive') }}
           </span>
         </template>
@@ -76,6 +81,7 @@
           </div>
         </template>
       </DataTable>
+    </div>
     </div>
   </main>
 </template>
