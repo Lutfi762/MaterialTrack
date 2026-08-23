@@ -147,7 +147,7 @@ export default {
 
 <style scoped>
 .page-header-card {
-    background: white; border-radius: 16px; padding: 22px 26px;
+    background: var(--color-surface); border: 1px solid color-mix(in srgb, var(--color-outline) 20%, transparent); border-radius: 16px; padding: 22px 26px;
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
@@ -157,24 +157,24 @@ export default {
     text-decoration: none; border: none; transition: transform 0.15s ease;
 }
 .btn-modern:hover { transform: translateY(-2px); text-decoration: none; }
-.btn-modern-success { background: #198754; color: white; box-shadow: 0 4px 12px rgba(25,135,84,0.25); }
+.btn-modern-success { background: var(--color-primary); color: white; box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 25%, transparent); }
 .btn-modern-success:hover { color: white; }
-.btn-modern-outline { background: white; color: #059669; border: 1.5px solid #d1fae5; }
-.btn-modern-outline:hover { color: #059669; background: #f0fdf4; }
+.btn-modern-outline { background: var(--color-surface); color: var(--color-primary); border: 1.5px solid color-mix(in srgb, var(--color-outline) 30%, transparent); }
+.btn-modern-outline:hover { color: var(--color-primary); background: var(--color-bg); }
 
 .filter-bar {
-    background: white; border-radius: 14px; padding: 14px 18px;
+    background: var(--color-surface); border: 1px solid color-mix(in srgb, var(--color-outline) 20%, transparent); border-radius: 14px; padding: 14px 18px;
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 .filter-item { display: flex; align-items: center; gap: 8px; }
-.filter-select { border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 7px 12px; font-size: 13px; }
-.btn-modern-primary { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
+.filter-select { background: var(--color-surface); color: var(--color-on-surface); border: 1.5px solid color-mix(in srgb, var(--color-outline) 30%, transparent); border-radius: 8px; padding: 7px 12px; font-size: 13px; }
+.btn-modern-primary { background: var(--color-primary); color: white; box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 25%, transparent); }
 .btn-modern-primary:hover { color: white; }
 
 .transaction-list { display: flex; flex-direction: column; gap: 12px; }
 .transaction-card {
-    background: white; border-radius: 14px; padding: 18px 20px;
+    background: var(--color-surface); border: 1px solid color-mix(in srgb, var(--color-outline) 20%, transparent); border-radius: 14px; padding: 18px 20px;
     display: flex; gap: 16px; align-items: flex-start;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -182,15 +182,15 @@ export default {
 .transaction-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.08); transform: translateY(-2px); }
 .transaction-icon {
     width: 44px; height: 44px; border-radius: 12px;
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669;
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent); color: var(--color-primary);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .transaction-main { flex: 1; min-width: 0; }
 .transaction-ref { font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; }
-.transaction-item-name { font-size: 15px; font-weight: 700; color: #1e293b; margin-top: 2px; }
-.transaction-qty { font-size: 20px; font-weight: 700; color: #059669; white-space: nowrap; }
+.transaction-item-name { font-size: 15px; font-weight: 700; color: var(--color-on-surface); margin-top: 2px; }
+.transaction-qty { font-size: 20px; font-weight: 700; color: var(--color-primary); white-space: nowrap; }
 .transaction-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.meta-badge { font-size: 11px; color: #64748b; background: #f8fafc; padding: 4px 10px; border-radius: 20px; }
+.meta-badge { font-size: 11px; color: var(--color-on-surface-variant); background: var(--color-bg); padding: 4px 10px; border-radius: 20px; }
 .transaction-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .act-btn {
     width: 34px; height: 34px; border-radius: 9px;
@@ -198,9 +198,9 @@ export default {
     border: none; text-decoration: none; font-size: 13px; transition: transform 0.15s ease;
 }
 .act-btn:hover { transform: scale(1.1); }
-.act-btn-neutral { background: #f1f5f9; color: #64748b; }
-.act-btn-success { background: #d1fae5; color: #059669; }
-.act-btn-danger { background: #fee2e2; color: #dc2626; }
-.empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 16px; border: 1px dashed #dee2e6; }
+.act-btn-neutral { background: var(--color-bg); color: var(--color-on-surface-variant); }
+.act-btn-success { background: color-mix(in srgb, var(--color-primary) 12%, transparent); color: var(--color-primary); }
+.act-btn-danger { background: color-mix(in srgb, var(--color-danger) 12%, transparent); color: var(--color-danger); }
+.empty-state { text-align: center; padding: 60px 20px; background: var(--color-surface); border-radius: 16px; border: 1px dashed color-mix(in srgb, var(--color-outline) 40%, transparent); }
 .empty-state i { font-size: 42px; color: #cbd5e1; margin-bottom: 12px; display: block; }
 </style>
