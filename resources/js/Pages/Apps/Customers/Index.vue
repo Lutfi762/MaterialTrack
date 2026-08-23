@@ -1,34 +1,36 @@
 <template>
   <Head><title>{{ $t('customers.heading') }} - MaterialTrack</title></Head>
 
-  <main class="p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-        <i class="fa fa-users text-indigo-600"></i>
+  <main class="min-h-full bg-bg p-4 sm:p-6 text-on-surface">
+    <div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div><p class="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant">Partners</p>
+      <h2 class="flex items-center gap-2 text-2xl font-bold tracking-tight text-on-surface">
+        <i class="fa fa-users text-primary"></i>
         {{ $t('customers.heading') }}
-      </h2>
-      <div class="flex items-center gap-4">
-        <div class="search-box">
+      </h2></div>
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="relative min-w-[220px]">
           <input
             type="text"
             v-model="search"
             :placeholder="$t('customers.search_placeholder')"
-            class="search-input"
+            class="w-full rounded-lg border border-outline/30 bg-surface py-2.5 pl-3 pr-9 text-sm text-on-surface outline-none placeholder:text-on-surface-variant/70 focus:border-primary focus:ring-2 focus:ring-primary/20"
             @input="handleSearch"
           />
-          <i class="fa fa-search search-icon"></i>
+          <i class="fa fa-search pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant"></i>
         </div>
         <Link
           v-if="hasAnyPermission(['customers.create'])"
           href="/apps/customers/create"
-          class="btn-modern btn-modern-primary"
+          class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 dark:text-[#1000a9]"
         >
-          <i class="fa fa-plus me-2"></i> {{ $t('common.new') }}
+          <i class="fa fa-plus"></i> {{ $t('common.new') }}
         </Link>
       </div>
     </div>
 
-    <DataTable
+    <section class="overflow-hidden rounded-xl border border-outline/20 bg-surface shadow-sm"><DataTable
       :columns="columns"
       :rows="customers.data"
       :pagination="customers"
@@ -38,7 +40,7 @@
       :empty-text="$t('customers.empty')"
     >
       <template #cell-code="{ row }">
-        <code>{{ row.code || '-' }}</code>
+        <code class="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">{{ row.code || '-' }}</code>
       </template>
       <template #cell-name="{ row }">
         {{ row.name }}
@@ -46,7 +48,7 @@
       <template #cell-contact="{ row }">
         {{ row.contact_person || '-' }}
         <br />
-        <span class="text-xs text-gray-400">{{ row.email }}</span>
+        <span class="text-xs text-on-surface-variant">{{ row.email }}</span>
       </template>
       <template #cell-type="{ row }">
         {{ row.type }}
@@ -59,14 +61,14 @@
           <Link
             v-if="hasAnyPermission(['customers.edit'])"
             :href="`/apps/customers/${row.id}/edit`"
-            class="act-btn act-btn-success"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-on-surface-variant transition hover:bg-primary/10 hover:text-primary"
             :aria-label="$t('common.edit')"
           >
             <i class="fa fa-pencil-alt"></i>
           </Link>
           <button
             v-if="hasAnyPermission(['customers.delete'])"
-            class="act-btn act-btn-danger"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-on-surface-variant transition hover:bg-danger/10 hover:text-danger"
             :aria-label="$t('common.delete')"
             @click="handleDelete(row.id)"
           >
@@ -74,7 +76,8 @@
           </button>
         </div>
       </template>
-    </DataTable>
+    </DataTable></section>
+    </div>
   </main>
 </template>
 
