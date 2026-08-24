@@ -557,6 +557,18 @@ export default {
 .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
 .sidebar-nav::-webkit-scrollbar-thumb { background: color-mix(in srgb, white 14%, transparent); border-radius: 4px; }
 
+.nav-section-label,
+.nav-section-link {
+    border-top: 1px solid color-mix(in srgb, var(--color-on-sidebar-variant) 18%, transparent);
+    margin-top: 10px;
+}
+
+.sidebar-nav > .nav-section-label:first-child,
+.sidebar-nav > .nav-section-link:first-child {
+    border-top: none;
+    margin-top: 0;
+}
+
 .nav-section-label {
     font-size: 10px;
     font-weight: 700;
