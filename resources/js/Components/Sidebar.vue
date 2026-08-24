@@ -10,7 +10,7 @@
             </button>
         </div>
 
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" ref="navEl">
 
             <div class="nav-section-label">MAIN</div>
 
@@ -416,7 +416,9 @@
 </template>
 
 <script>
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
+
+const SCROLL_KEY = 'sidebar-scroll-top';
 
 export default {
     components: { Link },
@@ -438,13 +440,38 @@ export default {
         },
         toggleMobile() {
             this.mobileOpen = !this.mobileOpen;
+        },
+        onNavScroll() {
+            const nav = this.$refs.navEl;
+            if (!nav) return;
+            sessionStorage.setItem(SCROLL_KEY, nav.scrollTop);
+        },
+        // Restore posisi scroll terakhir, lalu pastikan menu aktif kelihatan
+        // (kalau active item di luar posisi tersimpan, scroll ke situ).
+        restoreScroll() {
+            const nav = this.$refs.navEl;
+            if (!nav) return;
+            const saved = sessionStorage.getItem(SCROLL_KEY);
+            if (saved !== null) nav.scrollTop = parseInt(saved, 10) || 0;
+
+            const active = nav.querySelector('.nav-item.active');
+            if (active) active.scrollIntoView({ block: 'nearest' });
         }
     },
     mounted() {
         window.addEventListener('toggle-mobile-sidebar', this.toggleMobile);
+        this.$refs.navEl?.addEventListener('scroll', this.onNavScroll, { passive: true });
+        this.$nextTick(this.restoreScroll);
+        // Layout Sidebar dipertahankan lintas navigasi Inertia (bukan di-remount),
+        // jadi restore juga harus jalan tiap kali halaman baru selesai dirender.
+        this.unsubscribeNavigate = router.on('navigate', () => {
+            this.$nextTick(this.restoreScroll);
+        });
     },
     beforeUnmount() {
         window.removeEventListener('toggle-mobile-sidebar', this.toggleMobile);
+        this.$refs.navEl?.removeEventListener('scroll', this.onNavScroll);
+        this.unsubscribeNavigate?.();
     }
 }
 </script>
