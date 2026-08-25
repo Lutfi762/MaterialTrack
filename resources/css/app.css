@@ -8,6 +8,12 @@
 /* Dark mode via .dark class on <html> (toggled in Header.vue, persisted in localStorage) */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Tailwind preflight sets border-collapse:collapse on all <table>, which makes
+   `divide-y`/`border-b` on <tr> invisible per CSS table border rules (borders
+   only paint from cell edges under collapse). Every table page in this app
+   uses divide-y/border-b on <tr>, so restore separate borders app-wide. */
+table { border-collapse: separate; border-spacing: 0; }
+
 /* ============================================================
    MaterialTrack Design Tokens (light default / dark override)
    Source of truth — mirrors "Design tokens" section in CLAUDE.md.
