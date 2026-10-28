@@ -1,61 +1,57 @@
 <template>
     <Head><title>Data PIC - MaterialTrack</title></Head>
-    <main>
-        <div class="container-fluid">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="page-header-card">
-                        <div>
-                            <h4 class="mb-1"><i class="fa fa-id-badge me-2 text-primary"></i>{{ $t('pics.heading') }}</h4>
-                            <p class="text-muted mb-0 small">{{ $t('pics.subtitle') }}</p>
-                        </div>
-                        <Link v-if="hasAnyPermission(['pics.create'])" href="/apps/pics/create" class="btn btn-primary btn-modern">
-                            <i class="fa fa-plus-circle me-2"></i> {{ $t('pics.add') }}
-                        </Link>
-                    </div>
+    <main class="p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="mtx-page-header">
+                <div>
+                    <h1 class="mtx-page-title"><i class="fa fa-id-badge text-indigo-600" aria-hidden="true"></i> {{ $t('pics.heading') }}</h1>
+                    <p class="mtx-hint">{{ $t('pics.subtitle') }}</p>
                 </div>
+                <Link v-if="hasAnyPermission(['pics.create'])" href="/apps/pics/create" class="mtx-btn mtx-btn-primary">
+                    <i class="fa fa-plus" aria-hidden="true"></i> {{ $t('pics.add') }}
+                </Link>
             </div>
 
-            <div class="row" v-if="pics.data.length > 0">
-                <div class="col-md-4 mb-4" v-for="pic in pics.data" :key="pic.id">
-                    <div class="pic-card">
-                        <div class="pic-card-header">
-                            <div class="pic-avatar">{{ initials(pic.name) }}</div>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold">{{ pic.name }}</div>
-                                <span class="badge-dept">{{ pic.department?.name ?? '-' }}</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" v-if="pics.data.length > 0">
+                <div class="mtx-card" v-for="pic in pics.data" :key="pic.id">
+                    <div class="mtx-card-header">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 shrink-0 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">{{ initials(pic.name) }}</div>
+                            <div>
+                                <div class="font-semibold text-gray-900">{{ pic.name }}</div>
+                                <span class="mtx-badge mtx-badge-info">{{ pic.department?.name ?? '-' }}</span>
                             </div>
                         </div>
-                        <div class="pic-card-body">
-                            <div class="pic-info-row" v-if="pic.nik">
-                                <i class="fa fa-id-card text-muted"></i> {{ pic.nik }}
-                            </div>
-                            <div class="pic-info-row" v-if="pic.phone">
-                                <i class="fa fa-phone text-muted"></i> {{ pic.phone }}
-                            </div>
-                            <div class="pic-info-row" v-if="pic.email">
-                                <i class="fa fa-envelope text-muted"></i> {{ pic.email }}
-                            </div>
-                            <div class="pic-info-row text-muted" v-if="!pic.nik && !pic.phone && !pic.email">
-                                <i class="fa fa-circle-info"></i> {{ $t('pics.empty_contact') }}
-                            </div>
+                    </div>
+                    <div class="mtx-card-body space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-gray-600" v-if="pic.nik">
+                            <i class="fa fa-id-card text-gray-400" aria-hidden="true"></i> {{ pic.nik }}
                         </div>
-                        <div class="pic-card-footer">
-                            <Link v-if="hasAnyPermission(['pics.edit'])" :href="`/apps/pics/${pic.id}/edit`" class="btn btn-sm btn-outline-success flex-fill">
-                                <i class="fa fa-pencil-alt me-1"></i> {{ $t('common.edit') }}
+                        <div class="flex items-center gap-2 text-sm text-gray-600" v-if="pic.phone">
+                            <i class="fa fa-phone text-gray-400" aria-hidden="true"></i> {{ pic.phone }}
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600" v-if="pic.email">
+                            <i class="fa fa-envelope text-gray-400" aria-hidden="true"></i> {{ pic.email }}
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-400" v-if="!pic.nik && !pic.phone && !pic.email">
+                            <i class="fa fa-circle-info" aria-hidden="true"></i> {{ $t('pics.empty_contact') }}
+                        </div>
+                        <div class="flex gap-2 pt-2 border-t border-gray-100 mt-3">
+                            <Link v-if="hasAnyPermission(['pics.edit'])" :href="`/apps/pics/${pic.id}/edit`" class="mtx-btn mtx-btn-secondary mtx-btn-sm flex-1">
+                                <i class="fa fa-pencil" aria-hidden="true"></i> {{ $t('common.edit') }}
                             </Link>
-                            <button v-if="hasAnyPermission(['pics.delete'])" class="btn btn-sm btn-outline-danger flex-fill" @click="handleDelete(pic.id)">
-                                <i class="fa fa-trash me-1"></i> {{ $t('common.delete') }}
+                            <button v-if="hasAnyPermission(['pics.delete'])" class="mtx-btn mtx-btn-danger mtx-btn-sm flex-1" @click="handleDelete(pic.id)">
+                                <i class="fa fa-trash" aria-hidden="true"></i> {{ $t('common.delete') }}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="empty-state" v-else>
-                <i class="fa fa-id-badge"></i>
-                <p class="mb-0 fw-semibold">{{ $t('pics.empty') }}</p>
-                <p class="text-muted small">{{ $t('pics.add_desc') }}</p>
+            <div class="mtx-card text-center py-12" v-else>
+                <i class="fa fa-id-badge text-4xl text-gray-300" aria-hidden="true"></i>
+                <p class="mt-3 mb-0 font-semibold text-gray-700">{{ $t('pics.empty') }}</p>
+                <p class="text-sm text-gray-400">{{ $t('pics.add_desc') }}</p>
             </div>
 
             <Pagination v-if="pics.data.length > 0" :links="pics.links" align="center" />
@@ -102,101 +98,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.page-header-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
-    border-radius: 16px;
-    padding: 24px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 12px rgba(13, 110, 253, 0.06);
-    border: 1px solid rgba(13, 110, 253, 0.08);
-}
-.btn-modern {
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
-    border: none;
-    transition: transform 0.15s ease;
-}
-.btn-modern:hover { transform: translateY(-2px); }
-.pic-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    border: 1px solid #eef1f6;
-    overflow: hidden;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-.pic-card:hover {
-    box-shadow: 0 8px 24px rgba(13, 110, 253, 0.12);
-    transform: translateY(-3px);
-}
-.pic-card-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 20px;
-    border-bottom: 1px solid #f0f2f7;
-}
-.pic-avatar {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 15px;
-}
-.badge-dept {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    color: #1d4ed8;
-    background: #eaf1ff;
-    padding: 2px 10px;
-    border-radius: 20px;
-    margin-top: 2px;
-}
-.pic-card-body {
-    padding: 16px 20px;
-    flex-grow: 1;
-}
-.pic-info-row {
-    font-size: 13px;
-    color: #495057;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.pic-info-row:last-child { margin-bottom: 0; }
-.pic-card-footer {
-    padding: 14px 20px;
-    border-top: 1px solid #f0f2f7;
-    display: flex;
-    gap: 8px;
-}
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    background: white;
-    border-radius: 16px;
-    border: 1px dashed #dee2e6;
-}
-.empty-state i {
-    font-size: 42px;
-    color: #cbd5e1;
-    margin-bottom: 12px;
-    display: block;
-}
-</style>

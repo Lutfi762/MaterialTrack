@@ -55,6 +55,8 @@ class SalesOrderController extends Controller
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
+        self::validateStockAvailability($validated['items']);
+
         DB::transaction(function () use ($validated) {
             // Satu quotation maksimal menjadi satu SO
             if (($validated['quotation_id'] ?? null) && SalesOrder::where('quotation_id', $validated['quotation_id'])->exists()) {
@@ -99,6 +101,39 @@ class SalesOrderController extends Controller
         return to_route('apps.sales-orders.index')->with('success', 'Pesanan Penjualan (SO) berhasil dibuat.');
     }
 
+    /**
+     * ponytail: ATP menghitung current_stock dikurangi reservasi aktif;
+     * kalau nanti perlu menghitung SO terbuka lain juga, tambahkan di sini.
+     */
+    public static function validateStockAvailability(array $items): void
+    {
+        $requested = [];
+        foreach ($items as $row) {
+            $requested[(int) $row['item_id']] = ($requested[(int) $row['item_id']] ?? 0) + (int) $row['qty'];
+        }
+
+        $stocks = Item::whereIn('id', array_keys($requested))->get(['id', 'name', 'current_stock']);
+        $reserved = \App\Models\StockReservation::whereIn('item_id', array_keys($requested))
+            ->active()
+            ->selectRaw('item_id, SUM(qty) as total')
+            ->groupBy('item_id')
+            ->pluck('total', 'item_id');
+
+        $errors = [];
+        foreach ($requested as $itemId => $qty) {
+            $stock = $stocks->firstWhere('id', $itemId);
+            $available = ($stock->current_stock ?? 0) - (int) ($reserved[$itemId] ?? 0);
+            if (! $stock || $qty > $available) {
+                $name = $stock->name ?? "ID #{$itemId}";
+                $errors[] = "Stok {$name} tidak cukup (tersedia {$available}, diminta {$qty}).";
+            }
+        }
+
+        if ($errors) {
+            throw ValidationException::withMessages(['items' => $errors]);
+        }
+    }
+
     public function show(SalesOrder $salesOrder)
     {
         return Inertia::render('Apps/SalesOrders/Show', [
@@ -134,6 +169,8 @@ class SalesOrderController extends Controller
             'items.*.qty' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
+
+        self::validateStockAvailability($validated['items']);
 
         DB::transaction(function () use ($validated, $salesOrder) {
             if (($validated['quotation_id'] ?? null) && SalesOrder::where('quotation_id', $validated['quotation_id'])->where('id', '!=', $salesOrder->id)->exists()) {

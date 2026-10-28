@@ -1,88 +1,85 @@
 <template>
     <Head><title>Input Stock Opname - MaterialTrack</title></Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border-0 rounded-3 shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-clipboard-check me-1"></i> {{ $t('stock_opname.add') }}</span>
-                            <Link :href="`/apps/stock-opnames?period=${form.period}`" class="btn btn-sm btn-secondary">
-                                <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
-                            </Link>
+    <main class="p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-clipboard-check text-indigo-600" aria-hidden="true"></i> {{ $t('stock_opname.add') }}</span>
+                    <Link :href="`/apps/stock-opnames?period=${form.period}`" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                    </Link>
+                </div>
+                <div class="mtx-card-body">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 mb-4">
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('stock_opname.period') }}</label>
+                            <input v-model="form.period" type="month" class="mtx-input" />
                         </div>
-                        <div class="card-body">
-                            <div class="row g-2 mb-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">{{ $t('stock_opname.period') }}</label>
-                                    <input v-model="form.period" type="month" class="form-control" />
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">{{ $t('stock_opname.date') }}</label>
-                                    <input v-model="form.date" type="date" class="form-control" />
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">{{ $t('stock_opname.filter_category') }}</label>
-                                    <select v-model="selectedCategory" class="form-select">
-                                        <option value="">{{ $t('stock_opname.filter_all') }}</option>
-                                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-sm align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Kode</th>
-                                            <th>Nama Material</th>
-                                            <th>Kategori</th>
-                                            <th class="text-end">{{ $t('stock_opname.col_system_stock') }}</th>
-                                            <th style="width: 150px;">{{ $t('stock_opname.col_physical_stock') }}</th>
-                                            <th class="text-center" style="width: 100px;">{{ $t('stock_opname.col_diff') }}</th>
-                                            <th>{{ $t('stock_opname.col_notes') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="row in filteredItems" :key="row.item.id" :class="{ 'table-secondary': alreadyDone.includes(row.item.id) }">
-                                            <td>{{ row.item.code }}</td>
-                                            <td>{{ row.item.name }}</td>
-                                            <td>{{ row.item.category?.name ?? '-' }}</td>
-                                            <td class="text-end">{{ row.item.current_stock }} {{ row.item.unit }}</td>
-                                            <td>
-                                                <input
-                                                    v-if="!alreadyDone.includes(row.item.id)"
-                                                    v-model.number="row.physical_stock"
-                                                    type="number" min="0"
-                                                    class="form-control form-control-sm"
-                                                />
-                                                <span v-else class="text-muted small">{{ $t('stock_opname.already_opnamed') }}</span>
-                                            </td>
-                                            <td class="text-center">
-                                                <span v-if="!alreadyDone.includes(row.item.id)"
-                                                      :class="diffClass(row)">
-                                                    {{ diffLabel(row) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    v-if="!alreadyDone.includes(row.item.id)"
-                                                    v-model="row.notes"
-                                                    type="text"
-                                                    class="form-control form-control-sm"
-                                                    :placeholder="$t('common.optional')"
-                                                />
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <button @click="submit" class="btn btn-primary" :disabled="submitting">
-                                <i class="fa fa-save me-1"></i> {{ $t('stock_opname.save_opname') }}
-                            </button>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('stock_opname.date') }}</label>
+                            <input v-model="form.date" type="date" class="mtx-input" />
+                        </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('stock_opname.filter_category') }}</label>
+                            <select v-model="selectedCategory" class="mtx-select">
+                                <option value="">{{ $t('stock_opname.filter_all') }}</option>
+                                <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+                            </select>
                         </div>
                     </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm align-middle divide-y divide-gray-200">
+                            <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                                <tr class="border-b border-gray-200">
+                                    <th class="px-3 py-2.5 text-left font-semibold">Kode</th>
+                                    <th class="px-3 py-2.5 text-left font-semibold">Nama Material</th>
+                                    <th class="px-3 py-2.5 text-left font-semibold">Kategori</th>
+                                    <th class="px-3 py-2.5 text-right font-semibold">{{ $t('stock_opname.col_system_stock') }}</th>
+                                    <th class="px-3 py-2.5 text-left font-semibold w-[150px]">{{ $t('stock_opname.col_physical_stock') }}</th>
+                                    <th class="px-3 py-2.5 text-center font-semibold w-[110px]">{{ $t('stock_opname.col_diff') }}</th>
+                                    <th class="px-3 py-2.5 text-left font-semibold">{{ $t('stock_opname.col_notes') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr v-for="row in filteredItems" :key="row.item.id" :class="{ 'bg-gray-50': alreadyDone.includes(row.item.id) }">
+                                    <td class="px-3 py-2 whitespace-nowrap text-gray-500">{{ row.item.code }}</td>
+                                    <td class="px-3 py-2 font-medium text-gray-900">{{ row.item.name }}</td>
+                                    <td class="px-3 py-2 text-gray-500">{{ row.item.category?.name ?? '-' }}</td>
+                                    <td class="px-3 py-2 text-right whitespace-nowrap">{{ row.item.current_stock }} {{ row.item.unit }}</td>
+                                    <td class="px-3 py-2">
+                                        <input
+                                            v-if="!alreadyDone.includes(row.item.id)"
+                                            v-model.number="row.physical_stock"
+                                            type="number" min="0"
+                                            class="mtx-input"
+                                        />
+                                        <span v-else class="text-xs text-gray-400">{{ $t('stock_opname.already_opnamed') }}</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-center">
+                                        <span v-if="!alreadyDone.includes(row.item.id)"
+                                              class="mtx-badge"
+                                              :class="diffClass(row)">
+                                            {{ diffLabel(row) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <input
+                                            v-if="!alreadyDone.includes(row.item.id)"
+                                            v-model="row.notes"
+                                            type="text"
+                                            class="mtx-input"
+                                            :placeholder="$t('common.optional')"
+                                        />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <button @click="submit" class="mtx-btn mtx-btn-primary mt-4" :disabled="submitting">
+                        <i class="fa fa-save" aria-hidden="true"></i> {{ $t('stock_opname.save_opname') }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -140,8 +137,8 @@ export default {
         },
         diffClass(row) {
             const d = this.diff(row);
-            if (d === 0) return 'badge bg-success';
-            return d > 0 ? 'badge bg-info' : 'badge bg-danger';
+            if (d === 0) return 'mtx-badge-success';
+            return d > 0 ? 'mtx-badge-info' : 'mtx-badge-danger';
         },
         submit() {
             const entries = this.rows

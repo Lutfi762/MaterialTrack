@@ -161,8 +161,6 @@ body {
     text-align: center;
 }
 
-/* Reset sisa CoreUI */
-.c-main { padding: 0 !important; }
 .fade-in { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 

@@ -2,86 +2,72 @@
     <Head>
         <title>Tambah Role - MaterialTrack</title>
     </Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 rounded-3 shadow border-top-purple">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold"><i class="fa fa-shield-halved me-1"></i> {{ $t('roles.add') }}</span>
-                                <Link href="/apps/roles" class="btn btn-sm btn-secondary">
-                                    <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
-                                </Link>
-                            </div>
-                            <div class="card-body">
-
-                                <form @submit.prevent="submit">
-
-                                    <div class="mb-3">
-                                        <label class="fw-bold">{{ $t('roles.name') }}</label>
-                                        <input
-                                            class="form-control"
-                                            v-model="form.name"
-                                            :class="{ 'is-invalid': form.errors.name }"
-                                            type="text"
-                                            :placeholder="$t('roles.name_placeholder')"
-                                        >
-                                        <div v-if="form.errors.name" class="invalid-feedback d-block">
-                                            {{ form.errors.name }}
-                                        </div>
-                                    </div>
-
-                                    <hr>
-
-                                    <div class="mb-3">
-                                        <label class="fw-bold">Permissions</label>
-                                        <br>
-                                        <div
-                                            class="form-check form-check-inline"
-                                            v-for="permission in permissions"
-                                            :key="permission.id"
-                                        >
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                v-model="form.permissions"
-                                                :value="permission.name"
-                                                :id="`check-${permission.id}`"
-                                            >
-                                            <label class="form-check-label" :for="`check-${permission.id}`">
-                                                {{ permission.name }}
-                                            </label>
-                                        </div>
-                                        <div v-if="form.errors.permissions" class="invalid-feedback d-block">
-                                            {{ form.errors.permissions }}
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <button
-                                                class="btn btn-primary shadow-sm rounded-sm"
-                                                type="submit"
-                                                :disabled="form.processing"
-                                            >
-                                                <span v-if="form.processing">{{ $t('common.saving') }}</span>
-                                                <span v-else>SIMPAN</span>
-                                            </button>
-                                            <button
-                                                class="btn btn-warning shadow-sm rounded-sm ms-3"
-                                                type="button"
-                                                @click="form.reset()"
-                                            >
-                                                RESET
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-
-                            </div>
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-shield-halved text-indigo-600" aria-hidden="true"></i> {{ $t('roles.add') }}</span>
+                    <Link href="/apps/roles" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                    </Link>
+                </div>
+                <div class="mtx-card-body">
+                    <form @submit.prevent="submit">
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('roles.name') }}</label>
+                            <input
+                                class="mtx-input"
+                                v-model="form.name"
+                                :class="{ 'mtx-input-error': form.errors.name }"
+                                type="text"
+                                :placeholder="$t('roles.name_placeholder')"
+                            >
+                            <p v-if="form.errors.name" class="mtx-error-text">{{ form.errors.name }}</p>
                         </div>
-                    </div>
+
+                        <div class="mtx-field border-t border-gray-100 pt-4">
+                            <label class="mtx-label">Permissions</label>
+                            <div class="flex flex-wrap gap-x-4 gap-y-2 mt-1">
+                                <div
+                                    class="mtx-checkbox-row"
+                                    v-for="permission in permissions"
+                                    :key="permission.id"
+                                >
+                                    <input
+                                        class="mtx-checkbox"
+                                        type="checkbox"
+                                        v-model="form.permissions"
+                                        :value="permission.name"
+                                        :id="`check-${permission.id}`"
+                                    >
+                                    <label class="mtx-checkbox-label" :for="`check-${permission.id}`">
+                                        {{ permission.name }}
+                                    </label>
+                                </div>
+                            </div>
+                            <p v-if="form.errors.permissions" class="mtx-error-text">
+                                {{ form.errors.permissions }}
+                            </p>
+                        </div>
+
+                        <div class="flex gap-2 pt-2">
+                            <button
+                                class="mtx-btn mtx-btn-primary"
+                                type="submit"
+                                :disabled="form.processing"
+                            >
+                                <span v-if="form.processing">{{ $t('common.saving') }}</span>
+                                <span v-else>SIMPAN</span>
+                            </button>
+                            <button
+                                class="mtx-btn mtx-btn-secondary"
+                                type="button"
+                                @click="form.reset()"
+                            >
+                                RESET
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -133,8 +119,3 @@ export default {
 }
 </script>
 
-<style>
-.border-top-purple {
-    border-top: 3px solid #6f42c1 !important;
-}
-</style>

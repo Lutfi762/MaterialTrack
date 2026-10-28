@@ -1,4 +1,24 @@
 <?php
+use App\Http\Controllers\Apps\HelpdeskController;
+use App\Http\Controllers\Apps\DmsController;
+use App\Http\Controllers\Apps\FleetController;
+
+use App\Http\Controllers\Apps\CrmController;
+
+use App\Http\Controllers\Apps\ProjectController;
+use App\Http\Controllers\Apps\ProjectTaskController;
+
+use App\Http\Controllers\Apps\QualityControlController;
+
+use App\Http\Controllers\Apps\AssetMaintenanceController;
+
+use App\Http\Controllers\Apps\BomController;
+use App\Http\Controllers\Apps\ProductionOrderController;
+
+use App\Http\Controllers\Apps\FixedAssetController;
+use App\Http\Controllers\Apps\BudgetController;
+use App\Http\Controllers\Apps\SupplierScorecardController;
+
 
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +75,12 @@ use App\Http\Controllers\Apps\ErpSectionController;
 
 // Halaman Utama → Login (controller, bukan closure — supaya route:cache jalan)
 Route::get('/', WelcomeController::class)->middleware('guest');
+
+// Login dengan akun Google (Laravel Socialite)
+Route::get('/auth/google/redirect', [App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])
+    ->middleware('guest')->name('auth.google.redirect');
+Route::get('/auth/google/callback', [App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])
+    ->middleware('guest')->name('auth.google.callback');
 
 // API route for updating user locale
 Route::post('/api/user/locale', [UserLocaleController::class, 'update'])->middleware('auth');
@@ -237,6 +263,12 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])
         ->name('apps.reports.index')
         ->middleware('permission:reports.index');
+    Route::get('/reports/stock-card', [ReportController::class, 'stockCard'])
+        ->name('apps.reports.stock-card')
+        ->middleware('permission:reports.index');
+    Route::get('/reports/stock-card/export', [ReportController::class, 'exportStockCard'])
+        ->name('apps.reports.stock-card.export')
+        ->middleware(['permission:reports.index', 'throttle:10,1']);
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])
@@ -369,6 +401,8 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
         ->middleware('permission:purchase_requests.approve');
     Route::post('/purchase-requests/{purchaseRequest}/reject', [PurchaseRequestController::class, 'reject'])->name('apps.purchase-requests.reject')
         ->middleware('permission:purchase_requests.approve');
+    Route::post('/purchase-requests/{purchaseRequest}/convert-to-po', [PurchaseRequestController::class, 'convertToPo'])->name('apps.purchase-requests.convert-po')
+        ->middleware('permission:purchase_orders.create');
 
     Route::resource('/purchase-orders', PurchaseOrderController::class, ['as' => 'apps'])
         ->middleware('permission:purchase_orders.index|purchase_orders.create|purchase_orders.edit|purchase_orders.delete');
@@ -454,4 +488,83 @@ Route::prefix('apps')->middleware(['auth'])->group(function () {
         ->except(['show', 'edit', 'update', 'destroy'])
         ->middleware('permission:approval_workflows.index|approval_workflows.create');
 
+    // Fixed Assets
+    Route::resource('/fixed-assets', FixedAssetController::class, ['as' => 'apps'])
+        ->middleware('permission:fixed_assets.index|fixed_assets.create|fixed_assets.edit|fixed_assets.delete');
+    Route::post('/fixed-assets/{fixedAsset}/depreciate', [FixedAssetController::class, 'runDepreciation'])->name('apps.fixed-assets.depreciate')
+        ->middleware('permission:fixed_assets.create');
+
+    // Budgets
+    Route::resource('/budgets', BudgetController::class, ['as' => 'apps'])
+        ->middleware('permission:budgets.index|budgets.create|budgets.edit|budgets.delete');
+    Route::post('/budgets/{budget}/update-realization', [BudgetController::class, 'updateRealization'])->name('apps.budgets.update-realization')
+        ->middleware('permission:budgets.create');
+
+    // Supplier Scorecards
+    Route::get('/supplier-scorecards', [SupplierScorecardController::class, 'index'])->name('apps.supplier-scorecards.index')
+        ->middleware('permission:supplier_scorecards.index');
+    Route::post('/supplier-scorecards/generate', [SupplierScorecardController::class, 'generate'])->name('apps.supplier-scorecards.generate')
+        ->middleware('permission:supplier_scorecards.generate');
+
+    // Manufacturing
+    Route::resource('/boms', BomController::class, ['as' => 'apps'])->only(['index', 'create', 'store', 'destroy'])
+        ->middleware('permission:boms.index|boms.create|boms.delete');
+    Route::resource('/production-orders', ProductionOrderController::class, ['as' => 'apps'])->only(['index', 'create', 'store'])
+        ->middleware('permission:production_orders.index|production_orders.create');
+    Route::post('/production-orders/{productionOrder}/complete', [ProductionOrderController::class, 'complete'])->name('apps.production-orders.complete')
+        ->middleware('permission:production_orders.complete');
+
+    Route::resource('/asset-maintenances', AssetMaintenanceController::class, ['as' => 'apps'])
+        ->except(['show'])
+        ->middleware('permission:asset_maintenances.index|asset_maintenances.create|asset_maintenances.edit|asset_maintenances.delete');
+
+    Route::resource('/quality-controls', QualityControlController::class, ['as' => 'apps'])->only(['index', 'create', 'store', 'destroy'])
+        ->middleware('permission:quality_controls.index|quality_controls.create|quality_controls.delete');
+    Route::resource('/projects', ProjectController::class, ['as' => 'apps'])->except(['edit'])
+        ->middleware('permission:projects.index|projects.create|projects.delete');
+    Route::post('/projects/{project}/tasks', [ProjectTaskController::class, 'store'])->name('apps.tasks.store')
+        ->middleware('permission:projects.create');
+    Route::put('/tasks/{task}', [ProjectTaskController::class, 'update'])->name('apps.tasks.update')
+        ->middleware('permission:projects.create');
+    Route::delete('/tasks/{task}', [ProjectTaskController::class, 'destroy'])->name('apps.tasks.destroy')
+        ->middleware('permission:projects.delete');
+    Route::get('/crm/leads', [CrmController::class, 'leads'])->name('apps.crm.leads')
+        ->middleware('permission:crm.index');
+    Route::post('/crm/leads', [CrmController::class, 'storeLead'])
+        ->middleware('permission:crm.index');
+    Route::put('/crm/leads/{lead}', [CrmController::class, 'updateLead'])
+        ->middleware('permission:crm.index');
+    Route::get('/crm/opportunities', [CrmController::class, 'opportunities'])->name('apps.crm.opportunities')
+        ->middleware('permission:crm.index');
+    Route::post('/crm/opportunities', [CrmController::class, 'storeOpportunity'])
+        ->middleware('permission:crm.index');
+    Route::put('/crm/opportunities/{opportunity}', [CrmController::class, 'updateOpportunityStage'])
+        ->middleware('permission:crm.index');
+    Route::get('/fleet/vehicles', [FleetController::class, 'vehicles'])->name('apps.fleet.vehicles')
+        ->middleware('permission:fleet.index');
+    Route::post('/fleet/vehicles', [FleetController::class, 'storeVehicle'])
+        ->middleware('permission:fleet.index');
+    Route::put('/fleet/vehicles/{vehicle}', [FleetController::class, 'updateVehicle'])
+        ->middleware('permission:fleet.index');
+    Route::get('/fleet/deliveries', [FleetController::class, 'deliveries'])->name('apps.fleet.deliveries')
+        ->middleware('permission:fleet.index');
+    Route::post('/fleet/deliveries', [FleetController::class, 'storeDelivery'])
+        ->middleware('permission:fleet.index');
+    Route::put('/fleet/deliveries/{delivery}', [FleetController::class, 'updateDeliveryStatus'])
+        ->middleware('permission:fleet.index');
+    Route::resource('/helpdesk', HelpdeskController::class, ['as' => 'apps'])->only(['index', 'store', 'show', 'update'])
+        ->middleware('permission:helpdesk.index|helpdesk.create|helpdesk.update');
+    Route::post('/helpdesk/{ticket}/replies', [HelpdeskController::class, 'reply'])->name('apps.helpdesk.replies.store')
+        ->middleware('permission:helpdesk.update');
+
+    Route::get('/documents', [DmsController::class, 'index'])->name('apps.documents.index')
+        ->middleware('permission:documents.index');
+    Route::post('/documents/folders', [DmsController::class, 'storeFolder'])->name('apps.documents.folders.store')
+        ->middleware('permission:documents.create');
+    Route::post('/documents', [DmsController::class, 'storeDocument'])->name('apps.documents.store')
+        ->middleware('permission:documents.create');
+    Route::get('/documents/{document}/download', [DmsController::class, 'download'])->name('apps.documents.download')
+        ->middleware('permission:documents.index');
+    Route::delete('/documents/{document}', [DmsController::class, 'destroyDocument'])->name('apps.documents.destroy')
+        ->middleware('permission:documents.delete');
 });

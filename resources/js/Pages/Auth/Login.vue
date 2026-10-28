@@ -143,6 +143,11 @@
                         <span>{{ $t('auth.or') }}</span>
                     </div>
 
+                    <a href="/auth/google/redirect" class="google-button">
+                        <i class="fa-brands fa-google" aria-hidden="true"></i>
+                        <span>{{ $t('auth.continue_with_google') }}</span>
+                    </a>
+
                     <p class="access-note">
                         <i class="fa fa-circle-info" aria-hidden="true"></i>
                         {{ $t('auth.no_access') }}
@@ -633,6 +638,34 @@ export default {
 
 .submit-button:hover .submit-arrow {
     transform: translateX(3px);
+}
+
+.google-button {
+    width: 100%;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    background: white;
+    color: var(--gray-700);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 180ms ease-out, border-color 180ms ease-out;
+}
+
+.google-button:hover {
+    background: var(--brand-bg);
+    border-color: var(--gray-300);
+    text-decoration: none;
+}
+
+.google-button i {
+    color: #ea4335;
 }
 
 .divider {

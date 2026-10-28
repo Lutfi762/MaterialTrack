@@ -8,24 +8,24 @@ Menggabungkan dua laporan audit yang sebelumnya terpisah di root project:
 
 | Laporan | Status per dokumen asli | Cakupan |
 |---|---|---|
-| Audit sistem inti (7 Agu) | **DRAF — belum ada bukti perbaikan tercatat** di dokumen ini | Stock in/out/opname, items, categories, departments, locations, security & RBAC, frontend lama |
+| Audit sistem inti (7 Agu) | **BASI — 9 temuan CRITICAL/HIGH diverifikasi ulang manual 4 Sep 2026, semua sudah fix di kode aktual** (lihat tabel di bawah) | Stock in/out/opname, items, categories, departments, locations, security & RBAC, frontend lama |
 | Audit modul ERP (19–22 Agu) | **Sebagian besar sudah diperbaiki & diverifikasi** (lihat tabel status di bawah) | Procurement, Sales, Finance, HRM, ApprovalWorkflow |
 
-⚠️ Karena kedua audit beda tanggal dan beda scope, **cek ulang manual** apakah temuan di audit sistem inti (7 Agu) masih relevan sebelum menindaklanjuti — mungkin sudah diperbaiki di luar dokumen ini tapi belum diperbarui statusnya.
+## Verifikasi Ulang Temuan Sistem Inti (7 Agu) — 4 September 2026
 
-## Temuan Terbuka Prioritas Tinggi (Sistem Inti — Belum Ada Bukti Fix)
+Ke-9 temuan berikut sudah dicek langsung ke kode terkini (bukan cuma re-baca laporan lama) — semua **sudah fixed**, dokumen 7 Agu ini sekadar arsip sejarah, jangan ditindaklanjuti lagi:
 
-1. **CRITICAL** — Routes tanpa permission middleware (`routes/web.php:40-80`) — bypass RBAC total.
-2. **CRITICAL** — IDOR di StockIn/StockOut/Category/Department/Location controllers — user bisa edit/hapus data user/department lain.
-3. **CRITICAL** — Observer StockIn/StockOut tidak terdaftar di `AppServiceProvider` → audit trail StockMovement tidak jalan otomatis.
-4. **CRITICAL** — Race condition stok (check-then-decrement tanpa `lockForUpdate`) → stok bisa minus.
-5. **CRITICAL** — `current_stock` kolom signed integer, tanpa constraint → stok negatif mungkin tersimpan.
-6. **CRITICAL** — Race condition nomor referensi (`count()+1`) → duplikat/gagal unique constraint.
-7. **CRITICAL** — XSS via `v-html` di `Pagination.vue` & `StockMovements/Index.vue`.
-8. **HIGH** — Beberapa transaksi multi-step tidak dibungkus `DB::transaction`.
-9. **HIGH** — Field `date` hilang dari `$fillable` di `StockIn`/`StockOut`.
+1. ✅ Routes tanpa permission middleware — semua resource route sekarang pakai `->middleware('permission:...')` (`routes/web.php`); 9 modul ERP baru (BOM, Production Order, QC, Project, CRM, Fleet, Helpdesk, DMS) yang sempat lolos tanpa middleware juga sudah ditambal 4 Sep 2026.
+2. ✅ IDOR StockIn/StockOut — `edit`/`update`/`destroy` pakai `$this->authorize('update'|'delete', $stockOut)` (policy-guarded), `index` scope by `department_id` untuk role `department_user`.
+3. ✅ Observer StockIn/StockOut terdaftar di `AppServiceProvider::boot()` (`StockIn::observe(StockInObserver::class)`, dst).
+4. ✅ Race condition stok — `StockInController`/`StockOutController`/`StockAdjustmentController` pakai `lockForUpdate()` di dalam `DB::transaction`.
+5. ✅ `current_stock` sudah `unsignedInteger` (migration `2026_08_08_102844_add_unsigned_constraint_to_items_current_stock.php`) — DB-level constraint mencegah nilai negatif tersimpan.
+6. ✅ Race condition nomor referensi — diganti `App\Support\DocumentNumber::next()` (row-lock based), dipakai di semua modul ERP baru + PR/PO/GR/dll.
+7. ✅ XSS `v-html` — tidak ditemukan di `Pagination.vue` (dicek langsung, pakai `{{ }}` interpolation biasa) maupun modul lain (grep codebase-wide `v-html` cuma nongol di dokumentasi, bukan kode).
+8. ✅ Transaksi multi-step dibungkus `DB::transaction` — dicek di GoodsReceipt/Delivery/StockIn/StockOut/StockAdjustment/StockOpname/SalesReturn/StockReturn/FixedAsset dan semua titik `DocumentNumber::next()` (5 titik yang sempat kelewat ditambal 4 Sep 2026).
+9. ✅ Field `date` ada di `$fillable` `StockIn`/`StockOut` (dicek langsung).
 
-*(Detail lengkap 140 temuan asli ada di lampiran di bawah.)*
+*(Detail lengkap 140 temuan asli ada di lampiran di bawah — historis, sebagian besar sudah tidak relevan.)*
 
 ## Status Modul ERP Baru (per re-audit 22 Agustus)
 

@@ -1,49 +1,46 @@
 <template>
     <Head><title>Tambah Department - MaterialTrack</title></Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <div class="card border-0 rounded-3 shadow">
-                            <div class="card-header">
-                                <span class="font-weight-bold"><i class="fa fa-building me-1"></i> {{ $t('departments.add') }}</span>
-                            </div>
-                            <div class="card-body">
-                                <form @submit.prevent="submit">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('departments.name') }} <span class="text-danger">*</span></label>
-                                        <input v-model="form.name" type="text" class="form-control" :class="{ 'is-invalid': form.errors.name }" placeholder="Contoh: Produksi">
-                                        <div class="invalid-feedback">{{ form.errors.name }}</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('departments.code') }}</label>
-                                        <input v-model="form.code" type="text" class="form-control" :class="{ 'is-invalid': form.errors.code }" placeholder="Contoh: PROD">
-                                        <div class="invalid-feedback">{{ form.errors.code }}</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('common.status') }}</label>
-                                        <select v-model="form.status" class="form-select" :class="{ 'is-invalid': form.errors.status }">
-                                            <option value="active">{{ $t('common.active') }}</option>
-                                            <option value="inactive">{{ $t('common.inactive') }}</option>
-                                        </select>
-                                        <div class="invalid-feedback">{{ form.errors.status }}</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('common.description') }}</label>
-                                        <textarea v-model="form.description" class="form-control" rows="3" :placeholder="$t('departments.description_placeholder')"></textarea>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary" :disabled="form.processing">
-                                            <span v-if="form.processing" class="spinner-border spinner-border-sm me-1"></span>
-                                            {{ $t('common.save') }}
-                                        </button>
-                                        <Link href="/apps/departments" class="btn btn-secondary">{{ $t('common.cancel') }}</Link>
-                                    </div>
-                                </form>
-                            </div>
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-building text-indigo-600" aria-hidden="true"></i> {{ $t('departments.add') }}</span>
+                    <Link href="/apps/departments" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                    </Link>
+                </div>
+                <div class="mtx-card-body">
+                    <form @submit.prevent="submit">
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('departments.name') }} <span class="mtx-required">*</span></label>
+                            <input v-model="form.name" type="text" class="mtx-input" :class="{ 'mtx-input-error': form.errors.name }" placeholder="Contoh: Produksi">
+                            <p v-if="form.errors.name" class="mtx-error-text">{{ form.errors.name }}</p>
                         </div>
-                    </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('departments.code') }}</label>
+                            <input v-model="form.code" type="text" class="mtx-input" :class="{ 'mtx-input-error': form.errors.code }" placeholder="Contoh: PROD">
+                            <p v-if="form.errors.code" class="mtx-error-text">{{ form.errors.code }}</p>
+                        </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('common.status') }}</label>
+                            <select v-model="form.status" class="mtx-select" :class="{ 'mtx-select-error': form.errors.status }">
+                                <option value="active">{{ $t('common.active') }}</option>
+                                <option value="inactive">{{ $t('common.inactive') }}</option>
+                            </select>
+                            <p v-if="form.errors.status" class="mtx-error-text">{{ form.errors.status }}</p>
+                        </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('common.description') }}</label>
+                            <textarea v-model="form.description" class="mtx-textarea" rows="3" :placeholder="$t('departments.description_placeholder')"></textarea>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="submit" class="mtx-btn mtx-btn-primary" :disabled="form.processing">
+                                <span v-if="form.processing">{{ $t('common.saving') }}</span>
+                                <span v-else>{{ $t('common.save') }}</span>
+                            </button>
+                            <Link href="/apps/departments" class="mtx-btn mtx-btn-secondary">{{ $t('common.cancel') }}</Link>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <Head><title>{{ $t('departments.heading') }} - MaterialTrack</title></Head>
 
   <main class="p-6">
@@ -38,8 +38,8 @@
         {{ row.pics_count }}
       </template>
       <template #cell-status="{ row }">
-        <span v-if="row.status === 'active'" class="badge bg-success">{{ $t('common.active') }}</span>
-        <span v-else class="badge bg-secondary">{{ $t('common.inactive') }}</span>
+        <span v-if="row.status === 'active'" class="mtx-badge mtx-badge-success">{{ $t('common.active') }}</span>
+        <span v-else class="mtx-badge mtx-badge-neutral">{{ $t('common.inactive') }}</span>
       </template>
       <template #cell-actions="{ row }">
         <div class="flex items-center justify-center gap-2">

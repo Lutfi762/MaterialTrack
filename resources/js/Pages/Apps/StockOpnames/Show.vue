@@ -2,108 +2,102 @@
     <Head>
         <title>{{ $t('stock_opname.detail_heading') }} - MaterialTrack</title>
     </Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 rounded-3 shadow border-top-warning">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold"><i class="fa fa-eye me-1"></i> {{ $t('stock_opname.detail_heading') }}</span>
-                                <div class="d-flex gap-2">
-                                    <a :href="`/apps/stock-opnames/${opname.id}/pdf`" target="_blank" class="btn btn-sm btn-outline-warning">
-                                        <i class="fa fa-file-pdf me-1"></i> {{ $t('common.print') }}
-                                    </a>
-                                    <Link href="/apps/stock-opnames" class="btn btn-sm btn-secondary">
-                                        <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
-                                    </Link>
-                                </div>
-                            </div>
-                            <div class="card-body">
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-eye text-indigo-600" aria-hidden="true"></i> {{ $t('stock_opname.detail_heading') }}</span>
+                    <div class="flex gap-2">
+                        <a :href="`/apps/stock-opnames/${opname.id}/pdf`" target="_blank" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                            <i class="fa fa-file-pdf" aria-hidden="true"></i> {{ $t('common.print') }}
+                        </a>
+                        <Link href="/apps/stock-opnames" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                        </Link>
+                    </div>
+                </div>
+                <div class="mtx-card-body">
 
-                                <div class="detail-header mb-4">
-                                    <div class="ref-badge">{{ opname.reference_no }}</div>
-                                    <div class="mb-2">
-                                        <span v-if="opname.status === 'pending'" class="badge bg-warning text-dark">
-                                            <i class="fa fa-clock me-1"></i>Menunggu Verifikasi
-                                        </span>
-                                        <span v-else class="badge bg-success">
-                                            <i class="fa fa-check me-1"></i>Terverifikasi
-                                        </span>
-                                    </div>
-                                    <div class="difference-display">
-                                        <span class="difference-number" :class="differenceClass">
-                                            {{ differenceText }}
-                                        </span>
-                                        <span class="difference-label">{{ $t('stock_opname.col_diff') }}</span>
-                                    </div>
-                                    <div class="item-name">{{ opname.item?.name ?? '-' }}</div>
-                                </div>
+                    <div class="detail-header mb-4">
+                        <div class="ref-badge">{{ opname.reference_no }}</div>
+                        <div class="mb-2">
+                            <span v-if="opname.status === 'pending'" class="mtx-badge mtx-badge-warning">
+                                <i class="fa fa-clock" aria-hidden="true"></i>Menunggu Verifikasi
+                            </span>
+                            <span v-else class="mtx-badge mtx-badge-success">
+                                <i class="fa fa-check" aria-hidden="true"></i>Terverifikasi
+                            </span>
+                        </div>
+                        <div class="difference-display">
+                            <span class="difference-number" :class="differenceClass">
+                                {{ differenceText }}
+                            </span>
+                            <span class="difference-label">{{ $t('stock_opname.col_diff') }}</span>
+                        </div>
+                        <div class="item-name">{{ opname.item?.name ?? '-' }}</div>
+                    </div>
 
-                                <hr>
+                    <hr class="border-gray-200 mb-4">
 
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_opname.period') }}</div>
-                                        <div class="detail-value">{{ opname.period }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_opname.date') }}</div>
-                                        <div class="detail-value">{{ opname.date }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">Kode Material</div>
-                                        <div class="detail-value">{{ opname.item?.code ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_opname.col_category') }}</div>
-                                        <div class="detail-value">{{ opname.item?.category?.name ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_opname.col_system_stock') }}</div>
-                                        <div class="detail-value fw-bold">{{ opname.system_stock }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_opname.col_physical_stock') }}</div>
-                                        <div class="detail-value fw-bold">{{ opname.physical_stock }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_opname.recorded_by') }}</div>
-                                        <div class="detail-value">{{ opname.user?.name ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">Verifikator</div>
-                                        <div class="detail-value">{{ opname.verified_by?.name ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_opname.recorded_at') }}</div>
-                                        <div class="detail-value">{{ opname.created_at }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">Diverifikasi pada</div>
-                                        <div class="detail-value">{{ opname.verified_at ? new Date(opname.verified_at).toLocaleString('id-ID') : '-' }}</div>
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 d-flex gap-2">
-                                    <form v-if="opname.status === 'pending' && hasAnyPermission(['stock_opnames.verify'])" @submit.prevent="verify">
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fa fa-check-double me-1"></i> Verifikasi Opname
-                                        </button>
-                                    </form>
-                                    <Link v-if="opname.status === 'pending' && hasAnyPermission(['stock_opnames.create'])" :href="`/apps/stock-opnames/${opname.id}/edit`" class="btn btn-warning">
-                                        <i class="fa fa-edit me-1"></i> {{ $t('stock_opname.revision') }}
-                                    </Link>
-                                </div>
-
-                                <div v-if="opname.notes" class="mt-4">
-                                    <div class="detail-label">Catatan Tambahan</div>
-                                    <div class="notes-box">{{ opname.notes }}</div>
-                                </div>
-
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="detail-label">{{ $t('stock_opname.period') }}</div>
+                            <div class="detail-value">{{ opname.period }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_opname.date') }}</div>
+                            <div class="detail-value">{{ opname.date }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Kode Material</div>
+                            <div class="detail-value">{{ opname.item?.code ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_opname.col_category') }}</div>
+                            <div class="detail-value">{{ opname.item?.category?.name ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_opname.col_system_stock') }}</div>
+                            <div class="detail-value font-bold">{{ opname.system_stock }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_opname.col_physical_stock') }}</div>
+                            <div class="detail-value font-bold">{{ opname.physical_stock }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_opname.recorded_by') }}</div>
+                            <div class="detail-value">{{ opname.user?.name ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Verifikator</div>
+                            <div class="detail-value">{{ opname.verified_by?.name ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_opname.recorded_at') }}</div>
+                            <div class="detail-value">{{ opname.created_at }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Diverifikasi pada</div>
+                            <div class="detail-value">{{ opname.verified_at ? new Date(opname.verified_at).toLocaleString('id-ID') : '-' }}</div>
                         </div>
                     </div>
+
+                    <div class="mt-4 flex gap-2">
+                        <form v-if="opname.status === 'pending' && hasAnyPermission(['stock_opnames.verify'])" @submit.prevent="verify">
+                            <button type="submit" class="mtx-btn mtx-btn-primary">
+                                <i class="fa fa-check-double" aria-hidden="true"></i> Verifikasi Opname
+                            </button>
+                        </form>
+                        <Link v-if="opname.status === 'pending' && hasAnyPermission(['stock_opnames.create'])" :href="`/apps/stock-opnames/${opname.id}/edit`" class="mtx-btn mtx-btn-secondary">
+                            <i class="fa fa-edit" aria-hidden="true"></i> {{ $t('stock_opname.revision') }}
+                        </Link>
+                    </div>
+
+                    <div v-if="opname.notes" class="mt-4">
+                        <div class="detail-label">Catatan Tambahan</div>
+                        <div class="notes-box">{{ opname.notes }}</div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -146,9 +140,6 @@ export default {
 </script>
 
 <style>
-.border-top-warning {
-    border-top: 3px solid #ffc107 !important;
-}
 .detail-header {
     text-align: center;
 }

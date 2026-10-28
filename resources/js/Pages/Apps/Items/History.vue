@@ -1,67 +1,73 @@
 <template>
     <Head><title>{{ $t('items.history.title') }} - {{ item.name }}</title></Head>
 
-    <div class="history-page">
-        <div class="page-header">
-            <div class="header-left">
-                <a :href="'/apps/items/' + item.id" class="back-link">
-                    <i class="fa fa-arrow-left"></i> {{ $t('common.back') }}
-                </a>
-                <h4 class="page-title">{{ $t('items.history.title') }}</h4>
-                <span class="item-code">{{ item.code }}</span>
-            </div>
-        </div>
-
-        <div class="timeline-card">
-            <h6 class="card-title"><i class="fa fa-stream"></i> {{ $t('items.history.subtitle') }}</h6>
-
-            <div v-if="movements.data.length === 0" class="empty-state">
-                <i class="fa fa-inbox"></i>
-                <p>{{ $t('items.history.empty') }}</p>
-            </div>
-
-            <div v-else class="timeline">
-                <div v-for="movement in movements.data" :key="movement.id" class="timeline-item">
-                    <div class="timeline-dot" :class="dotClass(movement.type)"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <span class="timeline-date">{{ movement.created_at }}</span>
-                            <span class="timeline-badge" :class="badgeClass(movement.type)">
-                                {{ $t('stock_movements.type_' + movement.type) }}
-                            </span>
-                        </div>
-                        <div class="timeline-body">
-                            <div class="movement-qty">
-                                <span class="qty-label">{{ $t('common.quantity') }}:</span>
-                                <span class="qty-value" :class="qtyClass(movement.type)">
-                                    {{ movement.type === 'out' || movement.type === 'adjustment' ? '-' : '+' }}{{ movement.qty }}
-                                </span>
-                            </div>
-                            <div class="movement-stocks">
-                                <div class="stock-item">
-                                    <span class="stock-label">{{ $t('items.history.stock_before') }}</span>
-                                    <span class="stock-val">{{ movement.stock_before }}</span>
-                                </div>
-                                <i class="fa fa-arrow-right stock-arrow"></i>
-                                <div class="stock-item">
-                                    <span class="stock-label">{{ $t('items.history.stock_after') }}</span>
-                                    <span class="stock-val">{{ movement.balance_after }}</span>
-                                </div>
-                            </div>
-                            <p v-if="movement.notes" class="timeline-notes">
-                                <i class="fa fa-comment-dots"></i> {{ movement.notes }}
-                            </p>
-                            <p class="timeline-user">
-                                <i class="fa fa-user"></i> {{ movement.user?.name || '-' }}
-                            </p>
-                        </div>
-                    </div>
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-page-header">
+                <div>
+                    <Link :href="'/apps/items/' + item.id" class="mtx-btn mtx-btn-ghost mtx-btn-sm !px-0 mb-1">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                    </Link>
+                    <h1 class="mtx-page-title">{{ $t('items.history.title') }}</h1>
+                    <p class="mtx-hint text-indigo-600 font-semibold">{{ item.code }}</p>
                 </div>
             </div>
 
-            <Pagination :links="movements.links" />
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-stream text-indigo-600" aria-hidden="true"></i> {{ $t('items.history.subtitle') }}</span>
+                </div>
+                <div class="mtx-card-body">
+                    <div v-if="movements.data.length === 0" class="text-center py-10 text-gray-400">
+                        <i class="fa fa-inbox text-3xl mb-2 block" aria-hidden="true"></i>
+                        <p>{{ $t('items.history.empty') }}</p>
+                    </div>
+
+                    <div v-else class="relative pl-7">
+                        <div class="absolute left-[10px] top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                        <div v-for="movement in movements.data" :key="movement.id" class="relative mb-5">
+                            <div class="absolute -left-[26px] top-1 h-3 w-3 rounded-full border-2 border-white" :class="dotClass(movement.type)"></div>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                                <div class="flex items-center justify-between mb-2.5">
+                                    <span class="text-xs text-gray-500 font-medium">{{ movement.created_at }}</span>
+                                    <span class="mtx-badge" :class="badgeClass(movement.type)">
+                                        {{ $t('stock_movements.type_' + movement.type) }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-500">{{ $t('common.quantity') }}:</span>
+                                        <span class="text-[15px] font-bold" :class="qtyClass(movement.type)">
+                                            {{ movement.type === 'out' || movement.type === 'adjustment' ? '-' : '+' }}{{ movement.qty }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2.5 text-sm">
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="text-[10px] uppercase tracking-wide text-gray-400 font-medium">{{ $t('items.history.stock_before') }}</span>
+                                            <span class="font-semibold text-gray-700">{{ movement.stock_before }}</span>
+                                        </div>
+                                        <i class="fa fa-arrow-right text-gray-300 text-xs" aria-hidden="true"></i>
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="text-[10px] uppercase tracking-wide text-gray-400 font-medium">{{ $t('items.history.stock_after') }}</span>
+                                            <span class="font-semibold text-gray-700">{{ movement.balance_after }}</span>
+                                        </div>
+                                    </div>
+                                    <p v-if="movement.notes" class="text-xs text-gray-500 m-0">
+                                        <i class="fa fa-comment-dots" aria-hidden="true"></i> {{ movement.notes }}
+                                    </p>
+                                    <p class="text-xs text-gray-400 m-0">
+                                        <i class="fa fa-user" aria-hidden="true"></i> {{ movement.user?.name || '-' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Pagination :links="movements.links" />
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 </template>
 
 <script>

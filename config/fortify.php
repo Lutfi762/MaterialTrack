@@ -109,7 +109,8 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Registrasi publik dimatikan: user dibuat admin lewat /apps/users (Spatie roles).
+        // Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::updateProfileInformation(),

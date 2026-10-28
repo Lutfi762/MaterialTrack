@@ -1,72 +1,72 @@
 <template>
-    <div>
+    <main class="p-6">
         <Head :title="$t('stock_reservation.add')" />
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="page-title mb-1">{{ $t('stock_reservation.add') }}</h1>
-                <Breadcrumb :items="[{ label: 'Dashboard', url: '/apps/dashboard' }, { label: $t('stock_reservation.heading'), url: '/apps/stock-reservations' }, { label: $t('stock_reservation.add') }]" />
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-page-header">
+                <div>
+                    <h1 class="mtx-page-title">{{ $t('stock_reservation.add') }}</h1>
+                    <Breadcrumb :items="[{ label: 'Dashboard', url: '/apps/dashboard' }, { label: $t('stock_reservation.heading'), url: '/apps/stock-reservations' }, { label: $t('stock_reservation.add') }]" />
+                </div>
+                <Link href="/apps/stock-reservations" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                </Link>
             </div>
-            <Link href="/apps/stock-reservations" class="btn btn-outline-secondary">
-                <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
-            </Link>
-        </div>
 
-        <div class="card">
-            <div class="card-body">
-                <form @submit.prevent="submit">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">{{ $t('stock_reservation.material') }} <span class="text-danger">*</span></label>
-                            <select class="form-select" v-model="form.item_id" required>
-                                <option value="">{{ $t('stock_reservation.material_placeholder') }}</option>
-                                <option v-for="item in items" :key="item.id" :value="item.id">
-                                    [{{ item.code }}] {{ item.name }} (Stok: {{ item.current_stock }})
-                                </option>
-                            </select>
-                            <div v-if="selectedItem" class="mt-1">
-                                <small class="text-muted">
+            <div class="mtx-card">
+                <div class="mtx-card-body">
+                    <form @submit.prevent="submit">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                            <div class="mtx-field">
+                                <label class="mtx-label">{{ $t('stock_reservation.material') }} <span class="mtx-required">*</span></label>
+                                <select class="mtx-select" v-model="form.item_id" required>
+                                    <option value="">{{ $t('stock_reservation.material_placeholder') }}</option>
+                                    <option v-for="item in items" :key="item.id" :value="item.id">
+                                        [{{ item.code }}] {{ item.name }} (Stok: {{ item.current_stock }})
+                                    </option>
+                                </select>
+                                <p v-if="selectedItem" class="mtx-hint">
                                     {{ $t('stock_reservation.stock_available') }}: {{ availableStock }}
                                     ({{ $t('stock_reservation.stock_reserved') }}: {{ reservedStock }})
-                                </small>
+                                </p>
+                            </div>
+                            <div class="mtx-field">
+                                <label class="mtx-label">{{ $t('stock_reservation.qty') }} <span class="mtx-required">*</span></label>
+                                <input type="number" class="mtx-input" v-model="form.qty" min="1" :max="availableStock" required>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">{{ $t('stock_reservation.qty') }} <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" v-model="form.qty" min="1" :max="availableStock" required>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('stock_reservation.reserved_until') }}</label>
+                            <input type="date" class="mtx-input" v-model="form.reserved_until" :min="tomorrow">
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">{{ $t('stock_reservation.reserved_until') }}</label>
-                            <input type="date" class="form-control" v-model="form.reserved_until" :min="tomorrow">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                            <div class="mtx-field">
+                                <label class="mtx-label">{{ $t('stock_reservation.project_name') }}</label>
+                                <input type="text" class="mtx-input" v-model="form.project_name" :placeholder="$t('stock_reservation.project_placeholder')">
+                            </div>
+                            <div class="mtx-field">
+                                <label class="mtx-label">{{ $t('stock_reservation.department') }}</label>
+                                <select class="mtx-select" v-model="form.department_id">
+                                    <option :value="null">{{ $t('stock_reservation.dept_none') }}</option>
+                                    <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">{{ $t('stock_reservation.project_name') }}</label>
-                            <input type="text" class="form-control" v-model="form.project_name" :placeholder="$t('stock_reservation.project_placeholder')">
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('stock_reservation.purpose') }}</label>
+                            <textarea class="mtx-textarea" v-model="form.purpose" rows="2" :placeholder="$t('stock_reservation.purpose_placeholder')"></textarea>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">{{ $t('stock_reservation.department') }}</label>
-                            <select class="form-select" v-model="form.department_id">
-                                <option :value="null">{{ $t('stock_reservation.dept_none') }}</option>
-                                <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
-                            </select>
+                        <div class="flex gap-2">
+                            <button type="submit" class="mtx-btn mtx-btn-primary" :disabled="form.processing">
+                                <i class="fa fa-bookmark" aria-hidden="true"></i>
+                                {{ form.processing ? $t('common.saving') : $t('stock_reservation.save') }}
+                            </button>
+                            <Link href="/apps/stock-reservations" class="mtx-btn mtx-btn-secondary">{{ $t('common.cancel') }}</Link>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">{{ $t('stock_reservation.purpose') }}</label>
-                        <textarea class="form-control" v-model="form.purpose" rows="2" :placeholder="$t('stock_reservation.purpose_placeholder')"></textarea>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary" :disabled="form.processing">
-                            <i class="fa fa-bookmark me-1"></i>
-                            {{ form.processing ? $t('common.saving') : $t('stock_reservation.save') }}
-                        </button>
-                        <Link href="/apps/stock-reservations" class="btn btn-outline-secondary">{{ $t('common.cancel') }}</Link>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 </template>
 
 <script>

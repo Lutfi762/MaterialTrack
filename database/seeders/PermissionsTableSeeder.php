@@ -80,7 +80,24 @@ class PermissionsTableSeeder extends Seeder
             // 19. Master Data - Suppliers, Warehouses, Stock Reservations
             'suppliers.index', 'suppliers.create', 'suppliers.edit', 'suppliers.delete',
             'warehouses.index', 'warehouses.create', 'warehouses.edit', 'warehouses.delete',
-            'stock_reservations.index', 'stock_reservations.create',
+                        'stock_reservations.index', 'stock_reservations.create',
+
+                        'boms.index', 'boms.create', 'boms.delete',
+            'production_orders.index', 'production_orders.create', 'production_orders.complete',
+            
+                        'asset_maintenances.index', 'asset_maintenances.create', 'asset_maintenances.edit', 'asset_maintenances.delete',
+                        'quality_controls.index', 'quality_controls.create', 'quality_controls.delete',
+                        'projects.index', 'projects.create', 'projects.delete',
+                        'crm.index',
+                        'fleet.index',
+            'helpdesk.index', 'helpdesk.create', 'helpdesk.update',
+            'documents.index', 'documents.create', 'documents.delete',
+            // 20. Fixed Assets
+            'fixed_assets.index', 'fixed_assets.create', 'fixed_assets.edit', 'fixed_assets.delete',
+            // 21. Budgets
+            'budgets.index', 'budgets.create', 'budgets.edit', 'budgets.delete',
+            // 22. Supplier Scorecards
+            'supplier_scorecards.index', 'supplier_scorecards.generate',
         ];
 
         foreach ($permissions as $permission) {
@@ -123,3 +140,11 @@ class PermissionsTableSeeder extends Seeder
         ]);
     }
 }
+
+
+
+
+
+
+
+

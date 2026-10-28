@@ -1,11 +1,11 @@
-<template>
+﻿<template>
     <Head><title>{{ $t('stock_return.title') }} - MaterialTrack</title></Head>
     <div class="stockreturns-page">
 
         <div class="page-header-card mb-4">
             <div>
                 <h4 class="mb-1"><i class="fa fa-undo me-2 text-warning"></i>{{ $t('stock_return.title') }}</h4>
-                <p class="text-muted mb-0 small">{{ $t('stock_return.subtitle') }}</p>
+                <p class="text-gray-400 mb-0 small">{{ $t('stock_return.subtitle') }}</p>
             </div>
             <div class="d-flex gap-2">
                 <Link v-if="hasAnyPermission(['stock_ins.create'])" href="/apps/stock-returns/create" class="btn-modern btn-modern-warning">
@@ -31,14 +31,14 @@
 
         <div class="filter-bar mb-4">
             <div class="filter-item">
-                <i class="fa fa-building text-muted"></i>
+                <i class="fa fa-building text-gray-400"></i>
                 <select v-model="filterDepartment" class="filter-select" :disabled="isLoading">
                     <option value="">{{ $t('stock_return.filter_all_dept') }}</option>
                     <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
                 </select>
             </div>
             <div class="filter-item">
-                <i class="fa fa-box text-muted"></i>
+                <i class="fa fa-box text-gray-400"></i>
                 <select v-model="filterItem" class="filter-select" :disabled="isLoading">
                     <option value="">{{ $t('stock_return.filter_all_material') }}</option>
                     <option v-for="item in items" :key="item.id" :value="item.id">{{ item.name }}</option>
@@ -69,7 +69,7 @@
                         </div>
                     </div>
                     <div v-if="row.reason" class="transaction-reason mt-2">
-                        <small class="text-muted"><i class="fa fa-info-circle me-1"></i>{{ row.reason }}</small>
+                        <small class="text-gray-400"><i class="fa fa-info-circle me-1"></i>{{ row.reason }}</small>
                     </div>
                     <div v-if="row.status === 'pending' && hasAnyPermission(['stock_outs.approve'])" class="transaction-actions mt-3">
                         <button class="act-btn act-btn-success" :title="$t('stock_return.approve_title')" @click="handleApprove(row.id)">
@@ -83,7 +83,7 @@
                         <small :class="row.status === 'approved' ? 'text-success' : 'text-danger'">
                             <i :class="row.status === 'approved' ? 'fa fa-check-circle' : 'fa fa-times-circle'" class="me-1"></i>
                             {{ row.status === 'approved' ? $t('common.approved') : $t('common.rejected') }}
-                            <span v-if="row.approver"> — {{ row.approver?.name }}</span>
+                            <span v-if="row.approver"> â€” {{ row.approver?.name }}</span>
                         </small>
                     </div>
                 </div>
@@ -92,8 +92,8 @@
 
         <div v-else class="empty-state">
             <i class="fa fa-inbox"></i>
-            <p class="mb-0 fw-semibold">{{ $t('stock_return.empty') }}</p>
-            <p class="text-muted small">{{ $t('stock_return.empty_desc') }}</p>
+            <p class="mb-0 font-semibold">{{ $t('stock_return.empty') }}</p>
+            <p class="text-gray-500 text-xs">{{ $t('stock_return.empty_desc') }}</p>
         </div>
 
         <Pagination v-if="stockReturns.data.length > 0" :links="stockReturns.links" align="center" />

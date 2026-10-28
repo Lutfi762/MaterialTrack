@@ -36,4 +36,7 @@ Thumbs.db
 /pages_list.txt
 /cdp_test*.mjs
 /seed.out
+/tmp/
 
+
+/storage/framework/sessions/

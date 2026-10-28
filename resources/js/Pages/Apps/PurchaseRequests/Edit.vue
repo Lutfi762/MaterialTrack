@@ -72,6 +72,13 @@
               <textarea v-model="form.notes" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
             </div>
 
+            <div v-if="errors && Object.keys(errors).length" class="mb-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+              <p class="font-semibold mb-1">Periksa kembali isian berikut:</p>
+              <ul class="list-disc list-inside">
+                <li v-for="(msg, key) in errors" :key="key">{{ msg }}</li>
+              </ul>
+            </div>
+
             <div class="flex justify-end gap-3">
               <Link :href="route('apps.purchase-requests.index')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-gray-300">Batal</Link>
               <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-indigo-600 text-white rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-indigo-700">Simpan Perubahan</button>

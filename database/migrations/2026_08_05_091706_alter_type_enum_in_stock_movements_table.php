@@ -1,17 +1,22 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE stock_movements MODIFY COLUMN type ENUM('in','out','adjustment') NOT NULL");
+        Schema::table('stock_movements', function (Blueprint $table) {
+            $table->enum('type', ['in', 'out', 'adjustment'])->change();
+        });
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE stock_movements MODIFY COLUMN type ENUM('in','out') NOT NULL");
+        Schema::table('stock_movements', function (Blueprint $table) {
+            $table->enum('type', ['in', 'out'])->change();
+        });
     }
 };

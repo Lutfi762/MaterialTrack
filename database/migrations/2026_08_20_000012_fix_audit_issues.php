@@ -9,6 +9,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Migration ini raw-SQL MySQL-only (information_schema.REFERENTIAL_CONSTRAINTS).
+        // ponytail: skip di driver lain (sqlite test env); upgrade jika perlu FK audit lintas-DB.
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         // ============ HRM ============
         $this->ensureFk('attendances', 'employee_id', 'employees', 'RESTRICT');
         $this->ensureUnique('attendances', ['employee_id', 'date'], 'attendances_employee_id_date_unique');
@@ -110,6 +116,10 @@ return new class extends Migration
     }
 public function down(): void
     {
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         foreach ([
             ['attendances', 'employee_id'], ['leaves', 'employee_id'], ['leaves', 'leave_type_id'],
             ['payroll_items', 'employee_id'], ['employee_contracts', 'employee_id'],

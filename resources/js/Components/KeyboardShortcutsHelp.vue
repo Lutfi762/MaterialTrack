@@ -1,10 +1,10 @@
-<template>
+﻿<template>
     <Teleport to="body">
         <div v-if="visible" class="shortcuts-overlay" @click="hide">
             <div class="shortcuts-modal" @click.stop>
                 <div class="shortcuts-header">
-                    <h5 class="fw-bold mb-0"><i class="fa fa-keyboard me-2"></i>{{ $t('shortcuts.title') }}</h5>
-                    <button class="btn btn-sm btn-link text-muted" @click="hide"><i class="fa fa-times"></i></button>
+                    <h5 class="m-0 text-base font-bold"><i class="fa fa-keyboard me-2"></i>{{ $t('shortcuts.title') }}</h5>
+                    <button class="mtx-icon-btn" @click="hide"><i class="fa fa-times"></i></button>
                 </div>
                 <div class="shortcuts-body">
                     <div class="shortcut-group">
@@ -33,14 +33,14 @@ export default {
         return {
             visible: false,
             navigationShortcuts: [
-                { keys: 'G → D', desc: this.$t('shortcuts.go_dashboard') },
-                { keys: 'G → I', desc: this.$t('shortcuts.go_items') },
-                { keys: 'G → S', desc: this.$t('shortcuts.go_stock_in') },
-                { keys: 'G → O', desc: this.$t('shortcuts.go_stock_out') },
-                { keys: 'G → W', desc: this.$t('shortcuts.go_warehouses') },
-                { keys: 'G → R', desc: this.$t('shortcuts.go_reports') },
-                { keys: 'G → M', desc: this.$t('shortcuts.go_movements') },
-                { keys: 'G → F', desc: this.$t('shortcuts.go_forecasting') },
+                { keys: 'G â†’ D', desc: this.$t('shortcuts.go_dashboard') },
+                { keys: 'G â†’ I', desc: this.$t('shortcuts.go_items') },
+                { keys: 'G â†’ S', desc: this.$t('shortcuts.go_stock_in') },
+                { keys: 'G â†’ O', desc: this.$t('shortcuts.go_stock_out') },
+                { keys: 'G â†’ W', desc: this.$t('shortcuts.go_warehouses') },
+                { keys: 'G â†’ R', desc: this.$t('shortcuts.go_reports') },
+                { keys: 'G â†’ M', desc: this.$t('shortcuts.go_movements') },
+                { keys: 'G â†’ F', desc: this.$t('shortcuts.go_forecasting') },
             ],
             globalShortcuts: [
                 { keys: 'Ctrl + K', desc: this.$t('shortcuts.focus_search') },

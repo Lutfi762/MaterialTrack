@@ -20,11 +20,8 @@ class NotificationService
 
     public static function checkLowStock(): void
     {
-        $lowStockItems = Item::whereColumn('current_stock', '<=', 'min_stock')
-            ->where('current_stock', '>', 0)
-            ->get();
-
-        $outOfStockItems = Item::where('current_stock', '<=', 0)->get();
+        $lowStockItems = Item::lowStock()->get();
+        $outOfStockItems = Item::outOfStock()->get();
 
         $adminIds = User::whereHas('roles', fn($q) => $q->where('name', 'admin'))->pluck('id');
 

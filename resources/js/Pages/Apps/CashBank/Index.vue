@@ -1,50 +1,56 @@
 <template>
   <Head><title>{{ $t('cash_bank.heading') }} - MaterialTrack</title></Head>
 
-  <main class="p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-        <i class="fa fa-university text-indigo-600"></i>
-        {{ $t('cash_bank.title') }}
-      </h2>
+  <main class="min-h-full bg-bg p-4 sm:p-6 text-on-surface">
+    <div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant">Finance</p>
+        <h2 class="flex items-center gap-2 text-2xl font-bold tracking-tight text-on-surface">
+          <i class="fa fa-university text-primary" aria-hidden="true"></i>
+          {{ $t('cash_bank.title') }}
+        </h2>
+      </div>
       <Link
         v-if="hasAnyPermission(['cash_bank.create'])"
         href="/apps/cash-bank/create"
-        class="btn-modern btn-modern-primary"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 dark:text-[#1000a9]"
       >
-        <i class="fa fa-plus me-2"></i> {{ $t('cash_bank.add') }}
+        <i class="fa fa-plus" aria-hidden="true"></i>
+        {{ $t('cash_bank.add') }}
       </Link>
     </div>
 
-    <div class="filter-bar mb-4">
-      <div class="filter-item">
-        <label class="filter-label">{{ $t('cash_bank.col_type') }}</label>
-        <select v-model="form.type" class="filter-select" @change="apply">
+    <div class="mb-4 flex flex-wrap items-end gap-3">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-on-surface-variant">{{ $t('cash_bank.col_type') }}</label>
+        <select v-model="form.type" class="rounded-full border border-outline/30 bg-surface px-3 py-2 text-sm text-on-surface outline-none focus:border-primary" @change="apply">
           <option value="">{{ $t('common.all') }}</option>
           <option value="in">{{ $t('cash_bank.type_in', 'Kas Masuk') }}</option>
           <option value="out">{{ $t('cash_bank.type_out', 'Kas Keluar') }}</option>
         </select>
       </div>
-      <div class="filter-item">
-        <label class="filter-label">{{ $t('cash_bank.col_account') }}</label>
-        <select v-model="form.account_id" class="filter-select" @change="apply">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-on-surface-variant">{{ $t('cash_bank.col_account') }}</label>
+        <select v-model="form.account_id" class="rounded-full border border-outline/30 bg-surface px-3 py-2 text-sm text-on-surface outline-none focus:border-primary" @change="apply">
           <option value="">{{ $t('common.all') }}</option>
           <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.code }} - {{ a.name }}</option>
         </select>
       </div>
-      <div class="filter-item">
-        <label class="filter-label">{{ $t('common.from') }}</label>
-        <input type="date" v-model="form.date_from" class="filter-select" @change="apply">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-on-surface-variant">{{ $t('common.from') }}</label>
+        <input type="date" v-model="form.date_from" class="rounded-full border border-outline/30 bg-surface px-3 py-2 text-sm text-on-surface outline-none focus:border-primary" @change="apply">
       </div>
-      <div class="filter-item">
-        <label class="filter-label">{{ $t('common.to') }}</label>
-        <input type="date" v-model="form.date_to" class="filter-select" @change="apply">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-on-surface-variant">{{ $t('common.to') }}</label>
+        <input type="date" v-model="form.date_to" class="rounded-full border border-outline/30 bg-surface px-3 py-2 text-sm text-on-surface outline-none focus:border-primary" @change="apply">
       </div>
-      <div class="filter-item">
-        <button @click="reset" class="btn-modern btn-modern-outline">{{ $t('common.reset') }}</button>
-      </div>
+      <button @click="reset" class="inline-flex items-center gap-2 rounded-lg border border-outline/30 bg-surface px-3.5 py-2.5 text-sm font-medium text-on-surface-variant transition hover:bg-bg">
+        <i class="fa fa-rotate-left" aria-hidden="true"></i> {{ $t('common.reset') }}
+      </button>
     </div>
 
+    <div class="overflow-hidden rounded-xl border border-outline/20 bg-surface shadow-sm">
     <DataTable
       :columns="columns"
       :rows="transactions.data"
@@ -88,6 +94,8 @@
         {{ row.description || '-' }}
       </template>
     </DataTable>
+    </div>
+    </div>
   </main>
 </template>
 

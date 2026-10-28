@@ -1,41 +1,40 @@
 <template>
     <Head><title>{{ $t('locations.add') }} - MaterialTrack</title></Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <div class="card border-0 rounded-3 shadow">
-                            <div class="card-header"><span class="font-weight-bold">{{ $t('locations.add') }}</span></div>
-                            <div class="card-body">
-                                <form @submit.prevent="submit">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('locations.name') }} <span class="text-danger">*</span></label>
-                                        <input v-model="form.name" type="text" class="form-control" :class="{ 'is-invalid': form.errors.name }">
-                                        <div class="invalid-feedback">{{ form.errors.name }}</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('locations.code') }}</label>
-                                        <input v-model="form.code" type="text" class="form-control" :class="{ 'is-invalid': form.errors.code }">
-                                        <div class="invalid-feedback">{{ form.errors.code }}</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('locations.warehouse_zone') }}</label>
-                                        <input v-model="form.warehouse_zone" type="text" class="form-control" :class="{ 'is-invalid': form.errors.warehouse_zone }">
-                                        <div class="invalid-feedback">{{ form.errors.warehouse_zone }}</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">{{ $t('locations.address') }}</label>
-                                        <textarea v-model="form.address" class="form-control" rows="3"></textarea>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary" :disabled="form.processing">{{ $t('common.save') }}</button>
-                                        <Link href="/apps/locations" class="btn btn-secondary">{{ $t('common.cancel') }}</Link>
-                                    </div>
-                                </form>
-                            </div>
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-map-marker-alt text-indigo-600" aria-hidden="true"></i> {{ $t('locations.add') }}</span>
+                    <Link href="/apps/locations" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                    </Link>
+                </div>
+                <div class="mtx-card-body">
+                    <form @submit.prevent="submit">
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('locations.name') }} <span class="mtx-required">*</span></label>
+                            <input v-model="form.name" type="text" class="mtx-input" :class="{ 'mtx-input-error': form.errors.name }">
+                            <p v-if="form.errors.name" class="mtx-error-text">{{ form.errors.name }}</p>
                         </div>
-                    </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('locations.code') }}</label>
+                            <input v-model="form.code" type="text" class="mtx-input" :class="{ 'mtx-input-error': form.errors.code }">
+                            <p v-if="form.errors.code" class="mtx-error-text">{{ form.errors.code }}</p>
+                        </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('locations.warehouse_zone') }}</label>
+                            <input v-model="form.warehouse_zone" type="text" class="mtx-input" :class="{ 'mtx-input-error': form.errors.warehouse_zone }">
+                            <p v-if="form.errors.warehouse_zone" class="mtx-error-text">{{ form.errors.warehouse_zone }}</p>
+                        </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('locations.address') }}</label>
+                            <textarea v-model="form.address" class="mtx-textarea" rows="3"></textarea>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="submit" class="mtx-btn mtx-btn-primary" :disabled="form.processing">{{ $t('common.save') }}</button>
+                            <Link href="/apps/locations" class="mtx-btn mtx-btn-secondary">{{ $t('common.cancel') }}</Link>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

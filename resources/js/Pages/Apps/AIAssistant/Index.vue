@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <Head><title>AI Assistant - MaterialTrack</title></Head>
     <div class="ai-assistant-page">
 
@@ -7,7 +7,7 @@
                 <i class="fa fa-exclamation-triangle"></i>
             </div>
             <h4 class="mb-2">{{ $t('ai_assistant.not_configured') }}</h4>
-            <p class="text-muted mb-0">{{ $t('ai_assistant.not_configured_desc') }}</p>
+            <p class="text-gray-400 mb-0">{{ $t('ai_assistant.not_configured_desc') }}</p>
         </div>
 
         <div v-else class="chat-layout">
@@ -23,8 +23,8 @@
                 </div>
                 <div v-if="!sidebarCollapsed" class="conversation-list">
                     <div v-if="conversations.length === 0" class="no-conversations">
-                        <i class="fa fa-comments text-muted"></i>
-                        <p class="small text-muted mb-0">{{ $t('ai_assistant.no_conversations') }}</p>
+                        <i class="fa fa-comments text-gray-400"></i>
+                        <p class="text-xs text-gray-500 mb-0">{{ $t('ai_assistant.no_conversations') }}</p>
                     </div>
                     <div
                         v-for="conv in conversations"
@@ -52,7 +52,7 @@
                         </div>
                         <div>
                             <h5 class="mb-1">MaterialTrack AI</h5>
-                            <p class="text-muted small mb-0">
+                            <p class="text-gray-500 text-xs mb-0">
                                 {{ activeConversationTitle || $t('ai_assistant.subtitle') }}
                             </p>
                         </div>
@@ -65,7 +65,7 @@
                             <i class="fa fa-robot"></i>
                         </div>
                         <h5 class="mb-2">MaterialTrack AI</h5>
-                        <p class="text-muted mb-4">{{ $t('ai_assistant.placeholder') }}</p>
+                        <p class="text-gray-400 mb-4">{{ $t('ai_assistant.placeholder') }}</p>
 
                         <div class="suggested-prompts">
                             <button v-for="prompt in suggestedPrompts" :key="prompt" @click="sendSuggestedPrompt(prompt)" class="prompt-chip">
@@ -131,16 +131,16 @@
                     </button>
                 </div>
                 <div class="input-hint">
-                    <span class="text-muted small">
+                    <span class="text-gray-500 text-xs">
                         <template v-if="isRecording">
                             <i class="fa fa-circle text-danger me-1" style="animation: blink 1s infinite;"></i> {{ $t('ai_assistant.listening') }}
                         </template>
                         <template v-else>
                             {{ $t('ai_assistant.enter_hint') }}
-                            <span v-if="speechSupported"> · {{ $t('ai_assistant.mic_hint') }}</span>
+                            <span v-if="speechSupported"> Â· {{ $t('ai_assistant.mic_hint') }}</span>
                         </template>
                     </span>
-                    <span class="text-muted small">{{ userInput.length }}/{{ maxLength }}</span>
+                    <span class="text-gray-500 text-xs">{{ userInput.length }}/{{ maxLength }}</span>
                 </div>
             </div>
         </div>

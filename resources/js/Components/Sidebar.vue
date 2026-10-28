@@ -215,6 +215,15 @@
                     </span>
                     <span class="nav-label">{{ $t('sidebar.custom_reports') }}</span>
                 </Link>
+
+                <Link href="/apps/reports/stock-card" class="nav-item" :class="{ active: $page.url.startsWith('/apps/reports/stock-card') }">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Kartu Stok</span>
+                </Link>
             </template>
 
             <template v-if="hasAnyPermission(['items.index'])">
@@ -300,9 +309,44 @@
                     <span class="nav-label">Laporan Keuangan</span>
                 </Link>
 
-                <Link href="/apps/cash-bank" class="nav-item" :class="{ active: $page.url.startsWith('/apps/cash-bank') }">
-                    <span class="nav-icon">💰</span>
+                                <Link href="/apps/cash-bank" class="nav-item" :class="{ active: $page.url.startsWith('/apps/cash-bank') }">
+                    <span class="nav-icon">??</span>
                     <span class="nav-label">Kas & Bank</span>
+                </Link>
+
+                                <Link v-if="hasAnyPermission(['boms.index'])" href="/apps/boms" class="nav-item" :class="{ active: $page.url.startsWith('/apps/boms') }">
+                    <span class="nav-icon">??</span>
+                    <span class="nav-label">Bill of Materials</span>
+                </Link>
+
+                <Link v-if="hasAnyPermission(['production_orders.index'])" href="/apps/production-orders" class="nav-item" :class="{ active: $page.url.startsWith('/apps/production-orders') }">
+                    <span class="nav-icon">??</span>
+                    <span class="nav-label">Production Orders</span>
+                </Link>
+
+                                <Link v-if="hasAnyPermission(['quality_controls.index'])" href="/apps/quality-controls" class="nav-item" :class="{ active: $page.url.startsWith('/apps/quality-controls') }">
+                    <span class="nav-icon">?</span>
+                    <span class="nav-label">Quality Control</span>
+                </Link>
+
+                <Link v-if="hasAnyPermission(['fixed_assets.index'])" href="/apps/fixed-assets" class="nav-item" :class="{ active: $page.url.startsWith('/apps/fixed-assets') }"> class="nav-item" :class="{ active: $page.url.startsWith('/apps/fixed-assets') }">
+                    <span class="nav-icon">???</span>
+                    <span class="nav-label">{{ $t('fixed_assets.heading') }}</span>
+                </Link>
+
+                                <Link v-if="hasAnyPermission(['asset_maintenances.index'])" href="/apps/asset-maintenances" class="nav-item" :class="{ active: $page.url.startsWith('/apps/asset-maintenances') }">
+                    <span class="nav-icon">??</span>
+                    <span class="nav-label">Asset Maintenance</span>
+                </Link>
+
+                <Link v-if="hasAnyPermission(['budgets.index'])" href="/apps/budgets" class="nav-item" :class="{ active: $page.url.startsWith('/apps/budgets') }">
+                    <span class="nav-icon">??</span>
+                    <span class="nav-label">{{ $t('budgets.heading') }}</span>
+                </Link>
+
+                <Link v-if="hasAnyPermission(['supplier_scorecards.index'])" href="/apps/supplier-scorecards" class="nav-item" :class="{ active: $page.url.startsWith('/apps/supplier-scorecards') }">
+                    <span class="nav-icon">?</span>
+                    <span class="nav-label">{{ $t('supplier_scorecards.heading') }}</span>
                 </Link>
 
                 <Link href="/apps/employees" class="nav-item" :class="{ active: $page.url.startsWith('/apps/employees') }">
@@ -708,3 +752,9 @@ export default {
     }
 }
 </style>
+
+
+
+
+
+

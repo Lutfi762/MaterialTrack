@@ -2,149 +2,105 @@
     <Head>
         <title>Profil Saya - MaterialTrack</title>
     </Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row">
-                    <div class="col-md-8">
-                        <!-- Profile Info -->
-                        <div class="card border-0 rounded-3 shadow mb-4">
-                            <div class="card-header bg-white border-bottom">
-                                <h6 class="m-0 font-weight-bold text-primary">
-                                    <i class="fa fa-user me-1"></i> {{ $t('profile.heading') }}
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div v-if="profileSuccess" class="alert alert-success alert-dismissible fade show" role="alert">
-                                    {{ profileSuccess }}
-                                    <button type="button" class="btn-close" @click="profileSuccess = ''"></button>
-                                </div>
-
-                                <form @submit.prevent="updateProfile">
-                                    <div class="mb-3">
-                                        <label for="name" class="form-label fw-bold">{{ $t('profile.full_name') }}</label>
-                                        <input
-                                            id="name"
-                                            type="text"
-                                            class="form-control"
-                                            :class="{ 'is-invalid': profileForm.errors.name }"
-                                            v-model="profileForm.name"
-                                            required
-                                        />
-                                        <div v-if="profileForm.errors.name" class="invalid-feedback">{{ profileForm.errors.name }}</div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label fw-bold">Email</label>
-                                        <input
-                                            id="email"
-                                            type="email"
-                                            class="form-control"
-                                            :class="{ 'is-invalid': profileForm.errors.email }"
-                                            v-model="profileForm.email"
-                                            required
-                                        />
-                                        <div v-if="profileForm.errors.email" class="invalid-feedback">{{ profileForm.errors.email }}</div>
-                                    </div>
-
-                                    <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-primary" :disabled="profileForm.processing">
-                                            <i class="fa fa-save me-1"></i>
-                                            <span v-if="profileForm.processing">{{ $t('common.saving') }}</span>
-                                            <span v-else>{{ $t('profile.save_changes') }}</span>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+    <main class="p-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+                <div class="lg:col-span-2 space-y-4">
+                    <!-- Profile Info -->
+                    <div class="mtx-card">
+                        <div class="mtx-card-header">
+                            <span class="mtx-card-title"><i class="fa fa-user text-indigo-600" aria-hidden="true"></i> {{ $t('profile.heading') }}</span>
                         </div>
-
-                        <!-- Change Password -->
-                        <div class="card border-0 rounded-3 shadow">
-                            <div class="card-header bg-white border-bottom">
-                                <h6 class="m-0 font-weight-bold text-warning">
-                                    <i class="fa fa-lock me-1"></i> {{ $t('profile.change_password') }}
-                                </h6>
+                        <div class="mtx-card-body">
+                            <div v-if="profileSuccess" class="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-2.5 text-sm mb-4 flex items-center justify-between">
+                                {{ profileSuccess }}
+                                <button type="button" class="text-green-500 hover:text-green-700 text-lg leading-none" @click="profileSuccess = ''">&times;</button>
                             </div>
-                            <div class="card-body">
-                                <div v-if="passwordSuccess" class="alert alert-success alert-dismissible fade show" role="alert">
-                                    {{ passwordSuccess }}
-                                    <button type="button" class="btn-close" @click="passwordSuccess = ''"></button>
+
+                            <form @submit.prevent="updateProfile">
+                                <div class="mtx-field">
+                                    <label for="name" class="mtx-label">{{ $t('profile.full_name') }}</label>
+                                    <input id="name" type="text" class="mtx-input" :class="{ 'mtx-input-error': profileForm.errors.name }" v-model="profileForm.name" required />
+                                    <p v-if="profileForm.errors.name" class="mtx-error-text">{{ profileForm.errors.name }}</p>
                                 </div>
 
-                                <form @submit.prevent="updatePassword">
-                                    <div class="mb-3">
-                                        <label for="current_password" class="form-label fw-bold">{{ $t('profile.current_password') }}</label>
-                                        <input
-                                            id="current_password"
-                                            type="password"
-                                            class="form-control"
-                                            :class="{ 'is-invalid': passwordForm.errors.current_password }"
-                                            v-model="passwordForm.current_password"
-                                            required
-                                        />
-                                        <div v-if="passwordForm.errors.current_password" class="invalid-feedback">{{ passwordForm.errors.current_password }}</div>
-                                    </div>
+                                <div class="mtx-field">
+                                    <label for="email" class="mtx-label">Email</label>
+                                    <input id="email" type="email" class="mtx-input" :class="{ 'mtx-input-error': profileForm.errors.email }" v-model="profileForm.email" required />
+                                    <p v-if="profileForm.errors.email" class="mtx-error-text">{{ profileForm.errors.email }}</p>
+                                </div>
 
-                                    <div class="mb-3">
-                                        <label for="password" class="form-label fw-bold">{{ $t('profile.new_password') }}</label>
-                                        <input
-                                            id="password"
-                                            type="password"
-                                            class="form-control"
-                                            :class="{ 'is-invalid': passwordForm.errors.password }"
-                                            v-model="passwordForm.password"
-                                            required
-                                        />
-                                        <div v-if="passwordForm.errors.password" class="invalid-feedback">{{ passwordForm.errors.password }}</div>
-                                        <small class="text-muted">{{ $t('users.password_placeholder') }}</small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="password_confirmation" class="form-label fw-bold">{{ $t('profile.confirm_new_password') }}</label>
-                                        <input
-                                            id="password_confirmation"
-                                            type="password"
-                                            class="form-control"
-                                            v-model="passwordForm.password_confirmation"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-warning" :disabled="passwordForm.processing">
-                                            <i class="fa fa-key me-1"></i>
-                                            <span v-if="passwordForm.processing">{{ $t('common.saving') }}</span>
-                                            <span v-else>{{ $t('profile.change_password') }}</span>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                                <div class="flex justify-end">
+                                    <button type="submit" class="mtx-btn mtx-btn-primary" :disabled="profileForm.processing">
+                                        <i class="fa fa-save" aria-hidden="true"></i>
+                                        {{ profileForm.processing ? $t('common.saving') : $t('profile.save_changes') }}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
-                    <!-- Sidebar Info -->
-                    <div class="col-md-4">
-                        <div class="card border-0 rounded-3 shadow">
-                            <div class="card-body text-center">
-                                <img
-                                    :src="`https://ui-avatars.com/api/?name=${$page.props.auth?.user?.name || 'User'}&background=7c3aed&color=ffffff&size=128`"
-                                    class="rounded-circle mb-3"
-                                    width="80"
-                                    height="80"
-                                    alt="Avatar"
-                                />
-                                <h5 class="font-weight-bold">{{ $page.props.auth?.user?.name }}</h5>
-                                <p class="text-muted small">{{ $page.props.auth?.user?.email }}</p>
-                                <hr />
-                                <div class="text-start">
-                                    <small class="text-muted d-block">{{ $t('profile.department') }}</small>
-                                    <strong>{{ $page.props.auth?.user?.department?.name ?? '-' }}</strong>
-                                </div>
-                                <div class="text-start mt-2">
-                                    <small class="text-muted d-block">{{ $t('profile.role') }}</small>
-                                    <strong>{{ userRoleLabel }}</strong>
-                                </div>
+                        <!-- Change Password -->
+                    <div class="mtx-card">
+                        <div class="mtx-card-header">
+                            <span class="mtx-card-title"><i class="fa fa-lock text-amber-500" aria-hidden="true"></i> {{ $t('profile.change_password') }}</span>
+                        </div>
+                        <div class="mtx-card-body">
+                            <div v-if="passwordSuccess" class="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-2.5 text-sm mb-4 flex items-center justify-between">
+                                {{ passwordSuccess }}
+                                <button type="button" class="text-green-500 hover:text-green-700 text-lg leading-none" @click="passwordSuccess = ''">&times;</button>
                             </div>
+
+                            <form @submit.prevent="updatePassword">
+                                <div class="mtx-field">
+                                    <label for="current_password" class="mtx-label">{{ $t('profile.current_password') }}</label>
+                                    <input id="current_password" type="password" class="mtx-input" :class="{ 'mtx-input-error': passwordForm.errors.current_password }" v-model="passwordForm.current_password" required />
+                                    <p v-if="passwordForm.errors.current_password" class="mtx-error-text">{{ passwordForm.errors.current_password }}</p>
+                                </div>
+
+                                <div class="mtx-field">
+                                    <label for="password" class="mtx-label">{{ $t('profile.new_password') }}</label>
+                                    <input id="password" type="password" class="mtx-input" :class="{ 'mtx-input-error': passwordForm.errors.password }" v-model="passwordForm.password" required />
+                                    <p v-if="passwordForm.errors.password" class="mtx-error-text">{{ passwordForm.errors.password }}</p>
+                                    <p class="mtx-hint">{{ $t('users.password_placeholder') }}</p>
+                                </div>
+
+                                <div class="mtx-field">
+                                    <label for="password_confirmation" class="mtx-label">{{ $t('profile.confirm_new_password') }}</label>
+                                    <input id="password_confirmation" type="password" class="mtx-input" v-model="passwordForm.password_confirmation" required />
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <button type="submit" class="mtx-btn mtx-btn-primary" :disabled="passwordForm.processing">
+                                        <i class="fa fa-key" aria-hidden="true"></i>
+                                        {{ passwordForm.processing ? $t('common.saving') : $t('profile.change_password') }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Info -->
+                <div class="mtx-card">
+                    <div class="mtx-card-body text-center">
+                        <img
+                            :src="`https://ui-avatars.com/api/?name=${$page.props.auth?.user?.name || 'User'}&background=7c3aed&color=ffffff&size=128`"
+                            class="rounded-full mx-auto mb-3"
+                            width="80"
+                            height="80"
+                            alt="Avatar"
+                        />
+                        <h5 class="text-base font-bold text-gray-900">{{ $page.props.auth?.user?.name }}</h5>
+                        <p class="text-sm text-gray-500">{{ $page.props.auth?.user?.email }}</p>
+                        <hr class="border-gray-100 my-3" />
+                        <div class="text-left">
+                            <small class="block text-xs text-gray-400">{{ $t('profile.department') }}</small>
+                            <strong class="text-sm">{{ $page.props.auth?.user?.department?.name ?? '-' }}</strong>
+                        </div>
+                        <div class="text-left mt-2">
+                            <small class="block text-xs text-gray-400">{{ $t('profile.role') }}</small>
+                            <strong class="text-sm">{{ userRoleLabel }}</strong>
                         </div>
                     </div>
                 </div>

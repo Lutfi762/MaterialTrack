@@ -2,90 +2,80 @@
     <Head>
         <title>{{ $t('stock_out.edit_heading') }} - MaterialTrack</title>
     </Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 rounded-3 shadow border-top-danger">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold"><i class="fa fa-pencil-alt me-1"></i> {{ $t('stock_out.edit_heading') }}</span>
-                                <Link href="/apps/stock-outs" class="btn btn-sm btn-secondary">
-                                    <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
-                                </Link>
-                            </div>
-                            <div class="card-body">
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-pencil-alt text-indigo-600" aria-hidden="true"></i> {{ $t('stock_out.edit_heading') }}</span>
+                    <Link href="/apps/stock-outs" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                    </Link>
+                </div>
+                <div class="mtx-card-body">
 
-                                    <div class="alert alert-info">
-                                    <i class="fa fa-circle-info me-1"></i>
-                                    {{ $t('stock_out.edit_info') }}
-                                </div>
+                    <div class="mb-4 p-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-sm">
+                        <i class="fa fa-circle-info" aria-hidden="true"></i>
+                        {{ $t('stock_out.edit_info') }}
+                    </div>
 
-                                <!-- Info transaksi (read-only) -->
-                                <div class="row mb-3">
-                                    <div class="col-md-3">
-                                        <label class="fw-bold text-muted small">{{ $t('stock_out.col_ref_no') }}</label>
-                                        <p class="mb-0">{{ stockOut.reference_no }}</p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="fw-bold text-muted small">{{ $t('stock_out.material') }}</label>
-                                        <p class="mb-0">{{ stockOut.item?.name }}</p>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="fw-bold text-muted small">Qty</label>
-                                        <p class="mb-0">{{ stockOut.qty }} {{ stockOut.item?.unit }}</p>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="fw-bold text-muted small">{{ $t('stock_out.department') }}</label>
-                                        <p class="mb-0">{{ stockOut.department?.name }}</p>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="fw-bold text-muted small">{{ $t('stock_out.pic') }}</label>
-                                        <p class="mb-0">{{ stockOut.pic?.name }}</p>
-                                    </div>
-                                </div>
-
-                                <hr>
-
-                                <form @submit.prevent="submit">
-
-                                    <div class="mb-3">
-                                        <label class="fw-bold">{{ $t('stock_out.purpose') }}</label>
-                                        <input
-                                            class="form-control"
-                                            v-model="form.purpose"
-                                            :class="{ 'is-invalid': form.errors.purpose }"
-                                            type="text"
-                                        >
-                                        <div v-if="form.errors.purpose" class="invalid-feedback d-block">{{ form.errors.purpose }}</div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="fw-bold">{{ $t('stock_out.additional_notes') }}</label>
-                                        <textarea
-                                            class="form-control"
-                                            v-model="form.notes"
-                                            rows="3"
-                                        ></textarea>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <button
-                                                class="btn btn-primary shadow-sm rounded-sm"
-                                                type="submit"
-                                                :disabled="form.processing"
-                                            >
-                                                <span v-if="form.processing">{{ $t('common.saving') }}</span>
-                                                <span v-else>{{ $t('common.update') }}</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-
-                            </div>
+                    <!-- Info transaksi (read-only) -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-x-4 mb-4">
+                        <div>
+                            <label class="mtx-label">{{ $t('stock_out.col_ref_no') }}</label>
+                            <p class="text-sm text-gray-900">{{ stockOut.reference_no }}</p>
+                        </div>
+                        <div>
+                            <label class="mtx-label">{{ $t('stock_out.material') }}</label>
+                            <p class="text-sm text-gray-900">{{ stockOut.item?.name }}</p>
+                        </div>
+                        <div>
+                            <label class="mtx-label">Qty</label>
+                            <p class="text-sm text-gray-900">{{ stockOut.qty }} {{ stockOut.item?.unit }}</p>
+                        </div>
+                        <div>
+                            <label class="mtx-label">{{ $t('stock_out.department') }}</label>
+                            <p class="text-sm text-gray-900">{{ stockOut.department?.name }}</p>
+                        </div>
+                        <div>
+                            <label class="mtx-label">{{ $t('stock_out.pic') }}</label>
+                            <p class="text-sm text-gray-900">{{ stockOut.pic?.name }}</p>
                         </div>
                     </div>
+
+                    <hr class="border-gray-200 mb-4">
+
+                    <form @submit.prevent="submit">
+
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('stock_out.purpose') }}</label>
+                            <input
+                                class="mtx-input"
+                                v-model="form.purpose"
+                                :class="{ 'mtx-input-error': form.errors.purpose }"
+                                type="text"
+                            >
+                            <p v-if="form.errors.purpose" class="mtx-error-text">{{ form.errors.purpose }}</p>
+                        </div>
+
+                        <div class="mtx-field">
+                            <label class="mtx-label">{{ $t('stock_out.additional_notes') }}</label>
+                            <textarea
+                                class="mtx-textarea"
+                                v-model="form.notes"
+                                rows="3"
+                            ></textarea>
+                        </div>
+
+                        <button
+                            class="mtx-btn mtx-btn-primary"
+                            type="submit"
+                            :disabled="form.processing"
+                        >
+                            <span v-if="form.processing">{{ $t('common.saving') }}</span>
+                            <span v-else>{{ $t('common.update') }}</span>
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -135,9 +125,3 @@ export default {
     },
 }
 </script>
-
-<style>
-.border-top-danger {
-    border-top: 3px solid #dc3545 !important;
-}
-</style>

@@ -260,7 +260,10 @@ class CacheService
                 'items.image',
                 'items.created_at',
                 'categories.name as category_name',
-                'locations.name as location_name'
+                'locations.name as location_name',
+                // status stok — logika sama dgn Item::getStockStatusAttribute(),
+                // di-hitung di SQL karena list ini lewat DB::table (bukan Eloquent).
+                DB::raw("(CASE WHEN items.current_stock <= 0 THEN 'habis' WHEN items.current_stock <= items.min_stock THEN 'menipis' ELSE 'aman' END) as status")
             );
 
         // Apply department filter via category_department join

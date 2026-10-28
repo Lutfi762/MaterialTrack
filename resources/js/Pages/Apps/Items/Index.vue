@@ -75,6 +75,13 @@
         <template #cell-actions="{ row }">
           <div class="flex items-center gap-1 justify-center">
             <Link
+              :href="`/apps/items/${row.id}`"
+              class="mtx-icon-btn"
+              :aria-label="$t('common.view')"
+            >
+              <i class="fa fa-eye" aria-hidden="true"></i>
+            </Link>
+            <Link
               v-if="hasAnyPermission(['items.edit'])"
               :href="`/apps/items/${row.id}/edit`"
               class="mtx-icon-btn"

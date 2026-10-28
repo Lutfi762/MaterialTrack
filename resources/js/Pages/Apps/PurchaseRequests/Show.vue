@@ -6,6 +6,7 @@
         <div class="flex gap-2">
           <button v-if="purchaseRequest.status === 'pending'" @click="approve" class="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 font-semibold">Setujui (Approve)</button>
           <button v-if="purchaseRequest.status === 'pending'" @click="reject" class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 font-semibold">Tolak</button>
+          <button v-if="purchaseRequest.status === 'approved'" @click="convertToPo" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 font-semibold">Buat PO dari PR</button>
         </div>
       </div>
     </template>
@@ -60,6 +61,9 @@ export default {
       if (reason) {
         this.$inertia.post(route('apps.purchase-requests.reject', this.purchaseRequest.id), { rejection_reason: reason });
       }
+    },
+    convertToPo() {
+      this.$inertia.post(route('apps.purchase-requests.convert-po', this.purchaseRequest.id));
     },
   },
 };

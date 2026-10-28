@@ -2,74 +2,68 @@
     <Head>
         <title>{{ $t('stock_out.detail') }} - MaterialTrack</title>
     </Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 rounded-3 shadow border-top-danger">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <span class="font-weight-bold"><i class="fa fa-eye me-1"></i> {{ $t('stock_out.detail_heading') }}</span>
-                                <div class="d-flex gap-2">
-                                    <a :href="`/apps/stock-outs/${stockOut.id}/pdf`" target="_blank" class="btn btn-sm btn-outline-danger">
-                                        <i class="fa fa-file-pdf me-1"></i> {{ $t('stock_out.download_pdf') }}
-                                    </a>
-                                    <Link v-if="hasAnyPermission(['stock_outs.edit'])" :href="`/apps/stock-outs/${stockOut.id}/edit`" class="btn btn-sm btn-outline-primary">
-                                        <i class="fa fa-pencil-alt me-1"></i> {{ $t('common.edit') }}
-                                    </Link>
-                                    <Link href="/apps/stock-outs" class="btn btn-sm btn-secondary">
-                                        <i class="fa fa-arrow-left me-1"></i> {{ $t('common.back') }}
-                                    </Link>
-                                </div>
-                            </div>
-                            <div class="card-body">
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-eye text-indigo-600" aria-hidden="true"></i> {{ $t('stock_out.detail_heading') }}</span>
+                    <div class="flex gap-2">
+                        <a :href="`/apps/stock-outs/${stockOut.id}/pdf`" target="_blank" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                            <i class="fa fa-file-pdf" aria-hidden="true"></i> {{ $t('stock_out.download_pdf') }}
+                        </a>
+                        <Link v-if="hasAnyPermission(['stock_outs.edit'])" :href="`/apps/stock-outs/${stockOut.id}/edit`" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                            <i class="fa fa-pencil-alt" aria-hidden="true"></i> {{ $t('common.edit') }}
+                        </Link>
+                        <Link href="/apps/stock-outs" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ $t('common.back') }}
+                        </Link>
+                    </div>
+                </div>
+                <div class="mtx-card-body">
 
-                                <div class="detail-header mb-4">
-                                    <div class="ref-badge">{{ stockOut.reference_no }}</div>
-                                    <div class="qty-display">
-                                        <span class="qty-number">{{ stockOut.qty }}</span>
-                                        <span class="qty-unit">{{ stockOut.item?.unit ?? 'unit' }}</span>
-                                    </div>
-                                    <div class="item-name">{{ stockOut.item?.name ?? '-' }}</div>
-                                </div>
+                    <div class="detail-header mb-4">
+                        <div class="ref-badge">{{ stockOut.reference_no }}</div>
+                        <div class="qty-display">
+                            <span class="qty-number">{{ stockOut.qty }}</span>
+                            <span class="qty-unit">{{ stockOut.item?.unit ?? 'unit' }}</span>
+                        </div>
+                        <div class="item-name">{{ stockOut.item?.name ?? '-' }}</div>
+                    </div>
 
-                                <hr>
+                    <hr class="border-gray-200 mb-4">
 
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_out.col_date') }}</div>
-                                        <div class="detail-value">{{ stockOut.date }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_out.col_material_code') }}</div>
-                                        <div class="detail-value">{{ stockOut.item?.code ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_out.col_department') }}</div>
-                                        <div class="detail-value">{{ stockOut.department?.name ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_out.col_pic') }}</div>
-                                        <div class="detail-value">{{ stockOut.pic?.name ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_out.col_purpose') }}</div>
-                                        <div class="detail-value">{{ stockOut.purpose ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-label">{{ $t('stock_out.col_recorded_by') }}</div>
-                                        <div class="detail-value">{{ stockOut.user?.name ?? '-' }}</div>
-                                    </div>
-                                </div>
-
-                                <div v-if="stockOut.notes" class="mt-4">
-                                    <div class="detail-label">{{ $t('stock_out.col_additional_notes') }}</div>
-                                    <div class="notes-box">{{ stockOut.notes }}</div>
-                                </div>
-
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="detail-label">{{ $t('stock_out.col_date') }}</div>
+                            <div class="detail-value">{{ stockOut.date }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_out.col_material_code') }}</div>
+                            <div class="detail-value">{{ stockOut.item?.code ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_out.col_department') }}</div>
+                            <div class="detail-value">{{ stockOut.department?.name ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_out.col_pic') }}</div>
+                            <div class="detail-value">{{ stockOut.pic?.name ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_out.col_purpose') }}</div>
+                            <div class="detail-value">{{ stockOut.purpose ?? '-' }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">{{ $t('stock_out.col_recorded_by') }}</div>
+                            <div class="detail-value">{{ stockOut.user?.name ?? '-' }}</div>
                         </div>
                     </div>
+
+                    <div v-if="stockOut.notes" class="mt-4">
+                        <div class="detail-label">{{ $t('stock_out.col_additional_notes') }}</div>
+                        <div class="notes-box">{{ stockOut.notes }}</div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -90,9 +84,6 @@ export default {
 </script>
 
 <style>
-.border-top-danger {
-    border-top: 3px solid #dc3545 !important;
-}
 .detail-header {
     text-align: center;
 }

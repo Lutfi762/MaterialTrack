@@ -20,12 +20,14 @@ class Item extends Model
 
     protected $fillable = [
         'category_id', 'location_id', 'warehouse_id', 'code', 'name', 'description',
-        'unit', 'unit_alt', 'conversion_factor', 'min_stock', 'current_stock', 'price', 'image', 'photos',
+        'unit', 'unit_alt', 'conversion_factor', 'min_stock', 'reorder_point', 'reorder_qty', 'current_stock', 'price', 'image', 'photos',
     ];
 
     protected $casts = [
         'current_stock' => 'integer',
         'min_stock' => 'integer',
+        'reorder_point' => 'integer',
+        'reorder_qty' => 'integer',
         'price' => 'decimal:2',
         'conversion_factor' => 'decimal:2',
         'photos' => 'array',
@@ -88,5 +90,15 @@ class Item extends Model
         if ($this->current_stock <= 0) return 'habis';
         if ($this->current_stock <= $this->min_stock) return 'menipis';
         return 'aman';
+    }
+
+    public function scopeLowStock($query)
+    {
+        return $query->whereColumn('current_stock', '<=', 'min_stock')->where('current_stock', '>', 0);
+    }
+
+    public function scopeOutOfStock($query)
+    {
+        return $query->where('current_stock', '<=', 0);
     }
 }

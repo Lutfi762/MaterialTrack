@@ -31,4 +31,8 @@ class Supplier extends Model
     {
         return $this->hasMany(PurchaseInvoice::class);
     }
+    public function scorecards()
+    {
+        return $this->hasMany(SupplierScorecard::class);
+    }
 }

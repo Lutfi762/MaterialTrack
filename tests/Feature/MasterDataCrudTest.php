@@ -160,6 +160,40 @@ class MasterDataCrudTest extends TestCase
         $this->assertDatabaseMissing('items', ['id' => $item->id]);
     }
 
+    public function test_item_update_photos_add_and_remove(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $category = Category::create([
+            'name' => 'Kategori Foto Test',
+            'code_prefix' => 'PH'.substr(uniqid(), -4),
+        ]);
+
+        $item = \App\Models\Item::create([
+            'category_id' => $category->id,
+            'code' => $category->code_prefix.'-0001',
+            'name' => 'Material Foto Test',
+            'unit' => 'PCS',
+            'min_stock' => 1,
+            'current_stock' => 5,
+            'photos' => ['items/old-photo.jpg'],
+        ]);
+
+        // Upload foto baru (new_photos) sambil hapus foto lama (removed_photos)
+        $this->put("/apps/items/{$item->id}", [
+            'category_id' => $category->id,
+            'name' => $item->name,
+            'unit' => 'PCS',
+            'min_stock' => 1,
+            'new_photos' => [\Illuminate\Http\UploadedFile::fake()->image('new.jpg')],
+            'removed_photos' => ['items/old-photo.jpg'],
+        ])->assertRedirect();
+
+        $item->refresh();
+        $this->assertNotContains('items/old-photo.jpg', $item->photos);
+        $this->assertCount(1, $item->photos);
+    }
+
     public function test_item_list_cache_invalidated_on_create_and_delete(): void
     {
         config(['cache.default' => 'array']);

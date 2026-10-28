@@ -15,14 +15,8 @@ class SendLowStockAlert extends Command
 
     public function handle(): int
     {
-        $lowStockItems = Item::whereColumn('current_stock', '<=', 'min_stock')
-            ->where('current_stock', '>', 0)
-            ->orderBy('name')
-            ->get();
-
-        $outOfStockItems = Item::where('current_stock', '<=', 0)
-            ->orderBy('name')
-            ->get();
+        $lowStockItems = Item::lowStock()->orderBy('name')->get();
+        $outOfStockItems = Item::outOfStock()->orderBy('name')->get();
 
         if ($lowStockItems->isEmpty() && $outOfStockItems->isEmpty()) {
             $this->info('Tidak ada stok menipis atau habis. Email tidak dikirim.');

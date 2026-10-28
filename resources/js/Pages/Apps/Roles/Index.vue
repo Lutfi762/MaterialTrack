@@ -40,8 +40,8 @@
       <template #cell-name="{ row }">
         <div class="flex items-center gap-2">
           {{ row.name }}
-          <span v-if="isLockedRole(row.name)" class="badge bg-secondary ms-2">
-            <i class="fa fa-lock me-1"></i> {{ $t('roles.locked') }}
+          <span v-if="isLockedRole(row.name)" class="mtx-badge mtx-badge-neutral ml-2">
+            <i class="fa fa-lock mr-1"></i> {{ $t('roles.locked') }}
           </span>
         </div>
       </template>
@@ -50,7 +50,7 @@
           <span
             v-for="(permission, i) in row.permissions"
             :key="i"
-            class="badge bg-primary shadow border-0"
+            class="mtx-badge mtx-badge-info"
           >
             {{ permission.name }}
           </span>
@@ -76,7 +76,7 @@
               <i class="fa fa-trash"></i>
             </button>
           </template>
-          <span v-else class="text-muted small">-</span>
+          <span v-else class="text-gray-400 text-xs">-</span>
         </div>
       </template>
     </DataTable>

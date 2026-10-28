@@ -1,58 +1,52 @@
 <template>
     <Head><title>Ajukan Penyesuaian Stok - MaterialTrack</title></Head>
-    <main class="c-main">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card border-0 rounded-3 shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="font-weight-bold"><i class="fa fa-balance-scale me-1"></i> Ajukan Penyesuaian Stok</span>
-                            <Link href="/apps/stock-adjustments" class="btn btn-sm btn-secondary">
-                                <i class="fa fa-arrow-left me-1"></i> Kembali
-                            </Link>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-info">
-                                <i class="fa fa-info-circle me-1"></i>
-                                Penyesuaian stok memerlukan persetujuan dan tercatat permanen di ledger audit.
-                                Gunakan angka <strong>positif (+)</strong> untuk menambah stok dan <strong>negatif (-)</strong> untuk mengurangi.
-                            </div>
-
-                            <form @submit.prevent="submit">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Material</label>
-                                        <select v-model="form.item_id" class="form-select" required>
-                                            <option value="">Pilih material...</option>
-                                            <option v-for="item in items" :key="item.id" :value="item.id">
-                                                {{ item.code }} - {{ item.name }} (stok: {{ item.current_stock }} {{ item.unit }})
-                                            </option>
-                                        </select>
-                                        <div v-if="errors.item_id" class="text-danger small mt-1">{{ errors.item_id }}</div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold">Qty (bertanda)</label>
-                                        <input v-model.number="form.qty" type="number" class="form-control" placeholder="contoh: 10 atau -5" required>
-                                        <div v-if="errors.qty" class="text-danger small mt-1">{{ errors.qty }}</div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label fw-bold">Alasan (wajib)</label>
-                                        <textarea v-model="form.reason" class="form-control" rows="2" placeholder="Jelaskan alasan penyesuaian..." required></textarea>
-                                        <div v-if="errors.reason" class="text-danger small mt-1">{{ errors.reason }}</div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label fw-bold">Catatan (opsional)</label>
-                                        <textarea v-model="form.notes" class="form-control" rows="2" placeholder="Catatan tambahan..."></textarea>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary" :disabled="submitting">
-                                            <i class="fa fa-save me-1"></i> Ajukan Penyesuaian
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mtx-card">
+                <div class="mtx-card-header">
+                    <span class="mtx-card-title"><i class="fa fa-balance-scale text-indigo-600" aria-hidden="true"></i> Ajukan Penyesuaian Stok</span>
+                    <Link href="/apps/stock-adjustments" class="mtx-btn mtx-btn-secondary mtx-btn-sm">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Kembali
+                    </Link>
+                </div>
+                <div class="mtx-card-body">
+                    <div class="mb-4 p-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-sm">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Penyesuaian stok memerlukan persetujuan dan tercatat permanen di ledger audit.
+                        Gunakan angka <strong>positif (+)</strong> untuk menambah stok dan <strong>negatif (-)</strong> untuk mengurangi.
                     </div>
+
+                    <form @submit.prevent="submit">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                            <div class="mtx-field">
+                                <label class="mtx-label">Material</label>
+                                <select v-model="form.item_id" class="mtx-select" :class="{ 'mtx-select-error': errors.item_id }" required>
+                                    <option value="">Pilih material...</option>
+                                    <option v-for="item in items" :key="item.id" :value="item.id">
+                                        {{ item.code }} - {{ item.name }} (stok: {{ item.current_stock }} {{ item.unit }})
+                                    </option>
+                                </select>
+                                <p v-if="errors.item_id" class="mtx-error-text">{{ errors.item_id }}</p>
+                            </div>
+                            <div class="mtx-field">
+                                <label class="mtx-label">Qty (bertanda)</label>
+                                <input v-model.number="form.qty" type="number" class="mtx-input" :class="{ 'mtx-input-error': errors.qty }" placeholder="contoh: 10 atau -5" required>
+                                <p v-if="errors.qty" class="mtx-error-text">{{ errors.qty }}</p>
+                            </div>
+                        </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">Alasan (wajib)</label>
+                            <textarea v-model="form.reason" class="mtx-textarea" :class="{ 'mtx-textarea-error': errors.reason }" rows="2" placeholder="Jelaskan alasan penyesuaian..." required></textarea>
+                            <p v-if="errors.reason" class="mtx-error-text">{{ errors.reason }}</p>
+                        </div>
+                        <div class="mtx-field">
+                            <label class="mtx-label">Catatan (opsional)</label>
+                            <textarea v-model="form.notes" class="mtx-textarea" rows="2" placeholder="Catatan tambahan..."></textarea>
+                        </div>
+                        <button type="submit" class="mtx-btn mtx-btn-primary" :disabled="submitting">
+                            <i class="fa fa-save" aria-hidden="true"></i> Ajukan Penyesuaian
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

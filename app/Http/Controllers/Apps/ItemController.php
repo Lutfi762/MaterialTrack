@@ -105,6 +105,8 @@ class ItemController extends Controller
             'current_stock' => 'required|integer|min:0',
             'price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:min_width=100,min_height=100',
+            'photos' => 'nullable|array|max:5',
+            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Sanitize description
@@ -167,16 +169,10 @@ class ItemController extends Controller
     {
         $this->authorize('update', $item);
 
+        // Kategori terkunci setelah dibuat (lihat validasi di update()), jadi
+        // form Edit tidak butuh daftar departments/categories seperti Create.
         return inertia('Apps/Items/Edit', [
             'item' => $item->load('category'),
-            'departments' => Department::orderBy('name')->get(['id', 'name']),
-            'categories' => Category::with('departments:id')->orderBy('name')->get(['id', 'name', 'code_prefix'])
-                ->map(fn ($cat) => [
-                    'id' => $cat->id,
-                    'name' => $cat->name,
-                    'code_prefix' => $cat->code_prefix,
-                    'department_ids' => $cat->departments->pluck('id'),
-                ]),
             'locations' => Location::orderBy('name')->get(['id', 'name']),
             'warehouses' => Warehouse::where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'unitOptions' => self::UNIT_OPTIONS,
@@ -246,6 +242,10 @@ class ItemController extends Controller
             'min_stock' => 'required|integer|min:0',
             'price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:min_width=100,min_height=100',
+            'new_photos' => 'nullable|array|max:5',
+            'new_photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'removed_photos' => 'nullable|array',
+            'removed_photos.*' => 'string',
         ]);
 
         // Sanitize description
@@ -276,33 +276,29 @@ class ItemController extends Controller
             }
         }
 
-        // Handle multiple photos upload
-        if ($request->hasFile('photos')) {
-            // Delete old photos
-            if ($item->photos) {
-                foreach ($item->photos as $oldPhoto) {
-                    Storage::disk('public')->delete($oldPhoto);
-                }
+        // Foto: mulai dari foto lama, buang yang dihapus user, tambah upload baru.
+        $photos = $item->photos ?? [];
+
+        if ($request->input('removed_photos')) {
+            $removed = (array) $request->input('removed_photos');
+            foreach ($removed as $path) {
+                Storage::disk('public')->delete($path);
             }
-            $photos = [];
-            foreach ($request->file('photos') as $photo) {
+            $photos = array_values(array_diff($photos, $removed));
+        }
+
+        if ($request->hasFile('new_photos')) {
+            foreach ($request->file('new_photos') as $photo) {
                 try {
                     $photos[] = $photo->store('items', 'public');
                 } catch (\Exception $e) {
                     continue;
                 }
             }
-            $validated['photos'] = $photos;
         }
 
-        // Handle photo deletion (existing photo removed by user)
-        if ($request->input('removed_photos')) {
-            $removed = is_array($request->input('removed_photos')) ? $request->input('removed_photos') : [$request->input('removed_photos')];
-            foreach ($removed as $path) {
-                Storage::disk('public')->delete($path);
-            }
-            $remainingPhotos = array_diff($item->photos ?? [], $removed);
-            $validated['photos'] = array_values($remainingPhotos);
+        if ($request->input('removed_photos') || $request->hasFile('new_photos')) {
+            $validated['photos'] = array_values($photos);
         }
 
         try {

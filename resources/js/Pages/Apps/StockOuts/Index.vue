@@ -1,11 +1,11 @@
-<template>
+﻿<template>
     <Head><title>{{ $t('stock_out.title') }} - MaterialTrack</title></Head>
     <div class="stockouts-page">
 
         <div class="page-header-card mb-4">
             <div>
                 <h4 class="mb-1"><i class="fa fa-arrow-up-right-from-square me-2 text-danger"></i>{{ $t('stock_out.title') }}</h4>
-                <p class="text-muted mb-0 small">{{ $t('stock_out.subtitle') }}</p>
+                <p class="text-gray-400 mb-0 small">{{ $t('stock_out.subtitle') }}</p>
             </div>
             <div class="d-flex gap-2">
                 <a v-if="hasAnyPermission(['stock_outs.export', 'stock_outs.index'])" href="/apps/stock-outs/export/excel" class="btn-modern btn-modern-outline">
@@ -38,29 +38,29 @@
 
         <div class="filter-bar mb-4">
             <div class="filter-item">
-                <i class="fa fa-building text-muted"></i>
+                <i class="fa fa-building text-gray-400"></i>
                 <select v-model="filterDepartment" class="filter-select" :disabled="isLoading">
                     <option value="">{{ $t('common.all_department') }}</option>
                     <option v-for="dept in departments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
                 </select>
             </div>
             <div class="filter-item">
-                <i class="fa fa-box text-muted"></i>
+                <i class="fa fa-box text-gray-400"></i>
                 <select v-model="filterItem" class="filter-select" :disabled="isLoading">
                     <option value="">{{ $t('common.all_material') }}</option>
                     <option v-for="item in items" :key="item.id" :value="item.id">{{ item.name }}</option>
                 </select>
             </div>
             <div class="filter-item">
-                <i class="fa fa-calendar text-muted"></i>
+                <i class="fa fa-calendar text-gray-400"></i>
                 <input type="date" v-model="filterFrom" class="filter-select" :disabled="isLoading">
             </div>
             <div class="filter-item">
-                <span class="text-muted small">{{ $t('stock_out.date_range') }}</span>
+                <span class="text-gray-500 text-xs">{{ $t('stock_out.date_range') }}</span>
                 <input type="date" v-model="filterTo" class="filter-select" :disabled="isLoading">
             </div>
             <button class="btn-modern btn-modern-primary" @click="applyFilter" :disabled="isLoading">
-                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <span v-if="isLoading" class="fa fa-circle-notch fa-spin mr-2" role="status"></span>
                 <i v-else class="fa fa-filter me-2"></i>{{ $t('common.apply') }}
             </button>
         </div>
@@ -118,8 +118,8 @@
 
         <div v-else class="empty-state">
             <i class="fa fa-inbox"></i>
-            <p class="mb-0 fw-semibold">{{ $t('stock_out.empty') }}</p>
-            <p class="text-muted small">{{ $t('stock_out.empty_hint') }}</p>
+            <p class="mb-0 font-semibold">{{ $t('stock_out.empty') }}</p>
+            <p class="text-gray-500 text-xs">{{ $t('stock_out.empty_hint') }}</p>
         </div>
 
         <Pagination v-if="stockOuts.data.length > 0" :links="stockOuts.links" align="center" />

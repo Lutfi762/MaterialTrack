@@ -33,10 +33,14 @@ class PurchaseOrderController extends Controller
 
     public function create()
     {
+        $prefill = session('po_prefill');
+        session()->forget('po_prefill');
+
         return Inertia::render('Apps/PurchaseOrders/Create', [
             'suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code']),
             'items' => Item::orderBy('name')->get(['id', 'name', 'code', 'unit', 'price']),
             'purchaseRequests' => PurchaseRequest::where('status', 'approved')->orderBy('pr_number')->get(['id', 'pr_number']),
+            'prefill' => $prefill,
         ]);
     }
 

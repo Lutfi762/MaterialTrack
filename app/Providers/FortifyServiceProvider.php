@@ -19,9 +19,7 @@ class FortifyServiceProvider extends ServiceProvider
             return Inertia::render('Auth/Login');
         });
 
-        Fortify::registerView(function () {
-            return Inertia::render('Auth/Register');
-        });
+        // Registrasi publik dimatikan (lihat config/fortify.php); tidak ada registerView.
 
         Fortify::requestPasswordResetLinkView(function () {
             return Inertia::render('Auth/ForgotPassword');

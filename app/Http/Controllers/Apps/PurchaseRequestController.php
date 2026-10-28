@@ -178,4 +178,29 @@ class PurchaseRequestController extends Controller
 
         return back()->with('success', 'Purchase Request ditolak.');
     }
+
+    /**
+     * Prefill form Purchase Order dari item-item PR yang sudah disetujui.
+     */
+    public function convertToPo(PurchaseRequest $purchaseRequest)
+    {
+        if ($purchaseRequest->status !== 'approved') {
+            return back()->withErrors(['status' => 'Hanya PR berstatus approved yang dapat dikonversi menjadi Purchase Order.']);
+        }
+
+        $purchaseRequest->load('items.item');
+
+        session()->flash('po_prefill', [
+            'purchase_request_id' => $purchaseRequest->id,
+            'items' => $purchaseRequest->items->map(fn ($row) => [
+                'item_id' => $row->item_id,
+                'qty' => $row->qty,
+                'unit_price' => (float) ($row->estimated_price ?: ($row->item->price ?? 0)),
+            ])->all(),
+        ]);
+
+        return redirect()
+            ->route('apps.purchase-orders.create')
+            ->with('info', "Form PO diprefill dari {$purchaseRequest->pr_number}. Pilih supplier lalu simpan.");
+    }
 }

@@ -1,71 +1,70 @@
 <template>
     <Head><title>{{ $t('stock_alert.title') }} - MaterialTrack</title></Head>
-    <div class="stockalerts-page">
-
-        <div class="page-header-card mb-4">
-            <div>
-                <h4 class="mb-1"><i class="fa fa-bell me-2 text-primary"></i>{{ $t('stock_alert.title') }}</h4>
-                <p class="text-muted mb-0 small">{{ $t('stock_alert.subtitle') }}</p>
+    <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mb-6">
+                <h1 class="mtx-page-title"><i class="fa fa-bell text-indigo-600" aria-hidden="true"></i>{{ $t('stock_alert.title') }}</h1>
+                <p class="text-sm text-gray-500 mt-1">{{ $t('stock_alert.subtitle') }}</p>
             </div>
-        </div>
 
-        <div class="alert-config-list">
-            <div v-for="config in localConfigs" :key="config.id" class="alert-config-card">
-                <div class="alert-config-header">
-                    <div class="alert-config-icon" :class="`icon-${config.alert_type}`">
-                        <i :class="getAlertIcon(config.alert_type)"></i>
+            <div class="space-y-4">
+                <div v-for="config in localConfigs" :key="config.id" class="alert-config-card">
+                    <div class="alert-config-header">
+                        <div class="alert-config-icon" :class="`icon-${config.alert_type}`">
+                            <i :class="getAlertIcon(config.alert_type)"></i>
+                        </div>
+                        <div class="alert-config-info">
+                            <div class="alert-config-name">{{ getAlertLabel(config.alert_type) }}</div>
+                            <div class="alert-config-desc">{{ getAlertDesc(config.alert_type) }}</div>
+                        </div>
                     </div>
-                    <div class="alert-config-info">
-                        <div class="alert-config-name">{{ getAlertLabel(config.alert_type) }}</div>
-                        <div class="alert-config-desc">{{ getAlertDesc(config.alert_type) }}</div>
+
+                    <div class="alert-config-body">
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                <i class="fa fa-envelope mr-2 text-gray-400" aria-hidden="true"></i>
+                                {{ $t('stock_alert.email_alerts') }}
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" v-model="config.email_enabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                <i class="fa fa-globe mr-2 text-gray-400" aria-hidden="true"></i>
+                                {{ $t('stock_alert.browser_alerts') }}
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" v-model="config.browser_enabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div v-if="config.alert_type === 'expiry'" class="toggle-row">
+                            <div class="toggle-label">
+                                <i class="fa fa-calendar mr-2 text-gray-400" aria-hidden="true"></i>
+                                {{ $t('stock_alert.threshold_days') }}
+                            </div>
+                            <div class="flex items-center">
+                                <input type="number" v-model.number="config.threshold_days" min="1" max="365" class="mtx-input w-20 !py-1.5">
+                                <span class="ml-2 text-xs text-gray-500">{{ $t('stock_alert.days') }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="alert-config-body">
-                    <div class="toggle-row">
-                        <div class="toggle-label">
-                            <i class="fa fa-envelope me-2 text-muted"></i>
-                            {{ $t('stock_alert.email_alerts') }}
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" v-model="config.email_enabled">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="toggle-row">
-                        <div class="toggle-label">
-                            <i class="fa fa-globe me-2 text-muted"></i>
-                            {{ $t('stock_alert.browser_alerts') }}
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" v-model="config.browser_enabled">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-
-                    <div v-if="config.alert_type === 'expiry'" class="toggle-row">
-                        <div class="toggle-label">
-                            <i class="fa fa-calendar me-2 text-muted"></i>
-                            {{ $t('stock_alert.threshold_days') }}
-                        </div>
-                        <div class="threshold-input">
-                            <input type="number" v-model.number="config.threshold_days" min="1" max="365" class="form-control form-control-sm" style="width: 80px;">
-                            <span class="ms-2 text-muted small">{{ $t('stock_alert.days') }}</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex justify-end mt-4">
+                <button class="mtx-btn mtx-btn-primary px-4" @click="saveConfigs" :disabled="isSaving">
+                    <i class="fa fa-spinner fa-spin" v-if="isSaving" aria-hidden="true"></i>
+                    <i class="fa fa-save" v-else aria-hidden="true"></i>
+                    {{ $t('common.save') }}
+                </button>
             </div>
         </div>
-
-        <div class="d-flex justify-content-end mt-4">
-            <button class="btn btn-primary px-4" @click="saveConfigs" :disabled="isSaving">
-                <span v-if="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                <i v-else class="fa fa-save me-2"></i>
-                {{ $t('common.save') }}
-            </button>
-        </div>
-    </div>
+    </main>
 </template>
 
 <script>

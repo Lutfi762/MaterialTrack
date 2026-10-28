@@ -1,0 +1,11 @@
+<template>
+  <Head><title>{{ ticket.ticket_number }} - MaterialTrack</title></Head>
+  <main class="p-6"><div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section class="md:col-span-2 mtx-card"><div class="mtx-card-header"><span class="mtx-card-title">{{ ticket.ticket_number }} — {{ ticket.subject }}</span></div><div class="mtx-card-body"><p class="whitespace-pre-wrap">{{ ticket.description }}</p><hr class="my-5"><div v-for="reply in ticket.replies" :key="reply.id" class="border-b py-3"><b>{{ reply.user.name }}</b><span class="text-xs text-gray-500 ml-2">{{ reply.created_at }}</span><p class="mt-1 whitespace-pre-wrap">{{ reply.message }}</p></div><form @submit.prevent="reply" class="mt-4"><textarea v-model="replyForm.message" class="mtx-textarea" required placeholder="Write reply..."></textarea><button class="mtx-btn mtx-btn-primary mt-2" :disabled="replyForm.processing">Reply</button></form></div></section>
+    <aside class="mtx-card"><div class="mtx-card-header"><span class="mtx-card-title">Ticket Status</span></div><div class="mtx-card-body"><form @submit.prevent="update"><div class="mtx-field"><label class="mtx-label">Status</label><select v-model="updateForm.status" class="mtx-input"><option value="open">Open</option><option value="in_progress">In Progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select></div><div class="mtx-field"><label class="mtx-label">Assignee</label><select v-model="updateForm.assigned_to" class="mtx-input"><option value="">Unassigned</option><option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option></select></div><button class="mtx-btn mtx-btn-primary w-full" :disabled="updateForm.processing">Update</button></form></div></aside>
+  </div></main>
+</template>
+<script>
+import LayoutApp from '@/Layouts/App.vue'; import { Head, useForm } from '@inertiajs/vue3';
+export default { layout:LayoutApp, components:{Head}, props:{ticket:Object,users:Array}, setup(props) { const replyForm=useForm({message:''}),updateForm=useForm({status:props.ticket.status,assigned_to:props.ticket.assigned_to||''}); return {replyForm,updateForm,reply:()=>replyForm.post(`/apps/helpdesk/${props.ticket.id}/replies`,{onSuccess:()=>replyForm.reset()}),update:()=>updateForm.put(`/apps/helpdesk/${props.ticket.id}`)}; } };
+</script>

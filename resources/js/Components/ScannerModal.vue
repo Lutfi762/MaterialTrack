@@ -13,22 +13,22 @@
                         <div>
                             <strong>Akses Kamera Gagal</strong>
                             <p class="mb-2 mt-1">{{ permissionError }}</p>
-                            <button class="btn btn-sm btn-outline-danger" @click="requestCamera">
+                            <button class="mtx-btn mtx-btn-danger mtx-btn-sm" @click="requestCamera">
                                 <i class="fa fa-redo"></i> Coba Lagi
                             </button>
                         </div>
                     </div>
                     <div v-else class="requesting-screen">
-                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <div class="fa fa-circle-notch fa-spin text-3xl text-indigo-600 mb-3" role="status"></div>
                         <p>Meminta izin kamera...</p>
-                        <small class="text-muted">Browser akan menampilkan popup izin kamera.<br>Klik <strong>"Allow"</strong> atau <strong>"Izinkan"</strong>.</small>
+                        <small class="text-gray-400">Browser akan menampilkan popup izin kamera.<br>Klik <strong>"Allow"</strong> atau <strong>"Izinkan"</strong>.</small>
                     </div>
                 </div>
 
                 <!-- Step 2: Camera Picker -->
                 <div v-if="cameras.length > 1 && !manualMode" class="camera-picker mb-3">
-                    <label class="form-label fw-bold small">Pilih Kamera:</label>
-                    <select class="form-select form-select-sm" v-model="selectedCameraId" @change="switchCamera">
+                    <label class="mtx-label">Pilih Kamera:</label>
+                    <select class="mtx-select" v-model="selectedCameraId" @change="switchCamera">
                         <option v-for="cam in cameras" :key="cam.deviceId" :value="cam.deviceId">
                             {{ cam.label || 'Kamera ' + cam.deviceId.substring(0,8) }}
                         </option>
@@ -49,13 +49,13 @@
                     <div class="input-group">
                         <input
                             type="text"
-                            class="form-control"
+                            class="mtx-input"
                             v-model="manualCode"
                             placeholder="Contoh: MTR-0001"
                             @keyup.enter="lookupManualCode"
                             ref="manualInput"
                         />
-                        <button class="btn btn-primary" @click="lookupManualCode" :disabled="!manualCode.trim()">
+                        <button class="mtx-btn mtx-btn-primary" @click="lookupManualCode" :disabled="!manualCode.trim()">
                             <i class="fa fa-search"></i> Cari
                         </button>
                     </div>

@@ -87,16 +87,20 @@ import { Link } from '@inertiajs/vue3';
 
 export default {
   components: { AppLayout, Link },
-  props: { suppliers: Array, items: Array, purchaseRequests: Array, errors: Object },
+  props: { suppliers: Array, items: Array, purchaseRequests: Array, errors: Object, prefill: Object },
   data() {
+    const prefillRows = Array.isArray(this.prefill?.items) && this.prefill.items.length
+      ? this.prefill.items.map((i) => ({ item_id: i.item_id, qty: i.qty, unit_price: Number(i.unit_price) }))
+      : [{ item_id: '', qty: 1, unit_price: 0 }];
+
     return {
       form: this.$inertia.form({
         supplier_id: '',
-        purchase_request_id: '',
+        purchase_request_id: this.prefill?.purchase_request_id || '',
         expected_delivery_date: '',
         payment_term: 'Net 30',
         notes: '',
-        items: [{ item_id: '', qty: 1, unit_price: 0 }],
+        items: prefillRows,
       }),
     };
   },

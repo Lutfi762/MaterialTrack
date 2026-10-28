@@ -117,6 +117,16 @@ export default {
       }
     },
     submit() {
+      const shortages = [];
+      for (const row of this.form.items) {
+        const selected = this.items.find(i => i.id === Number(row.item_id));
+        if (selected && Number(row.qty) > Number(selected.current_stock)) {
+          shortages.push(`${selected.name} (stok ${selected.current_stock}, diminta ${row.qty})`);
+        }
+      }
+      if (shortages.length && !confirm(`Stok tidak cukup untuk:\n- ${shortages.join('\n- ')}\n\nTetap simpan SO ini? (Server akan menolak jika stok benar-benar kurang)`)) {
+        return;
+      }
       this.form.post(route('apps.sales-orders.store'));
     },
   },
